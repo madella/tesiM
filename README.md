@@ -6,8 +6,6 @@
 🔴 NOT-DOABLE
 ⚫ NEED-HELP
 `
-
-Post-Call Update
 - 🟢 **Can the same app be subscribed to different domains?**
     Yes, I tested this morning and a single subscriber node (pure FastDDS, not using ROS) is able to subscribe (and consequently publish) to two different topics on two different DomainIDs.
 
@@ -39,7 +37,7 @@ Post-Call Update
 
 - 🟡 **Understand the flexibilities introduced by domains and partitions in topic based communications?**
 
-- 🟣 **Evaluate the cost of #publish subscribers.**
+- 🟣 **Evaluate the cost of #publish #subscribers.**
 
 
 
