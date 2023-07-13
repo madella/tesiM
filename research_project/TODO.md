@@ -1,0 +1,5 @@
+- [ ] Curriculum VIte
+- [ ] Documento di riconoscimento, scansione fronte e retro
+- [ ] Attestazioni relative al conseguimento dei titoli di primo e secondo livello, agli esami sostenuti e ai voti conseguiti (vedi Art. 3 del Bando)
+- [ ] Altri documenti valutabili 
+- [ ] PROGETTO DI RICERCA

@@ -30,3 +30,5 @@
 *.exe
 *.out
 *.app
+wrap_rwm/**
+**/wrap_rwm
