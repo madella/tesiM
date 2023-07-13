@@ -1,0 +1,55 @@
+\subsection{ROS2}
+ROS2 uses \texttt{rmw} (ROS Middleware) to manage this middleware and allows avoiding direct use of the \texttt{FastDDS} and \texttt{FastRTPS} libraries in the user space. In particular, the ROS2 structure utilizes two packages:
+
+\begin{itemize}
+    \item \texttt{RWM\_IMPLEMENTATION}: Middleware that allows changing the implementation of \texttt{RTPS} dynamically, without the need for recompilation.
+    \item \texttt{RWM\_FASTRTPS}: Middleware for a specific \texttt{FastDDS} implementation.
+\end{itemize}
+
+This mechanism is made possible through an environment variable that needs to be set before starting a node, called \texttt{\$RMW\_IMPLEMENTATION}. Naturally, ROS2 defines a default implementation, which was \texttt{FastDDS} until ROS2 Galactic, after which it switched to \texttt{CycloneDDS} (Oracle).
+
+During the Discovery phase of \texttt{FastDDS} managed by the script \texttt{RWM\_FASTRTPS/participant.cpp}, \texttt{RWM\_FASTRTPS} allows configuring four cases:
+
+\begin{itemize}
+    \item \texttt{RMW\_AUTOMATIC\_DISCOVERY\_RANGE\_SYSTEM\_DEFAULT} \& \texttt{RMW\_AUTOMATIC\_DISCOVERY\_RANGE\_SUBNET} (default ones): Uses the simple \texttt{FastDDS} behavior.
+    \item \texttt{RMW\_AUTOMATIC\_DISCOVERY\_RANGE\_LOCALHOST}: Utilizes \texttt{SharedMemory} as the packet transport method.
+    \item \texttt{RMW\_AUTOMATIC\_DISCOVERY\_RANGE\_OFF}: Disables Discovery.
+\end{itemize}
+
+Finally, everything is set to start the Discovery phase on the FastDDS side with the above-requested settings. In this phase, Quality of Service (QoS) settings are also configured, either by reading from XML or using default settings if not declared.
+
+%todo:
+
+\section{Introduction}
+High-Performance Computing (HPC) plays a crucial role in addressing the computational demands of modern scientific and engineering applications. However, the escalating power requirements and environmental impact of traditional HPC systems have raised concerns about sustainability and energy efficiency. This proposal presents a novel approach to address these challenges through the development of a secure and distributed middleware for green computing, leveraging the Real-Time Publish-Subscribe (RTPS) protocol and the FastDDS stack. The primary objective of this research would be the design and implement an advanced middleware solution that promotes energy-efficient computing while ensuring robust measures. The proposed middleware will facilitate the seamless integration of HPC resources distributed across different nodes, enabling efficient resource utilization and minimizing power consumption. By leveraging the capabilities of RTPS and the FastDDS stack, the middleware will provide reliable and real-time communication channels among HPC components while optimizing resource allocation to achieve high performance. Furthermore, the proposed middleware will focus on promoting green computing practices by optimizing energy consumption. It will employ intelligent resource management techniques, such as dynamic workload balancing and power-aware scheduling algorithms, to minimize energy waste and maximize the utilization of available resources. The middleware will also provide monitoring and profiling capabilities to analyze energy consumption patterns and identify optimization opportunities. To evaluate the effectiveness of the proposed middleware, a comprehensive experimental setup will be established. Performance benchmarks will be conducted using representative HPC workloads, and energy consumption metrics will be measured. The results will be compared against existing HPC systems to quantify the energy savings achieved and validate the efficiency and scalability of the proposed solution. In summary, this PhD proposal aims to develop a secure and distributed middleware for green computing in the context of HPC. By leveraging the RTPS protocol and the FastDDS stack, the proposed middleware will enable efficient resource utilization, real-time communication, and enhanced security in HPC systems. The research outcomes will contribute to the advancement of sustainable and energy-efficient computing practices, ensuring a greener future for HPC applications.
+
+\newpage
+\section{REGALE stack}
+The REGALE project conhsists of two main paths: (i) PowerStack and (ii) Workflow Engine. Within the project, we focuses on the PowerStack path, which aims to develop a software stack that enables comprehensive power management solutions for a supercomputing system.
+
+\subsection{Integration Approaches}
+To integrate the different REGALE tools, two approaches were taken: component-to-component integration and the introduction of a middle layer.
+
+\subsubsection{Component-to-Component Integration}
+In the previous deliverable (D3.1), we proposed integrating the tools by restructuring the code to include interfaces between them. The following integrations were suggested:
+\begin{enumerate}
+\item Countdown - EXAMON
+\item EAR - EXAMON
+\item EAR - COUNTDOWN
+\item EAR - DCDB
+\item EAR - OAR
+\end{enumerate}
+However, this approach presents challenges, as the number of interfaces to be supported grows exponentially with the number of tools. It requires an interoperability layer to abstract communication from policy integration.
+
+\subsubsection{Middle Layer Approach}
+In D3.2, we explored the possibility of implementing a unified middle layer. Various software approaches were considered, such as callbacks, virtual tables, and different communication frameworks with robust inter-agent messaging. One promising communication framework identified was the Data Distribution Service (DDS). DDS is fully distributed, enables low-latency messaging, and offers configurable Quality of Service (QoS) profiles for customizing messaging parameters. Additionally, being brokerless, DDS allows flexible communication topologies between REGALE actors (e.g., node, job, system managers) that may be located in different parts of the ICT infrastructure.
+
+\subsection{REGALE Library}
+To facilitate communication and integration among REGALE tools in a loosely coupled fashion, we introduce the REGALE library in this document. The REGALE library serves as a standard communication layer to be used by all REGALE tools. It enables agnostic communication among the tools, ensuring that the REGALE Power Stack remains easily extensible and not dependent on any specific tool. This design allows for future expansion with the inclusion of new tools. The REGALE library is built on the eProsima FastDDS communication framework.
+\newpage
+\section{State of the Art}
+ROS2 is one of the most efficient and well-implemented implementations of FastDDS. For this reason, the state of the art, especially regarding the Discovery phase, has also been studied.
+
+\section{FastDDS}
+
+\subsection{Discovery}

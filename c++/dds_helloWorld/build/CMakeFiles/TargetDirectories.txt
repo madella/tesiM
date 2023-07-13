@@ -1,0 +1,6 @@
+/media/dati/tesi/c++/dds_helloWorld/build/CMakeFiles/pub.dir
+/media/dati/tesi/c++/dds_helloWorld/build/CMakeFiles/pub1.dir
+/media/dati/tesi/c++/dds_helloWorld/build/CMakeFiles/sub.dir
+/media/dati/tesi/c++/dds_helloWorld/build/CMakeFiles/subM.dir
+/media/dati/tesi/c++/dds_helloWorld/build/CMakeFiles/edit_cache.dir
+/media/dati/tesi/c++/dds_helloWorld/build/CMakeFiles/rebuild_cache.dir
