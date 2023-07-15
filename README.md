@@ -22,7 +22,7 @@
     650 nodes (SDP: Distributed; DS 1/2: Server v1/2 ).We are able to use also DS2.0: ![IMAGE](image.png)
 
 
-- 🟡⚫ **Regarding verifying which entities are connected on a specific topic at a specific moment.**
+- 🟢⚫ **Regarding verifying which entities are connected on a specific topic at a specific moment.**
 
     I heard there was talk of checking if there was an entity x on a topic else y would take over. Verifying which entities is listening (both publishers and subscribers) to a topic is a non-trivial process. When testing in ROS2 (and this is why i believe it is also not possible in FastDDS), it is not possible to know at runtime who is connected to a topic at a FastDDS level (such as NodeManager instead of JobManager, Countdown, EAR, etc.). However, it is possible to know the number of connected nodes (#sub #pub #totsub_ever_connected #totpub_ever_connected and maybe only the UID), but identification is not performed. ROS2 offers a higher-level tool that provides a graph view of which nodes are publishers and subscribers to a topic, and I think this is done using a higher-level event-driven structure (ROS's structure).
 
@@ -31,11 +31,13 @@
   - Identifying publishers (subscribers cannot be identified) in the messages they send. When messages are exchanged, a structure is defined to be exchanged, and this structure can include a field like <char[] id = "JobManagerX">.
   - Having multiple topics (e.g., JobManagerTopic, etc.) where our physical node subscribes to multiple topics. It would be possible for the node to know if there are connected subscribers to those topics and gather information from where at least one subscriber is present.
 
+    PS: It is not possible with default rules to know which Partecipant is online on certain topic, and for example it is not possible to know for a publisher if ther's another publisher on the same Domain&Topic. You can only know how many Partecipants of the opposite type are connected. But it is possible for certain entuty to sub and pub on different topic, to know if someone is online or not (dds_simpubsub).
+
 -  🟡 **How to manage real-time pull messages?**
 
     I'm not sure if I understood correctly.
 
-- 🟡 **How can we leverage partitions to create hierarchies of topics?**
+- 🟢 **Need to check where wildcards are defined. Are these on topic or in partitions? How we can leverage partitions to create hierarchies of topics.**
 
 - 🟡 **Understand the flexibilities introduced by domains and partitions in topic based communications?**
 

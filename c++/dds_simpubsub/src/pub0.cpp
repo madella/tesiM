@@ -17,8 +17,9 @@
  *
  */
 
-#include "HelloWorldPubSubTypes.h"
+#include <random>
 
+#include "HelloWorldPubSubTypes.h"
 #include <fastdds/dds/domain/DomainParticipantFactory.hpp>
 #include <fastdds/dds/domain/DomainParticipant.hpp>
 #include <fastdds/dds/topic/TypeSupport.hpp>
@@ -114,7 +115,7 @@ public:
     bool init()
     {
         hello_.index(0);
-        hello_.message("Domain 0 pub");
+        hello_.message("Domain 0 secret ");
 
         DomainParticipantQos participantQos;
         participantQos.name("Participant_publisher");
@@ -176,8 +177,7 @@ public:
             if (publish())
             {
                 samples_sent++;
-                std::cout << "Message: " << hello_.message() << " with index: " << hello_.index()
-                            << " SENT" << std::endl;
+                std::cout << "P]: " << hello_.message() << " " << std::endl;
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
@@ -200,3 +200,5 @@ int main(
     delete mypub;
     return 0;
 }
+
+

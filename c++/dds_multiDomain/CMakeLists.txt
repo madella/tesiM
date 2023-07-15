@@ -35,3 +35,9 @@ target_link_libraries(pub fastrtps fastcdr)
 
 add_executable(sub src/sub.cpp ${DDS_HELLOWORLD_SOURCES_CXX})
 target_link_libraries(sub fastrtps fastcdr)
+
+add_executable(pub1 src/pubD1.cpp ${DDS_HELLOWORLD_SOURCES_CXX})
+target_link_libraries(pub1 fastrtps fastcdr)
+
+add_executable(subM src/subM.cpp ${DDS_HELLOWORLD_SOURCES_CXX})
+target_link_libraries(subM fastrtps fastcdr)

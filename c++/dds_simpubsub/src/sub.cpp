@@ -18,7 +18,6 @@
  */
 
 #include "HelloWorldPubSubTypes.h"
-
 #include <fastdds/dds/domain/DomainParticipantFactory.hpp>
 #include <fastdds/dds/domain/DomainParticipant.hpp>
 #include <fastdds/dds/topic/TypeSupport.hpp>
@@ -30,9 +29,8 @@
 
 using namespace eprosima::fastdds::dds;
 
-class HelloWorldSubscriber
-{
-private:
+class HelloWorldSubscriber{
+  private:
 
     DomainParticipant* participant_;
 
@@ -56,6 +54,7 @@ private:
         ~SubListener() override
         {
         }
+
         void on_subscription_matched(
                 DataReader*,
                 const SubscriptionMatchedStatus& info) override
@@ -86,7 +85,7 @@ private:
                 if (info.valid_data)
                 {
                     samples_++;
-                    std::cout << "Message: " << hello_.message() << " with index: " << hello_.index()
+                    std::cout << "S]: " << hello_.message() << " with index: " << hello_.index()
                                 << " RECEIVED." << std::endl;
                 }
             }
@@ -127,11 +126,11 @@ public:
     }
 
     //!Initialize the subscriber
-    bool init()
+    bool init(int domainID)
     {
         DomainParticipantQos participantQos;
         participantQos.name("Participant_subscriber");
-        participant_ = DomainParticipantFactory::get_instance()->create_participant(0, participantQos);
+        participant_ = DomainParticipantFactory::get_instance()->create_participant(domainID, participantQos);
 
         if (participant_ == nullptr)
         {
@@ -157,7 +156,6 @@ public:
             return false;
         }
 
-        // Create the DataReader
         reader_ = subscriber_->create_datareader(topic_, DATAREADER_QOS_DEFAULT, &listener_);
 
         if (reader_ == nullptr)
@@ -169,28 +167,9 @@ public:
     }
 
     //!Run the Subscriber
-    void run(uint32_t samples)
+    HelloWorld run(uint32_t samples)
     {
-        while(listener_.samples_ < samples)
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(200));
-        }
+        return listener_.hello_;
     }
+    
 };
-
-int main(
-        int argc,
-        char** argv)
-{
-    std::cout << "Starting subscriber." << std::endl;
-    int samples = 1000;
-
-    HelloWorldSubscriber* mysub = new HelloWorldSubscriber();
-    if(mysub->init())
-    {
-        mysub->run(static_cast<uint32_t>(samples));
-    }
-
-    delete mysub;
-    return 0;
-}

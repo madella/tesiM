@@ -30,8 +30,17 @@ endif()
 message(STATUS "Configuring HelloWorld publisher/subscriber example...")
 file(GLOB DDS_HELLOWORLD_SOURCES_CXX "src/*.cxx")
 
-add_executable(pub src/pub.cpp ${DDS_HELLOWORLD_SOURCES_CXX})
-target_link_libraries(pub fastrtps fastcdr)
+add_executable(both src/bothpubsub.cpp ${DDS_HELLOWORLD_SOURCES_CXX})
+target_link_libraries(both fastrtps fastcdr)
 
-add_executable(sub src/sub.cpp ${DDS_HELLOWORLD_SOURCES_CXX})
-target_link_libraries(sub fastrtps fastcdr)
+
+add_executable(sub1 src/sub1.cpp ${DDS_HELLOWORLD_SOURCES_CXX})
+target_link_libraries(sub1 fastrtps fastcdr)
+
+
+add_executable(pub0 src/pub0.cpp ${DDS_HELLOWORLD_SOURCES_CXX})
+target_link_libraries(pub0 fastrtps fastcdr)
+
+
+# add_executable(backup src/backup.cpp ${DDS_HELLOWORLD_SOURCES_CXX})
+# target_link_libraries(backup fastrtps fastcdr)

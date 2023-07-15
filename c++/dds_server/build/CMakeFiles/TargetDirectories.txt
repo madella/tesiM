@@ -1,6 +1,0 @@
-/media/dati/tesi/c++/dds_server/build/CMakeFiles/pub.dir
-/media/dati/tesi/c++/dds_server/build/CMakeFiles/sub.dir
-/media/dati/tesi/c++/dds_server/build/CMakeFiles/serv.dir
-/media/dati/tesi/c++/dds_server/build/CMakeFiles/backup.dir
-/media/dati/tesi/c++/dds_server/build/CMakeFiles/edit_cache.dir
-/media/dati/tesi/c++/dds_server/build/CMakeFiles/rebuild_cache.dir

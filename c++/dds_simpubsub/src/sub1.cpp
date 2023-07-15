@@ -86,7 +86,7 @@ private:
                 if (info.valid_data)
                 {
                     samples_++;
-                    std::cout << "Message: " << hello_.message() << " with index: " << hello_.index()
+                    std::cout << "S]: " << hello_.message() << " with index: " << hello_.index()
                                 << " RECEIVED." << std::endl;
                 }
             }
@@ -127,11 +127,11 @@ public:
     }
 
     //!Initialize the subscriber
-    bool init()
+    bool init(int domainID)
     {
         DomainParticipantQos participantQos;
         participantQos.name("Participant_subscriber");
-        participant_ = DomainParticipantFactory::get_instance()->create_participant(0, participantQos);
+        participant_ = DomainParticipantFactory::get_instance()->create_participant(domainID, participantQos);
 
         if (participant_ == nullptr)
         {
@@ -186,7 +186,7 @@ int main(
     int samples = 1000;
 
     HelloWorldSubscriber* mysub = new HelloWorldSubscriber();
-    if(mysub->init())
+    if(mysub->init(1))
     {
         mysub->run(static_cast<uint32_t>(samples));
     }

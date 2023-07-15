@@ -37,15 +37,20 @@ private:
     DomainParticipant* participant_;
 
     Subscriber* subscriber_;
+    
+    DomainParticipant* participant1_;
+
+    Subscriber* subscriber1_;
 
     DataReader* reader_;
+
+    DataReader* reader1_;
 
     Topic* topic_;
 
     TypeSupport type_;
 
-    class SubListener : public DataReaderListener
-    {
+    class SubListener : public DataReaderListener {
     public:
 
         SubListener()
@@ -57,10 +62,10 @@ private:
         {
         }
         void on_subscription_matched(
-                DataReader*,
+                DataReader* readerM,
                 const SubscriptionMatchedStatus& info) override
         {
-            std::cout << "DEBUG:" << info.current_count << " " << std::endl;
+            std::cout << "DEBUG:" << info.last_publication_handle.value << " " << std::endl;
 
             if (info.current_count_change == 1)
             {
@@ -103,6 +108,9 @@ public:
     HelloWorldSubscriber()
         : participant_(nullptr)
         , subscriber_(nullptr)
+        , participant1_(nullptr)
+        , subscriber1_(nullptr)
+        , reader1_(nullptr)
         , topic_(nullptr)
         , reader_(nullptr)
         , type_(new HelloWorldPubSubType())
@@ -132,38 +140,24 @@ public:
         DomainParticipantQos participantQos;
         participantQos.name("Participant_subscriber");
         participant_ = DomainParticipantFactory::get_instance()->create_participant(0, participantQos);
-
-        if (participant_ == nullptr)
-        {
-            return false;
-        }
-
-        // Register the Type
+        if (participant_ == nullptr){return false;}
         type_.register_type(participant_);
-
-        // Create the subscriptions Topic
+        
         topic_ = participant_->create_topic("HelloWorldTopic", "HelloWorld", TOPIC_QOS_DEFAULT);
-
-        if (topic_ == nullptr)
-        {
-            return false;
-        }
-
-        // Create the Subscriber
+        
+        if (topic_ == nullptr){return false;}
         subscriber_ = participant_->create_subscriber(SUBSCRIBER_QOS_DEFAULT, nullptr);
-
-        if (subscriber_ == nullptr)
-        {
-            return false;
-        }
-
-        // Create the DataReader
+        if (subscriber_ == nullptr){return false;}
         reader_ = subscriber_->create_datareader(topic_, DATAREADER_QOS_DEFAULT, &listener_);
+        if (reader_ == nullptr){return false;}
 
-        if (reader_ == nullptr)
-        {
-            return false;
-        }
+        participant1_ = DomainParticipantFactory::get_instance()->create_participant(1, participantQos);
+        if (participant1_ == nullptr){return false;}
+        type_.register_type(participant1_);
+        subscriber1_ = participant1_->create_subscriber(SUBSCRIBER_QOS_DEFAULT, nullptr);
+        if (subscriber1_ == nullptr){return false;}
+        reader1_ = subscriber1_->create_datareader(topic_, DATAREADER_QOS_DEFAULT, &listener_);
+        if (reader1_ == nullptr){return false;}
 
         return true;
     }
@@ -173,6 +167,7 @@ public:
     {
         while(listener_.samples_ < samples)
         {
+            //need only to keep alice this thread, otherwise it will stop.
             std::this_thread::sleep_for(std::chrono::milliseconds(200));
         }
     }
@@ -182,7 +177,7 @@ int main(
         int argc,
         char** argv)
 {
-    std::cout << "Starting subscriber." << std::endl;
+    std::cout << "Starting multiple domanin subscriber." << std::endl;
     int samples = 1000;
 
     HelloWorldSubscriber* mysub = new HelloWorldSubscriber();

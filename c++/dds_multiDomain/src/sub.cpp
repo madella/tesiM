@@ -19,6 +19,7 @@
 
 #include "HelloWorldPubSubTypes.h"
 
+
 #include <fastdds/dds/domain/DomainParticipantFactory.hpp>
 #include <fastdds/dds/domain/DomainParticipant.hpp>
 #include <fastdds/dds/topic/TypeSupport.hpp>
@@ -57,10 +58,10 @@ private:
         {
         }
         void on_subscription_matched(
-                DataReader*,
+                DataReader* dr,
                 const SubscriptionMatchedStatus& info) override
         {
-            std::cout << "DEBUG:" << info.current_count << " " << std::endl;
+            std::cout << "N of sub:" << info.current_count << " " << "Info on DR :" << dr->get_subscriber()->get_participant()->get_qos().name() << info.total_count << std::endl;
 
             if (info.current_count_change == 1)
             {
@@ -130,7 +131,7 @@ public:
     bool init()
     {
         DomainParticipantQos participantQos;
-        participantQos.name("Participant_subscriber");
+        participantQos.name("TryToGetMyName");
         participant_ = DomainParticipantFactory::get_instance()->create_participant(0, participantQos);
 
         if (participant_ == nullptr)
@@ -183,7 +184,7 @@ int main(
         char** argv)
 {
     std::cout << "Starting subscriber." << std::endl;
-    int samples = 1000;
+    int samples = 100;
 
     HelloWorldSubscriber* mysub = new HelloWorldSubscriber();
     if(mysub->init())

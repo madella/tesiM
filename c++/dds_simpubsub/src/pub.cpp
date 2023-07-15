@@ -111,14 +111,14 @@ public:
     }
 
     //!Initialize the publisher
-    bool init()
+    bool init(int domainID)
     {
         hello_.index(0);
         hello_.message("Domain 0 pub");
 
         DomainParticipantQos participantQos;
         participantQos.name("Participant_publisher");
-        participant_ = DomainParticipantFactory::get_instance()->create_participant(0, participantQos);
+        participant_ = DomainParticipantFactory::get_instance()->create_participant(domainID, participantQos);
 
         if (participant_ == nullptr)
         {
@@ -155,48 +155,29 @@ public:
     }
 
     //!Send a publication
-    bool publish()
+    bool publish(HelloWorld hello)
     {
         if (listener_.matched_ > 0)
         {
-            hello_.index(hello_.index() + 1);
-            writer_->write(&hello_);
+            writer_->write(&hello);
             return true;
         }
         return false;
     }
 
     //!Run the Publisher
-    void run(
-            uint32_t samples)
+    bool run(
+            uint32_t samples,
+            HelloWorld hello)
     {
         uint32_t samples_sent = 0;
-        while (samples_sent < samples)
-        {
-            if (publish())
+            if (publish(hello))
             {
                 samples_sent++;
-                std::cout << "Message: " << hello_.message() << " with index: " << hello_.index()
+                std::cout << "P]: " << hello_.message() << " with index: " << hello_.index()
                             << " SENT" << std::endl;
+                return true;
             }
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        }
+            return false;
     }
 };
-
-int main(
-        int argc,
-        char** argv)
-{
-    std::cout << "Starting publisher." << std::endl;
-    int samples = 1000;
-
-    HelloWorldPublisher* mypub = new HelloWorldPublisher();
-    if(mypub->init())
-    {
-        mypub->run(static_cast<uint32_t>(samples));
-    }
-
-    delete mypub;
-    return 0;
-}
