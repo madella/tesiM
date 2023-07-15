@@ -37,9 +37,9 @@
 
     I'm not sure if I understood correctly.
 
-- 🟢 **Need to check where wildcards are defined. Are these on topic or in partitions? How we can leverage partitions to create hierarchies of topics.**
+- 🟢 **Need to check where wildcards are defined. Are these on topic or in partitions? How we can leverage partitions to create hierarchies of topics.** Wildcards are defined only in partitions. Pretty simple, user for example perm_1 perm_2 perm_x and perm*  (dds_partitions)
 
-- 🟡 **Understand the flexibilities introduced by domains and partitions in topic based communications?**
+- 🟢🟡 **Understand the flexibilities introduced by domains and partitions in topic based communications?**
 
 - 🟣 **Evaluate the cost of #publish #subscribers.**
 
