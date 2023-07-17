@@ -74,7 +74,7 @@ private:
             }
             else if (info.current_count_change == -1)
             {
-                std::cout << "Subscriber unmatched." << std::endl;
+                // std::cout << "Subscriber unmatched." << std::endl;
             }
             else
             {
@@ -92,8 +92,7 @@ private:
                 if (info.valid_data)
                 {
                     samples_++;
-                    std::cout << "Message: " << hello_.message() << " with index: " << hello_.index()
-                                << " RECEIVED." << std::endl;
+                    // std::cout << "Message: " << hello_.message() << " with index: " << hello_.index() << " RECEIVED." << std::endl;
                 }
             }
         }
@@ -207,7 +206,7 @@ int main(
         int argc,
         char** argv)
 {
-    std::cout << "Starting subscriber." << std::endl;
+    // std::cout << "Starting subscriber." << std::endl;
     int samples = 1000;
 
     HelloWorldSubscriber* mysub = new HelloWorldSubscriber();

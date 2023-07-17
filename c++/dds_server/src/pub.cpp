@@ -70,7 +70,7 @@ private:
             if (info.current_count_change == 1)
             {
                 matched_ = info.total_count;
-                std::cout << "Publisher matched." << std::endl;
+                // std::cout << "Publisher matched." << std::endl;
             }
             else if (info.current_count_change == -1)
             {
@@ -120,7 +120,7 @@ public:
     bool init()
     {
         hello_.index(0);
-        hello_.message("HPC");
+        hello_.message("Publisher with server");
 
         DomainParticipantQos client_qos;
         client_qos.name("Participant_Publisher");

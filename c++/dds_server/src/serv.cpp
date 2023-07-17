@@ -79,8 +79,10 @@ public:
 
    void run()
     {
-        std::cout << "Server running. Please press enter to stop the server" << std::endl;
-        std::cin.ignore();
+        while(true)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }            
     }
 
 private:

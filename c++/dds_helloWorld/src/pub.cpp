@@ -64,7 +64,7 @@ private:
             if (info.current_count_change == 1)
             {
                 matched_ = info.total_count;
-                std::cout << "Publisher matched." << std::endl;
+                // std::cout << "Publisher matched." << std::endl;
             }
             else if (info.current_count_change == -1)
             {
@@ -176,8 +176,7 @@ public:
             if (publish())
             {
                 samples_sent++;
-                std::cout << "Message: " << hello_.message() << " with index: " << hello_.index()
-                            << " SENT" << std::endl;
+                std::cout << "Message: " << hello_.message() << " with index: " << hello_.index() << " SENT" << std::endl;
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
