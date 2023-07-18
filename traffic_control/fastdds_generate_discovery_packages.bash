@@ -29,10 +29,10 @@ N_OF_TEST=${1}
 PROTOCOL=${2}
 
 # Dump file for capture
-DUMP_FILE="simple.pcapng"
+DUMP_FILE="pcapng/simple_$N_OF_TEST.pcapng"
 if [[ ${PROTOCOL} == "SERVER" ]]
 then
-    DUMP_FILE="discovery_server.pcapng"
+    DUMP_FILE="pcapng/discovery_server_$N_OF_TEST.pcapng"
     echo "Run in Discovery Server mode"
 else
     unset ROS_DISCOVERY_SERVER
@@ -62,7 +62,6 @@ then
     $BASE_NO_SERV/sub &
     for ((i=1; i<=$N_OF_TEST; i++))
     do
-        echo "TEST"
         $BASE_NO_SERV/sub &
     done
 else
@@ -97,3 +96,4 @@ echo "Traffic capture can be found in: ${DUMP_FILE}"
 # Make sure they are killed
 pkill pub
 pkill sub
+pkill serv

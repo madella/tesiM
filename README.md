@@ -33,7 +33,7 @@
 
     PS: It is not possible with default rules to know which Partecipant is online on certain topic, and for example it is not possible to know for a publisher if ther's another publisher on the same Domain&Topic. You can only know how many Partecipants of the opposite type are connected. But it is possible for certain entuty to sub and pub on different topic, to know if someone is online or not (dds_simpubsub).
 
--  🟡 **How to manage real-time pull messages?**
+- 🟢🟡 **How to manage real-time pull messages?**
 
     I'm not sure if I understood correctly.
 
@@ -41,7 +41,8 @@
 
 - 🟢🟡 **Understand the flexibilities introduced by domains and partitions in topic based communications?**
 
-- 🟣 **Evaluate the cost of #publish #subscribers.**
+- 🟢 **Evaluate the cost of #publish #subscribers.**
+    Inside the "traffic_control" folder, there are some scripts that allow testing only on the discovery part without any use of ROS. Once the network of nodes is configured, there is no need to check how many packets are exchanged, as it depends on how they have been programmed rather than FastDDS itself. The next step is to assess the performance impact of connected nodes.
 
 
 

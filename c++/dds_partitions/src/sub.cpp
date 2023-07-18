@@ -140,31 +140,19 @@ public:
 
         // Register the Type
         type_.register_type(participant_);
-
-        // Create the subscriptions Topic
         topic_ = participant_->create_topic("HelloWorldTopic", "HelloWorld", TOPIC_QOS_DEFAULT);
+        if (topic_ == nullptr){return false;}
+        SubscriberQos subscriberQos = SUBSCRIBER_QOS_DEFAULT;
 
-        if (topic_ == nullptr)
-        {
-            return false;
-        }
-        SubscriberQos subscriberQos = SUBSCRIBER_QOS_DEFAULT; 
-        subscriberQos.partition().push_back(partitions);  
-        // Create the Subscriber
+        subscriberQos.partition().push_back(partitions);  //SET PARTITION PASSED IN argv
+       
         subscriber_ = participant_->create_subscriber(subscriberQos, nullptr);
-
         if (subscriber_ == nullptr)
-        {
-            return false;
-        }
+        {return false;}
 
-        // Create the DataReader
         reader_ = subscriber_->create_datareader(topic_, DATAREADER_QOS_DEFAULT, &listener_);
-
         if (reader_ == nullptr)
-        {
-            return false;
-        }
+        {return false;}
 
         return true;
     }

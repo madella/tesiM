@@ -1,4 +1,6 @@
 - [ ] Documentation of ROS2 impl.
 - [ ] Compare RWM_IMPL and Stack FastDDS, if cost-benefit is ok
-- [ ] Show which actor are present on specific topic
+  - [ ] Try with rwm tests
+  - [ ] implement libraries and use it from custom c++
+- [x] Show which actor are present on specific topic
 - [x] Vedere che HW ha E4 : lscpu , lshw 

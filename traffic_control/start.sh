@@ -1,14 +1,27 @@
 #!/bin/bash
 pwd
 export FASTRTPS_DEFAULT_PROFILES_FILE="no_intraprocess_configuration.xml"
-pwd
-sudo bash fastdds_generate_discovery_packages.bash /opt/ros/humble/local_setup.bash
-echo "
-Il risultato dell'operazione è $?
+
+usage="usage: $(basename "$0") N_OF_TEST -- analyze network trafic of ros2 nodes discovery messages
+
+positional arguments:
+    N_OF_TEST 
 "
-sudo bash fastdds_generate_discovery_packages.bash /opt/ros/humble/local_setup.bash SERVER
+
+N_OF_TEST=${1}
+
+if [ $# -lt 1 ]; then
+    python3 discovery_packets.py
+    exit 1
+fi
+
+sudo bash fastdds_generate_discovery_packages.bash ${N_OF_TEST}
 echo "
 Il risultato dell'operazione è $?
 "
 
-python3 discovery_packets.py
+sudo bash fastdds_generate_discovery_packages.bash ${N_OF_TEST} SERVER
+echo "
+Il risultato dell'operazione è $?
+"
+exit 0
