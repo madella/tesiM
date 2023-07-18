@@ -70,7 +70,7 @@ private:
         {
             if (info.current_count_change == 1)
             {
-                std::cout << "Subscriber matched." << std::endl;
+                // std::cout << "Subscriber matched." << std::endl;
             }
             else if (info.current_count_change == -1)
             {

@@ -75,7 +75,7 @@ private:
             else if (info.current_count_change == -1)
             {
                 matched_ = info.total_count;
-                std::cout << "Publisher unmatched." << std::endl;
+                //std::cout << "Publisher unmatched." << std::endl;
             }
             else
             {
@@ -212,7 +212,7 @@ int main(
         int argc,
         char** argv)
 {
-    std::cout << "Starting publisher." << std::endl;
+    // std::cout << "Starting publisher." << std::endl;
     int samples = 1000;
 
     HelloWorldPublisher* mypub = new HelloWorldPublisher();
