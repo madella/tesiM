@@ -18,6 +18,10 @@
  */
 
 #include "HelloWorldPubSubTypes.h"
+#include <fastdds/dds/domain/DomainParticipantFactory.hpp>
+#include <fastdds/dds/subscriber/qos/DataReaderQos.hpp>
+#include <fastdds/rtps/transport/shared_mem/SharedMemTransportDescriptor.h>
+#include <fastdds/rtps/transport/UDPv4TransportDescriptor.h>
 
 #include <fastdds/dds/domain/DomainParticipantFactory.hpp>
 #include <fastdds/dds/domain/DomainParticipant.hpp>
@@ -29,6 +33,8 @@
 #include <fastdds/dds/subscriber/SampleInfo.hpp>
 
 using namespace eprosima::fastdds::dds;
+using namespace eprosima::fastdds::rtps;
+using namespace eprosima::fastrtps::rtps;
 
 class HelloWorldSubscriber
 {
@@ -124,11 +130,26 @@ public:
     }
 
     //!Initialize the subscriber
-    bool init()
+    bool init(std::string topicName)
     {
-        DomainParticipantQos participantQos;
-        participantQos.name("Participant_subscriber");
-        participant_ = DomainParticipantFactory::get_instance()->create_participant(0, participantQos);
+        
+        //CREATE THE PARTICIPANT
+        DomainParticipantQos pqos;
+        pqos.wire_protocol().builtin.discovery_config.discoveryProtocol = DiscoveryProtocol_t::SIMPLE;
+        pqos.wire_protocol().builtin.discovery_config.use_SIMPLE_EndpointDiscoveryProtocol = true;
+        pqos.wire_protocol().builtin.discovery_config.m_simpleEDP.use_PublicationReaderANDSubscriptionWriter = true;
+        pqos.wire_protocol().builtin.discovery_config.m_simpleEDP.use_PublicationWriterANDSubscriptionReader = true;
+        pqos.wire_protocol().builtin.discovery_config.leaseDuration = eprosima::fastrtps::c_TimeInfinite;
+        pqos.name("Participant_sub");
+
+        // Explicit configuration of SharedMem transport
+        pqos.transport().use_builtin_transports = false;
+
+        auto sm_transport = std::make_shared<SharedMemTransportDescriptor>();
+        sm_transport->segment_size(2 * 1024 * 1024);
+        pqos.transport().user_transports.push_back(sm_transport);
+
+        participant_ = DomainParticipantFactory::get_instance()->create_participant(0, pqos);
 
         if (participant_ == nullptr)
         {
@@ -139,7 +160,7 @@ public:
         type_.register_type(participant_);
 
         // Create the subscriptions Topic
-        topic_ = participant_->create_topic("HelloWorldTopic", "HelloWorld", TOPIC_QOS_DEFAULT);
+        topic_ = participant_->create_topic(topicName, "HelloWorld", TOPIC_QOS_DEFAULT);
 
         if (topic_ == nullptr)
         {
@@ -179,11 +200,18 @@ int main(
         int argc,
         char** argv)
 {
-    // std::cout << "Starting subscriber." << std::endl;
+
+    if (argc < 2) {
+        std::cout << "Please provide a string as a command-line argument." << std::endl;
+        return 1;
+    }
+    std::string inputString = argv[1]; 
+    std::cout << "Starting sub with topic " << inputString <<std::endl;
+    char* topicName = const_cast<char*>(inputString.c_str());
     int samples = 1000;
 
     HelloWorldSubscriber* mysub = new HelloWorldSubscriber();
-    if(mysub->init())
+    if(mysub->init(topicName))
     {
         mysub->run(static_cast<uint32_t>(samples));
     }
