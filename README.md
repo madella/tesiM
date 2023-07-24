@@ -65,5 +65,5 @@ We have done a first implementation of message exchange between two of our tools
   
 - 🟣🟡**REGALE library and all its dependencies will have to be installed on any node that needs to run it. This is easily solvable by installing it on a shared folder, but it is worth mentioning.**
 
-- 🟡 **We have run into issues when using the shared memory and TCP transport methods. Due to the way FastDDS is installed, we believe it may be caused by privilege discrepancies with the foonathan_memory library, but we have not been able to fix it yet. It would be helpful to show where in the process the error can be found to reduce the time searching for it. We were able to send messages through UDP though we do not know why.**
+- 🟢 **We have run into issues when using the shared memory and TCP transport methods. Due to the way FastDDS is installed, we believe it may be caused by privilege discrepancies with the foonathan_memory library, but we have not been able to fix it yet. It would be helpful to show where in the process the error can be found to reduce the time searching for it. We were able to send messages through UDP though we do not know why.**
 
