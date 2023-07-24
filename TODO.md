@@ -4,3 +4,5 @@
   - [ ] implement libraries and use it from custom c++
 - [x] Show which actor are present on specific topic
 - [x] Vedere che HW ha E4 : lscpu , lshw 
+- [x] Try shared auto shm_transport = std::make_shared<eprosima::fastdds::rtps::SharedMemTransportDescriptor>();
+- [ ] CHeck ipv4, udpv4

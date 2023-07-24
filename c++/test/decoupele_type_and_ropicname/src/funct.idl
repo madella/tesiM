@@ -1,0 +1,4 @@
+struct func
+{
+    sequence<char> func;
+};

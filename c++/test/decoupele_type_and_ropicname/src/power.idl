@@ -1,0 +1,5 @@
+struct power
+{
+    uint32 freq;
+    string message;
+};
