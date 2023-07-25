@@ -62,16 +62,25 @@ private:
         {
             if (info.current_count_change == 1)
             {
-                std::cout << "Subscriber matched." << std::endl;
+                this->count+=1;
+
+                // std::cout << "Subscriber matched." << std::endl;
             }
             else if (info.current_count_change == -1)
             {
-                std::cout << "Subscriber unmatched." << std::endl;
+                this->count-=1;
+
+                // std::cout << "Subscriber unmatched." << std::endl;
             }
             else
             {
                 std::cout << info.current_count_change
                         << " is not a valid value for SubscriptionMatchedStatus current count change" << std::endl;
+            }
+            if (this->count == 0){
+                // std::cout << "0 pubs remained." << std::endl;
+                this->goon=false;
+                return;
             }
         }
 
@@ -84,12 +93,16 @@ private:
                 if (info.valid_data)
                 {
                     samples_++;
-                    std::cout << "Message: " << hello_.message() << " with index: " << hello_.index() << " RECEIVED." << std::endl;
+                    // std::cout << "Message: " << hello_.message() << " with index: " << hello_.index() << " RECEIVED." << std::endl;
                 }
             }
         }
 
         HelloWorld hello_;
+        
+        bool goon;
+
+        int count;
 
         std::atomic_int samples_;
 
@@ -135,6 +148,9 @@ public:
             return false;
         }
 
+        listener_.goon=true;
+        listener_.count=0;
+
         // Register the Type
         type_.register_type(participant_);
 
@@ -168,7 +184,7 @@ public:
     //!Run the Subscriber
     void run(uint32_t samples)
     {
-        while(listener_.samples_ < samples)
+        while(listener_.samples_ < samples && listener_.goon)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(200));
         }
@@ -185,7 +201,7 @@ int main(
         return 1;
     }
     std::string inputString = argv[1]; 
-    std::cout << "Starting sub with topic " << inputString <<std::endl;
+    // std::cout << "Starting sub with topic " << inputString <<std::endl;
     char* topicName = const_cast<char*>(inputString.c_str());
     int samples = 1000;
 

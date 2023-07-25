@@ -64,12 +64,12 @@ private:
             if (info.current_count_change == 1)
             {
                 matched_ = info.total_count;
-                std::cout << "Publisher matched." << std::endl;
+                //std::cout << "Publisher matched." << std::endl;
             }
             else if (info.current_count_change == -1)
             {
                 matched_ = info.total_count;
-                std::cout << "Publisher unmatched." << std::endl;
+                //std::cout << "Publisher unmatched." << std::endl;
             }
             else
             {
@@ -114,7 +114,7 @@ public:
     bool init(char * partition)
     {
         hello_.index(0);
-        hello_.message("Partition prova");
+        hello_.message("customPARTITION");
 
         DomainParticipantQos participantQos;
         participantQos.name("Participant_publisher");        
@@ -181,7 +181,7 @@ public:
                 std::cout << "Message: " << hello_.message() << " with index: " << hello_.index()
                             << " SENT" << std::endl;
             }
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            std::this_thread::sleep_for(std::chrono::milliseconds(300));
         }
     }
 };
@@ -200,7 +200,7 @@ int main(
     std::cout << "Starting publisher with partition " << inputString <<std::endl;
     char* partition = const_cast<char*>(inputString.c_str());
 
-    int samples = 1000;
+    int samples = 10;
 
     HelloWorldPublisher* mypub = new HelloWorldPublisher();
 

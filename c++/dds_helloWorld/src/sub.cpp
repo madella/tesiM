@@ -62,16 +62,23 @@ private:
         {
             if (info.current_count_change == 1)
             {
-                std::cout << "Subscriber matched." << std::endl;
+                this->count+=1;
+                //std::cout << "Subscriber matched.  " << this->count << std::endl;
             }
             else if (info.current_count_change == -1)
             {
-                std::cout << "Subscriber unmatched." << std::endl;
+                this->count-=1;
+                // std::cout << "Subscriber unmatched.  " << this->count << std::endl;
             }
             else
             {
                 std::cout << info.current_count_change
                         << " is not a valid value for SubscriptionMatchedStatus current count change" << std::endl;
+            }
+            if (this->count == 0){
+                // std::cout << "0 pubs remained." << std::endl;
+                this->goon=false;
+                return;
             }
         }
 
@@ -84,7 +91,7 @@ private:
                 if (info.valid_data)
                 {
                     samples_++;
-                    std::cout << "Message: " << hello_.message() << " with index: " << hello_.index() << " RECEIVED." << std::endl;
+                    //std::cout << "Message: " << hello_.message() << " with index: " << hello_.index() << " RECEIVED." << std::endl;
                 }
             }
         }
@@ -92,6 +99,10 @@ private:
         HelloWorld hello_;
 
         std::atomic_int samples_;
+
+        bool goon;
+
+        int count;
 
     } listener_;
 
@@ -129,6 +140,8 @@ public:
         DomainParticipantQos participantQos;
         participantQos.name("Participant_subscriber");
         participant_ = DomainParticipantFactory::get_instance()->create_participant(0, participantQos);
+        listener_.goon=true;
+        listener_.count=0;
 
         if (participant_ == nullptr)
         {
@@ -168,9 +181,9 @@ public:
     //!Run the Subscriber
     void run(uint32_t samples)
     {
-        while(listener_.samples_ < samples)
+        while(listener_.samples_ < samples && listener_.goon)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            std::this_thread::sleep_for(std::chrono::milliseconds(300));
         }
     }
 };
@@ -180,7 +193,7 @@ int main(
         char** argv)
 {
     // std::cout << "Starting subscriber." << std::endl;
-    int samples = 1000;
+    int samples = 10000;
 
     HelloWorldSubscriber* mysub = new HelloWorldSubscriber();
     if(mysub->init())

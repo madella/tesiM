@@ -178,7 +178,7 @@ public:
                 samples_sent++;
                 std::cout << "Message: " << hello_.message() << " with index: " << hello_.index() << " SENT" << std::endl;
             }
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            std::this_thread::sleep_for(std::chrono::milliseconds(300));
         }
     }
 };
@@ -188,7 +188,7 @@ int main(
         char** argv)
 {
     std::cout << "Starting publisher." << std::endl;
-    int samples = 1000;
+    int samples = 10;
 
     HelloWorldPublisher* mypub = new HelloWorldPublisher();
     if(mypub->init())

@@ -46,11 +46,11 @@
 
 ---
 
-## Mail from Lluis Alonso
+## Mail from Lluis
 
 We have done a first implementation of message exchange between two of our tools and we are happy to report that the basic functionality of a "get" is working as intended. It is very much a proof of concept, but it has allowed us to see a few things that we would like to comment about the current in-progress API:
 
-- 🟢 **We should change it to either void* or char*, depending on what is easier to implement on the library layer.**
+- 🟢 **We should change it to either void\* or char\*, depending on what is easier to implement on the library layer.**
 
     void* is not possible with bare FastDDS, char* is doable or with string, or with sequence<char>.
 

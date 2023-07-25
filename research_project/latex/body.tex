@@ -53,3 +53,28 @@ ROS2 is one of the most efficient and well-implemented implementations of FastDD
 \section{FastDDS}
 
 \subsection{Discovery}
+
+
+
+% TOTO:
+Argomento principale? Su cosa devo puntare?
+
+Devo fare un abstract che parla della mia tesi il cui argomento è il seguente:
+
+Problema: Ho un sistema HPC e voglio ridurre i consumi andando a cambiare la frequenza (_formula potenza dinamica_) di lavoro. E' possibile farlo anche lato tensione ma non dipende totalmente da noi. Per farlo è necessario avere informazioni in real-time dei job-scheduler e node-scheduler per andare a ridurre la frequenza nei _momenti di attesa delle chiamate in memoria_ e non a caso, andando ad impattare solo sui consumi ma mantenendo le performance. Una libreria in corso di sviluppo chiamata REGALE è presente, e nel seguente progetto sarebbe da sviluppare un sistema di scambio dei dati efficente e distribuito come FastDDS e FastRTPS tra i vari attori di questo sistema. Il mio scopo è quello di studiare e introdurre questo strumento con i relativi tipi e librerie a supporto dello scambio di messaggi.
+
+Mi serve tradotto e scritto meglio in inglese (mi servono non più di 500 parole) per latex. Inoltre al posto delle frasi tra "_ _" ci vogliono le parole corrispondenti
+
+
+Title: Real-time Power Management in High-Performance Computing (HPC) Systems using REGALE and FastDDS
+
+Abstract:
+In this thesis, we address the problem of reducing power consumption in an HPC system by dynamically adjusting the operating frequency through the dynamic power formula. While voltage adjustments are feasible, they are not entirely within our control. To achieve power reduction, we propose leveraging real-time information from the job-scheduler and node-scheduler to optimize the frequency during moments of memory call waiting, minimizing power consumption while preserving system performance.
+
+To implement this approach, we introduce the ongoing development of REGALE, a promising library that facilitates power management in HPC systems. Within this project, we focus on developing an efficient and distributed data exchange system using FastDDS and FastRTPS. These technologies enable seamless communication among the various components of the system, allowing them to share real-time data and coordinate their efforts to optimize power consumption effectively.
+
+The primary objective of this thesis is to study and introduce the FastDDS and FastRTPS tools, along with their associated data structures and supporting libraries, to facilitate message exchange. By seamlessly integrating these tools into REGALE, we aim to create a robust and scalable solution for real-time power management in HPC systems.
+
+The proposed approach holds the potential to significantly reduce power consumption while maintaining optimal system performance. By intelligently adjusting the operating frequency during idle periods and memory call waiting times, we can achieve a greener and more sustainable HPC environment without compromising on computational efficiency.
+
+Keywords: High-Performance Computing (HPC), power management, dynamic power formula, real-time data exchange, REGALE, FastDDS, FastRTPS, system optimization, green computing.

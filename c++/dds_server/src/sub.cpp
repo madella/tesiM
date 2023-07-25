@@ -70,16 +70,23 @@ private:
         {
             if (info.current_count_change == 1)
             {
+                this->count+=1;
                 // std::cout << "Subscriber matched." << std::endl;
             }
             else if (info.current_count_change == -1)
             {
+                this->count-=1;
                 // std::cout << "Subscriber unmatched." << std::endl;
             }
             else
             {
                 std::cout << info.current_count_change
                         << " is not a valid value for SubscriptionMatchedStatus current count change" << std::endl;
+            }
+            if (this->count == 0){
+                // std::cout << "0 pubs remained." << std::endl;
+                this->goon=false;
+                return;
             }
         }
 
@@ -100,6 +107,9 @@ private:
         HelloWorld hello_;
 
         std::atomic_int samples_;
+
+        bool goon;
+        int count;
 
     } listener_;
 
@@ -136,6 +146,8 @@ public:
     {
         DomainParticipantQos client_qos;
         client_qos.name("Participant_subscriber");
+        listener_.count=0;
+        listener_.goon=true;
 
         // Set participant as CLIENT
         client_qos.wire_protocol().builtin.discovery_config.discoveryProtocol =
@@ -195,7 +207,7 @@ public:
     //!Run the Subscriber
     void run(uint32_t samples)
     {
-        while(listener_.samples_ < samples)
+        while(listener_.samples_ < samples && listener_.goon)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(200));
         }

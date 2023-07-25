@@ -1,8 +1,7 @@
 #!/bin/bash
-pwd
 export FASTRTPS_DEFAULT_PROFILES_FILE="no_intraprocess_configuration.xml"
 
-usage="usage: $(basename "$0") N_OF_TEST -- analyze network trafic of ros2 nodes discovery messages
+usage="usage: $(basename "$0") N_OF_TEST -- analyze messages
 
 positional arguments:
     N_OF_TEST 
