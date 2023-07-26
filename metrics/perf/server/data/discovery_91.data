@@ -1,0 +1,20 @@
+# started on Tue Jul 25 12:17:24 2023
+
+
+ Performance counter stats for './perf_monitor.sh 91':
+
+         29.457,59 msec task-clock                #    3,575 CPUs utilized          
+           722.743      context-switches          #   24,535 K/sec                  
+           130.467      cpu-migrations            #    4,429 K/sec                  
+           216.670      page-faults               #    7,355 K/sec                  
+    92.667.869.036      cycles                    #    3,146 GHz                    
+    59.193.703.302      instructions              #    0,64  insn per cycle         
+    12.931.581.470      branches                  #  438,990 M/sec                  
+       226.938.617      branch-misses             #    1,75% of all branches        
+
+       8,240678768 seconds time elapsed
+
+      19,096513000 seconds user
+      10,850772000 seconds sys
+
+

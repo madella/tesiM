@@ -1,0 +1,20 @@
+# started on Wed Jul 26 10:38:33 2023
+
+
+ Performance counter stats for './perf_monitor.sh 71 customdomain 3':
+
+          4.091,26 msec task-clock                #    1,070 CPUs utilized          
+            83.996      context-switches          #   20,531 K/sec                  
+            33.883      cpu-migrations            #    8,282 K/sec                  
+           112.447      page-faults               #   27,485 K/sec                  
+    13.514.455.974      cycles                    #    3,303 GHz                    
+     6.575.798.943      instructions              #    0,49  insn per cycle         
+     1.326.664.536      branches                  #  324,268 M/sec                  
+        40.922.248      branch-misses             #    3,08% of all branches        
+
+       3,821887710 seconds time elapsed
+
+       1,720112000 seconds user
+       1,940873000 seconds sys
+
+
