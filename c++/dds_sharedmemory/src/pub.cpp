@@ -35,6 +35,8 @@ using namespace eprosima::fastdds::dds;
 using namespace eprosima::fastdds::rtps;
 using namespace eprosima::fastrtps::rtps;
 
+using namespace eprosima::fastdds::dds;
+
 class HelloWorldPublisher
 {
 private:
@@ -76,7 +78,7 @@ private:
             else if (info.current_count_change == -1)
             {
                 matched_ = info.total_count;
-                std::cout << "Publisher unmatched." << std::endl;
+                //std::cout << "Publisher unmatched." << std::endl;
             }
             else
             {
@@ -121,8 +123,8 @@ public:
     bool init(std::string topicName)
     {
         hello_.index(0);
-        hello_.message("Domain 0 pub");
-
+        hello_.message("customTOPIC");
+        
         DomainParticipantQos pqos;
         pqos.wire_protocol().builtin.discovery_config.discoveryProtocol = DiscoveryProtocol_t::SIMPLE;
         pqos.wire_protocol().builtin.discovery_config.use_SIMPLE_EndpointDiscoveryProtocol = true;
@@ -198,7 +200,7 @@ public:
                 samples_sent++;
                 std::cout << "Message: " << hello_.message() << " with index: " << hello_.index() << " SENT" << std::endl;
             }
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            std::this_thread::sleep_for(std::chrono::milliseconds(300));
         }
     }
 };
@@ -214,7 +216,7 @@ int main(
     std::string inputString = argv[1]; 
     std::cout << "Starting pub with topic " << inputString <<std::endl;
     char* topicName = const_cast<char*>(inputString.c_str());
-    int samples = 1000;
+    int samples = 10;
 
     HelloWorldPublisher* mypub = new HelloWorldPublisher();
     if(mypub->init(topicName))

@@ -168,7 +168,7 @@ public:
         while(listener_.samples_ < samples)
         {
             //need only to keep alice this thread, otherwise it will stop.
-            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            std::this_thread::sleep_for(std::chrono::milliseconds(300));
         }
     }
 };

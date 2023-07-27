@@ -32,3 +32,4 @@
 *.app
 wrap_rwm/
 build/
+data/

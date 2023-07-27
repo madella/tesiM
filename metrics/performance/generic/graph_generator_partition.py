@@ -45,8 +45,8 @@ def main():
         exit(1)
     # Find all files in the 'perf' folder
     for X in range(1, ranges + 1, granularity):
-        prot1_file = f'data/{prot1}_{X}.data'
-        prot2_file = f'data/{prot2}_{X}.data'
+        prot1_file = f'data/{prot1}_partition_{X}.data'
+        prot2_file = f'data/{prot2}_partition_{X}.data'
         prot2_list.append(prot2_file)    
         prot1_list.append(prot1_file)
     # Extract data from 'discovery' files
@@ -61,8 +61,8 @@ def main():
             metric_data_prot2[metric].append(data[i])
 
     # Create a summary graph comparing 'discovery' and 'discovery_server' for each metric
-    x_labels = [f'{i*10}' for i in range(1, len(prot1_list) + 1)]
-    x_labels_2 = [f'{i*10}' for i in range(1, len(prot2_list) + 1)]
+    x_labels = [f'{i}' for i in range(1, len(prot1_list) + 1)]
+    x_labels_2 = [f'{i}' for i in range(1, len(prot2_list) + 1)]
 
     for metric in metric_names:
         plt.figure()
@@ -74,7 +74,7 @@ def main():
         plt.legend()
         plt.xticks(rotation=65)
         plt.tight_layout()
-        plt.savefig(f'img/{prot1}_{prot2}_{metric}.png')
+        plt.savefig(f'img/{prot1}_{prot2}__partition_{metric}.png')
 
 if __name__ == "__main__":
     main()

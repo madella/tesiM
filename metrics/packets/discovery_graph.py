@@ -3,19 +3,18 @@ import subprocess
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
-def plot_packets(data):
+def plot_packets(data,prot1,prot2):
     x_values = [first[0] for first in data]
-    server = [first[1] for first in data]
-    distributed = [first[2] for first in data]
+    protc1 = [first[1] for first in data]
+    protc2 = [first[2] for first in data]
     fig, ax = plt.subplots()
-    ax.plot(x_values, server, color='red', label='Discovery Server')
-    ax.plot(x_values, distributed, color='blue', label='Distributed')
-    ax.set_xlabel('X-axis')
-    ax.set_ylabel('Y-axis')
-    ax.set_title('Graphs showing ')
+    ax.plot(x_values, protc1, color='red', label=prot1.replace('custom',''))
+    ax.plot(x_values, protc2, color='blue', label=prot2.replace('custom',''))
+    ax.set_xlabel('entities')
+    ax.set_ylabel('packets')
+    ax.set_title('comparing')
     ax.legend()
-    #plt.show()
-    plt.savefig('discovery_graph.png')
+    plt.savefig(f'img/{prot1}_{prot2}.png')
     plt.close()
 
 def count_packets(filename):
@@ -41,20 +40,25 @@ def count_packets(filename):
 
 if __name__ == '__main__':
     data = []
-    ranges=os.environ['RANG']
-    granularity=os.environ['GRAN']
-    print("Check env variable: {}, {}".format(ranges,granularity))
+    try:
+        ranges=int(os.environ['RANG'])
+        granularity=int(os.environ['GRAN'])
+        prot1=os.environ['PROT1']
+        prot2=os.environ['PROT2']
+        print(type(ranges),type(granularity))
+    except:
+        print("ENV NOT FOUND")
+        exit(1)
     for X in range(1, ranges + 1, granularity):
-        simple_file = f'pcapng/simple_{X}.pcapng'
-        server_file = f'pcapng/discovery_server_{X}.pcapng'
-
-        if not os.path.isfile(simple_file) or not os.path.isfile(server_file):
-            print(f'Cannot find files {simple_file} or {server_file}')
+        prot1_file = f'data/{prot1}_{X}.data'
+        prot2_file = f'data/{prot2}_{X}.data'
+        if not os.path.isfile(prot1_file) or not os.path.isfile(prot2_file):
+            print(f'Cannot find files {prot1_file} or {prot2_file}')
             continue
 
-        server = count_packets(server_file)
-        distributed =  count_packets(simple_file)
-        data.append([X,server,distributed])
+        prot_c1 =  count_packets(prot1_file)
+        prot_c2 = count_packets(prot2_file)
+        data.append([X,prot_c1,prot_c2])
 
     print(data)
-    plot_packets(data)
+    plot_packets(data,prot1=prot1,prot2=prot2)

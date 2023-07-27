@@ -33,22 +33,23 @@ PROTOCOL=${2}
 PARTITIONS=${3}
 
 DUMP_FILE="data/${PROTOCOL}_$N_OF_TEST.data"
-echo $DUMP_FILE
+N=$(( $N_OF_TEST / $PARTITIONS ))
+if [ $N -eq 0 ]; then
+    N=1
+fi
+
+echo "starting test with $N entities, protocol: $PROTOCOL ,partitions:$PARTITIONS, in $DUMP_FILE"
+
 
 PROTB1="/media/dati/tesi/tesiM/c++/dds_${PROTOCOL}/build"
 for (( j=0; j < $PARTITIONS; j++)); do
-    echo "PARTITION$J
-"
-    $PROTB1/sub $j &
     var_name="PUBPID$j"
-    for (( i=1; i < $(( $N_OF_TEST / $PARTITIONS )); i++)); do
+    for (( i=0; i < $N; i++)); do
         $PROTB1/sub $j &
     done
     $PROTB1/pub $j &
     save=$!
     eval "$var_name=$save"
-
-
 done
 for (( j=0; j < $PARTITIONS; j++)); do
     var_name="PUBPID$j"

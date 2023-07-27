@@ -18,10 +18,6 @@
  */
 
 #include "HelloWorldPubSubTypes.h"
-#include <fastdds/dds/domain/DomainParticipantFactory.hpp>
-#include <fastdds/dds/subscriber/qos/DataReaderQos.hpp>
-#include <fastdds/rtps/transport/shared_mem/SharedMemTransportDescriptor.h>
-#include <fastdds/rtps/transport/UDPv4TransportDescriptor.h>
 
 #include <fastdds/dds/domain/DomainParticipantFactory.hpp>
 #include <fastdds/dds/domain/DomainParticipant.hpp>
@@ -33,8 +29,6 @@
 #include <fastdds/dds/subscriber/SampleInfo.hpp>
 
 using namespace eprosima::fastdds::dds;
-using namespace eprosima::fastdds::rtps;
-using namespace eprosima::fastrtps::rtps;
 
 class HelloWorldSubscriber
 {
@@ -68,16 +62,25 @@ private:
         {
             if (info.current_count_change == 1)
             {
-                std::cout << "Subscriber matched." << std::endl;
+                this->count+=1;
+
+                // std::cout << "Subscriber matched." << std::endl;
             }
             else if (info.current_count_change == -1)
             {
-                std::cout << "Subscriber unmatched." << std::endl;
+                this->count-=1;
+
+                // std::cout << "Subscriber unmatched." << std::endl;
             }
             else
             {
                 std::cout << info.current_count_change
                         << " is not a valid value for SubscriptionMatchedStatus current count change" << std::endl;
+            }
+            if (this->count == 0){
+                // std::cout << "0 pubs remained." << std::endl;
+                this->goon=false;
+                return;
             }
         }
 
@@ -90,12 +93,16 @@ private:
                 if (info.valid_data)
                 {
                     samples_++;
-                    std::cout << "Message: " << hello_.message() << " with index: " << hello_.index() << " RECEIVED." << std::endl;
+                    // std::cout << "Message: " << hello_.message() << " with index: " << hello_.index() << " RECEIVED." << std::endl;
                 }
             }
         }
 
         HelloWorld hello_;
+        
+        bool goon;
+
+        int count;
 
         std::atomic_int samples_;
 
@@ -132,29 +139,17 @@ public:
     //!Initialize the subscriber
     bool init(std::string topicName)
     {
-        
-        //CREATE THE PARTICIPANT
-        DomainParticipantQos pqos;
-        pqos.wire_protocol().builtin.discovery_config.discoveryProtocol = DiscoveryProtocol_t::SIMPLE;
-        pqos.wire_protocol().builtin.discovery_config.use_SIMPLE_EndpointDiscoveryProtocol = true;
-        pqos.wire_protocol().builtin.discovery_config.m_simpleEDP.use_PublicationReaderANDSubscriptionWriter = true;
-        pqos.wire_protocol().builtin.discovery_config.m_simpleEDP.use_PublicationWriterANDSubscriptionReader = true;
-        pqos.wire_protocol().builtin.discovery_config.leaseDuration = eprosima::fastrtps::c_TimeInfinite;
-        pqos.name("Participant_sub");
-
-        // Explicit configuration of SharedMem transport
-        pqos.transport().use_builtin_transports = false;
-
-        auto sm_transport = std::make_shared<SharedMemTransportDescriptor>();
-        sm_transport->segment_size(2 * 1024 * 1024);
-        pqos.transport().user_transports.push_back(sm_transport);
-
-        participant_ = DomainParticipantFactory::get_instance()->create_participant(0, pqos);
+        DomainParticipantQos participantQos;
+        participantQos.name("Participant_subscriber");
+        participant_ = DomainParticipantFactory::get_instance()->create_participant(0, participantQos);
 
         if (participant_ == nullptr)
         {
             return false;
         }
+
+        listener_.goon=true;
+        listener_.count=0;
 
         // Register the Type
         type_.register_type(participant_);
@@ -175,8 +170,13 @@ public:
             return false;
         }
 
-        // Create the DataReader
-        reader_ = subscriber_->create_datareader(topic_, DATAREADER_QOS_DEFAULT, &listener_);
+        DataReaderQos dr_qos;
+        eprosima::fastrtps::rtps::Locator_t new_multicast_locator;
+        eprosima::fastrtps::rtps::IPLocator::setIPv4(new_multicast_locator, "239.255.0.4");
+        new_multicast_locator.port = 7900;
+        dr_qos.endpoint().multicast_locator_list.push_back(new_multicast_locator);
+
+        reader_ = subscriber_->create_datareader(topic_, dr_qos, &listener_);
 
         if (reader_ == nullptr)
         {
@@ -189,9 +189,9 @@ public:
     //!Run the Subscriber
     void run(uint32_t samples)
     {
-        while(listener_.samples_ < samples)
+        while(listener_.samples_ < samples && listener_.goon)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            std::this_thread::sleep_for(std::chrono::milliseconds(300));
         }
     }
 };
@@ -206,7 +206,7 @@ int main(
         return 1;
     }
     std::string inputString = argv[1]; 
-    std::cout << "Starting sub with topic " << inputString <<std::endl;
+    // std::cout << "Starting sub with topic " << inputString <<std::endl;
     char* topicName = const_cast<char*>(inputString.c_str());
     int samples = 1000;
 

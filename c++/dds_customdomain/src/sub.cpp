@@ -186,7 +186,7 @@ public:
     {
         while(listener_.samples_ < samples && listener_.goon)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            std::this_thread::sleep_for(std::chrono::milliseconds(300));
         }
     }
 };
