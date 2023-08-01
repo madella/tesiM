@@ -4,7 +4,7 @@ if(NOT CMAKE_VERSION VERSION_LESS 3.0)
     cmake_policy(SET CMP0048 NEW)
 endif()
 
-project(DDSdecouple)
+project(sender_receiver)
 
 # Find requirements
 if(NOT fastcdr_FOUND)
@@ -28,11 +28,11 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANG OR
 endif()
 
 message(STATUS "Configuring HelloWorld publisher/subscriber example...")
-file(GLOB DDSdecouple_SOURCES_CXX "src/*.cxx")
+file(GLOB CXX_SOURCES "src/*.cxx")
+file(GLOB H_SOURCES "src/*.h")
 
-add_executable(pub src/pub.cpp ${DDSdecouple_SOURCES_CXX})
-target_link_libraries(pub fastrtps fastcdr)
+add_executable(sender src/sender.cpp ${CXX_SOURCES} ${H_SOURCES})
+target_link_libraries(sender fastrtps fastcdr)
 
-add_executable(sub src/sub.cpp ${DDSdecouple_SOURCES_CXX})
-target_link_libraries(sub fastrtps fastcdr)
-
+add_executable(receiver src/receiver.cpp ${CXX_SOURCES} ${H_SOURCES})
+target_link_libraries(receiver fastrtps fastcdr)

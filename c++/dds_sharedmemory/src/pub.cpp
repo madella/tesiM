@@ -35,7 +35,6 @@ using namespace eprosima::fastdds::dds;
 using namespace eprosima::fastdds::rtps;
 using namespace eprosima::fastrtps::rtps;
 
-using namespace eprosima::fastdds::dds;
 
 class HelloWorldPublisher
 {

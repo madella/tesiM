@@ -91,7 +91,7 @@ private:
                 if (info.valid_data)
                 {
                     samples_++;
-                    // std::cout << "Message: " << hello_.message() << " with index: " << hello_.index() << " RECEIVED." << std::endl;
+                    std::cout << "Message: " << hello_.message() << " with index: " << hello_.index() << " RECEIVED." << std::endl;
                 }
             }
         }

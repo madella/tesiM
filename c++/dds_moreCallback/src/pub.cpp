@@ -17,8 +17,13 @@
  *
  */
 
-#include "powerPubSubTypes.h"
-#include "freqPubSubTypes.h"
+
+#include <fastdds/dds/domain/DomainParticipantFactory.hpp>
+#include <fastdds/rtps/transport/shared_mem/SharedMemTransportDescriptor.h>
+#include <fastdds/rtps/transport/UDPv4TransportDescriptor.h>
+#include <thread>
+
+#include "HelloWorldPubSubTypes.h"
 
 #include <fastdds/dds/domain/DomainParticipantFactory.hpp>
 #include <fastdds/dds/domain/DomainParticipant.hpp>
@@ -26,14 +31,18 @@
 #include <fastdds/dds/publisher/Publisher.hpp>
 #include <fastdds/dds/publisher/DataWriter.hpp>
 #include <fastdds/dds/publisher/DataWriterListener.hpp>
+#include <fastdds/dds/domain/DomainParticipantListener.hpp>
+
 
 using namespace eprosima::fastdds::dds;
+using namespace eprosima::fastdds::rtps;
+
 
 class HelloWorldPublisher
 {
 private:
 
-    power hello_;
+    HelloWorld hello_;
 
     DomainParticipant* participant_;
 
@@ -70,7 +79,7 @@ private:
             else if (info.current_count_change == -1)
             {
                 matched_ = info.total_count;
-                std::cout << "Publisher unmatched." << std::endl;
+                //std::cout << "Publisher unmatched." << std::endl;
             }
             else
             {
@@ -82,6 +91,37 @@ private:
         std::atomic_int matched_;
 
     } listener_;
+    class DiscListener : public DomainParticipantListener
+    {
+    public:
+        DiscListener()
+        {
+        }
+
+        ~DiscListener() override
+        {
+        }
+
+        void on_participant_discovery(
+        DomainParticipant* participant,
+        eprosima::fastrtps::rtps::ParticipantDiscoveryInfo&& info) override
+        {
+        static_cast<void>(participant);
+        std::cout << "New DomainParticipant '" << info.info.m_participantName <<
+        "' with ID '" << info.info.m_guid.entityId << "' and GuidPrefix '" <<
+        info.info.m_guid.guidPrefix << std::endl;
+        }
+        void on_publisher_discovery(
+        DomainParticipant* participant,
+        eprosima::fastrtps::rtps::WriterDiscoveryInfo&& info) override
+            {
+            static_cast<void>(participant);
+            /* Process the case when a new publisher was found in the domain */
+            std::cout << "New DataWriter publishing under topic '" << info.info.topicName() << "' of type '" << info.status << "' discovered";
+        }
+            
+
+    } domain_listener_;
 
 public:
 
@@ -90,7 +130,7 @@ public:
         , publisher_(nullptr)
         , topic_(nullptr)
         , writer_(nullptr)
-        , type_(new powerPubSubType())
+        , type_(new HelloWorldPubSubType())
     {
     }
 
@@ -112,14 +152,14 @@ public:
     }
 
     //!Initialize the publisher
-    bool init()
+    bool init(std::string topicName)
     {
-        hello_.freq(0);
-        hello_.message("Domain 0 pub");
-
+        hello_.index(0);
+        hello_.message("customTOPIC");
+        
         DomainParticipantQos participantQos;
-        participantQos.name("Participant_publisher");
-        participant_ = DomainParticipantFactory::get_instance()->create_participant(0, participantQos);
+        participantQos.name("Participant_publisher");        
+        participant_ = DomainParticipantFactory::get_instance()->create_participant(0, participantQos,&domain_listener_);
 
         if (participant_ == nullptr)
         {
@@ -130,7 +170,7 @@ public:
         type_.register_type(participant_);
 
         // Create the publications Topic
-        topic_ = participant_->create_topic("asyouwant", "power", TOPIC_QOS_DEFAULT);
+        topic_ = participant_->create_topic(topicName, "HelloWorld", TOPIC_QOS_DEFAULT);
 
         if (topic_ == nullptr)
         {
@@ -160,7 +200,7 @@ public:
     {
         if (listener_.matched_ > 0)
         {
-            hello_.freq(hello_.freq() + 1);
+            hello_.index(hello_.index() + 1);
             writer_->write(&hello_);
             return true;
         }
@@ -177,9 +217,9 @@ public:
             if (publish())
             {
                 samples_sent++;
-                std::cout << "Message: " << hello_.message() << " with index: " << hello_.freq() << " SENT" << std::endl;
+                std::cout << "Message: " << hello_.message() << " with index: " << hello_.index() << " SENT" << std::endl;
             }
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            std::this_thread::sleep_for(std::chrono::milliseconds(300));
         }
     }
 };
@@ -188,11 +228,17 @@ int main(
         int argc,
         char** argv)
 {
-    std::cout << "Starting publisher." << std::endl;
-    int samples = 1000;
+    if (argc < 2) {
+        std::cout << "Please provide a string as a command-line argument." << std::endl;
+        return 1;
+    }
+    std::string inputString = argv[1]; 
+    std::cout << "Starting pub with topic " << inputString <<std::endl;
+    char* topicName = const_cast<char*>(inputString.c_str());
+    int samples = 10;
 
     HelloWorldPublisher* mypub = new HelloWorldPublisher();
-    if(mypub->init())
+    if(mypub->init(topicName))
     {
         mypub->run(static_cast<uint32_t>(samples));
     }

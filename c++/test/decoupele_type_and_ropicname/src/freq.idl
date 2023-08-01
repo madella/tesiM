@@ -1,5 +1,0 @@
-struct freq
-{
-    uint32 freqenc;
-    string message;
-};

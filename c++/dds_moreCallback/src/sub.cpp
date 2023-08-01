@@ -17,7 +17,7 @@
  *
  */
 
-#include "powerPubSubTypes.h"
+#include "HelloWorldPubSubTypes.h"
 
 #include <fastdds/dds/domain/DomainParticipantFactory.hpp>
 #include <fastdds/dds/domain/DomainParticipant.hpp>
@@ -62,16 +62,25 @@ private:
         {
             if (info.current_count_change == 1)
             {
-                 std::cout << "Subscriber matched." << std::endl;
+                this->count+=1;
+
+                // std::cout << "Subscriber matched." << std::endl;
             }
             else if (info.current_count_change == -1)
             {
+                this->count-=1;
+
                 // std::cout << "Subscriber unmatched." << std::endl;
             }
             else
             {
                 std::cout << info.current_count_change
                         << " is not a valid value for SubscriptionMatchedStatus current count change" << std::endl;
+            }
+            if (this->count == 0){
+                // std::cout << "0 pubs remained." << std::endl;
+                this->goon=false;
+                return;
             }
         }
 
@@ -84,12 +93,16 @@ private:
                 if (info.valid_data)
                 {
                     samples_++;
-                    std::cout << "Message: " << hello_.message() << " with index: " << hello_.freq() << " RECEIVED." << std::endl;
+                    // std::cout << "Message: " << hello_.message() << " with index: " << hello_.index() << " RECEIVED." << std::endl;
                 }
             }
         }
 
-        power hello_;
+        HelloWorld hello_;
+        
+        bool goon;
+
+        int count;
 
         std::atomic_int samples_;
 
@@ -102,7 +115,7 @@ public:
         , subscriber_(nullptr)
         , topic_(nullptr)
         , reader_(nullptr)
-        , type_(new powerPubSubType())
+        , type_(new HelloWorldPubSubType())
     {
     }
 
@@ -124,7 +137,7 @@ public:
     }
 
     //!Initialize the subscriber
-    bool init()
+    bool init(std::string topicName)
     {
         DomainParticipantQos participantQos;
         participantQos.name("Participant_subscriber");
@@ -135,11 +148,14 @@ public:
             return false;
         }
 
+        listener_.goon=true;
+        listener_.count=0;
+
         // Register the Type
         type_.register_type(participant_);
 
         // Create the subscriptions Topic
-        topic_ = participant_->create_topic("asyouwant", "power", TOPIC_QOS_DEFAULT);
+        topic_ = participant_->create_topic(topicName, "HelloWorld", TOPIC_QOS_DEFAULT);
 
         if (topic_ == nullptr)
         {
@@ -168,7 +184,7 @@ public:
     //!Run the Subscriber
     void run(uint32_t samples)
     {
-        while(listener_.samples_ < samples)
+        while(listener_.samples_ < samples && listener_.goon)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(300));
         }
@@ -179,11 +195,18 @@ int main(
         int argc,
         char** argv)
 {
-    // std::cout << "Starting subscriber." << std::endl;
+
+    if (argc < 2) {
+        std::cout << "Please provide a string as a command-line argument." << std::endl;
+        return 1;
+    }
+    std::string inputString = argv[1]; 
+    // std::cout << "Starting sub with topic " << inputString <<std::endl;
+    char* topicName = const_cast<char*>(inputString.c_str());
     int samples = 1000;
 
     HelloWorldSubscriber* mysub = new HelloWorldSubscriber();
-    if(mysub->init())
+    if(mysub->init(topicName))
     {
         mysub->run(static_cast<uint32_t>(samples));
     }

@@ -18,13 +18,20 @@
  */
 
 #include "HelloWorldPubSubTypes.h"
-
+#include <fastdds/dds/domain/DomainParticipantFactory.hpp>
+#include <fastdds/dds/subscriber/qos/DataReaderQos.hpp>
+#include <fastdds/rtps/transport/shared_mem/SharedMemTransportDescriptor.h>
+#include <fastdds/rtps/transport/UDPv4TransportDescriptor.h>
 #include <fastdds/dds/domain/DomainParticipantFactory.hpp>
 #include <fastdds/dds/domain/DomainParticipant.hpp>
 #include <fastdds/dds/topic/TypeSupport.hpp>
 #include <fastdds/dds/publisher/Publisher.hpp>
 #include <fastdds/dds/publisher/DataWriter.hpp>
 #include <fastdds/dds/publisher/DataWriterListener.hpp>
+
+#include <fastdds/dds/subscriber/qos/DataReaderQos.hpp>
+#include <fastdds/rtps/transport/shared_mem/SharedMemTransportDescriptor.h>
+#include <fastdds/rtps/transport/UDPv4TransportDescriptor.h>
 
 #include <linux/perf_event.h>
 #include <asm/unistd.h>
@@ -33,6 +40,8 @@
 
 
 using namespace eprosima::fastdds::dds;
+using namespace eprosima::fastdds::rtps;
+using namespace eprosima::fastrtps::rtps;
 
 class HelloWorldPublisher
 {
@@ -117,13 +126,26 @@ public:
     }
 
     //!Initialize the publisher
-    bool init(int domain,char* partition,char* topic)
+    bool init(int domain,char* partition,char* topic, std::string message)
     {
         hello_.index(0);
-        hello_.message("perf_metric");
-
+        hello_.message(message);
         DomainParticipantQos participantQos;
         participantQos.name("Participant_publisher");        
+        participantQos.wire_protocol().builtin.discovery_config.leaseDuration_announcementperiod = Duration_t(3, 2);
+        participantQos.wire_protocol().builtin.discovery_config.leaseDuration = eprosima::fastrtps::c_TimeInfinite;
+
+        if (false)
+        {
+            participantQos.wire_protocol().builtin.discovery_config.discoveryProtocol = DiscoveryProtocol_t::SIMPLE;
+            participantQos.wire_protocol().builtin.discovery_config.use_SIMPLE_EndpointDiscoveryProtocol = true;
+            participantQos.wire_protocol().builtin.discovery_config.m_simpleEDP.use_PublicationReaderANDSubscriptionWriter = true;
+            participantQos.wire_protocol().builtin.discovery_config.m_simpleEDP.use_PublicationWriterANDSubscriptionReader = true;
+            participantQos.transport().use_builtin_transports = false;
+            auto sm_transport = std::make_shared<SharedMemTransportDescriptor>();
+            sm_transport->segment_size(2 * 1024 * 1024);
+            participantQos.transport().user_transports.push_back(sm_transport);
+        }
         participant_ = DomainParticipantFactory::get_instance()->create_participant(domain, participantQos);
         if (participant_ == nullptr)
         {
@@ -166,82 +188,73 @@ public:
         read(fd, &count, sizeof(long long));
         return count;
     }
+    struct metrics_return{
+        unsigned long long cycles;
+        unsigned long long instructions;
+        std::chrono::high_resolution_clock::time_point sent_time;
+    } metrics ;
 
-    //!Send a publication
-    long long publish()
-    {
-        if (listener_.matched_ > 0)
-        {
-            hello_.index(hello_.index() + 1);
-            //Setting up PERF_EVENT
+    int get_pe(unsigned long long config){
             struct perf_event_attr pe;
             memset(&pe, 0, sizeof(struct perf_event_attr));
             pe.type = PERF_TYPE_HARDWARE;
-            pe.config = PERF_COUNT_HW_BUS_CYCLES; // TSC (CYCLE); REFERENCE CYCLE;  instruction; ABS time with  time.time()// Or any other desired event
+            pe.config = PERF_COUNT_HW_REF_CPU_CYCLES; // TSC TIME_STAMP_COUNT? (CYCLE); REFERENCE CYCLE;  instruction; ABS time with  time.time()// Or any other desired event
             pe.size = sizeof(struct perf_event_attr);
             pe.disabled = 1;
             pe.exclude_kernel = 1;
             pe.exclude_hv = 1;
             int fd = syscall(__NR_perf_event_open, &pe, 0, -1, -1, 0);
-            if (fd == -1) { std::cout << "open event error" <<std::endl; }
-            ioctl(fd, PERF_EVENT_IOC_RESET, 0);
-            ioctl(fd, PERF_EVENT_IOC_ENABLE, 0);
+            if (fd == -1) { std::cout << "open event error; set kernel.perf_event_paranoid = -1" <<std::endl; return -1; }
+            else{
+                return fd;
+            }
+    }
+
+    metrics_return publish()
+    {
+        if (listener_.matched_ > 0)
+        {
+            hello_.index(hello_.index() + 1);
+             
+            auto pe_cycles=get_pe(PERF_COUNT_HW_REF_CPU_CYCLES);
+            auto pe_instruction=get_pe(PERF_COUNT_HW_INSTRUCTIONS);
+            ioctl(pe_instruction, PERF_EVENT_IOC_RESET, 0);
+            ioctl(pe_cycles, PERF_EVENT_IOC_RESET, 0);
+            std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
+            ioctl(pe_instruction, PERF_EVENT_IOC_ENABLE, 0);
+            ioctl(pe_cycles, PERF_EVENT_IOC_ENABLE, 0);
             // Start monitoring
             writer_->write(&hello_);
             // Stop monitoring
-            ioctl(fd, PERF_EVENT_IOC_DISABLE, 0);
-            long long cycles = read_hw_counter(fd);
-            close(fd);
+            ioctl(pe_cycles, PERF_EVENT_IOC_DISABLE, 0);
+            ioctl(pe_instruction, PERF_EVENT_IOC_DISABLE, 0);
+            unsigned long long cycles = read_hw_counter(pe_cycles);
+            unsigned long instructions = read_hw_counter(pe_cycles);
+            close(pe_cycles);
+            close(pe_instruction);
             // Return result to print out
-            return cycles;
+            metrics.cycles=cycles;
+            metrics.instructions=instructions;
+            metrics.sent_time= start;
+            return metrics;
         }
-        return -1;
+        metrics.cycles=-1;
+        metrics.instructions=-1;
+        time_t dummytime(0);
+        metrics.sent_time = std::chrono::high_resolution_clock::from_time_t(dummytime);
+        return metrics;
     }
 
-    //!Run the Publisher
-    void run(
-            uint32_t samples)
+    metrics_return run(uint32_t samples)
     {   
-        uint32_t samples_sent = 0;
-        while (samples_sent < samples)
-        {
-
+        bool sent(false);
+        while (!sent){
             auto ret=publish();
-
-            if (ret != -1)
-            {
-                samples_sent++;
-                std::cout << ret << std::endl;
-            }
-            std::this_thread::sleep_for(std::chrono::milliseconds(300));
+            if (ret.cycles != -1){
+                // std::cout << ret.cycles << std::endl;
+                sent=true;
+            } 
         }
+        return metrics;
     }
 };
-
-int main(
-        int argc,
-        char** argv)
-{
-        if (argc < 4) {
-        std::cout << "Please provide DOMAIN PARTITIONS TOPIC" << std::endl;
-        return 1;
-    }
-
-    int domain = atoi(argv[1]); 
-    std::string inputString1 = argv[2]; 
-    std::string inputString2 = argv[3]; 
-    // std::cout << "Starting subscriber with partition " << inputString <<std::endl;
-    char* partition = const_cast<char*>(inputString1.c_str());
-    char* topic = const_cast<char*>(inputString2.c_str());
-    int samples = 10;
-
-    HelloWorldPublisher* mypub = new HelloWorldPublisher();
-
-    if(mypub->init(domain,partition,topic))
-    {
-        mypub->run(static_cast<uint32_t>(samples));
-    }
-
-    delete mypub;
-    return 0;
-}

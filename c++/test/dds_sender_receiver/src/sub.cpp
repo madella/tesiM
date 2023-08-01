@@ -18,6 +18,9 @@
  */
 
 #include "HelloWorldPubSubTypes.h"
+#include <fastdds/dds/domain/DomainParticipantFactory.hpp>
+#include <fastdds/rtps/transport/shared_mem/SharedMemTransportDescriptor.h>
+#include <fastdds/rtps/transport/UDPv4TransportDescriptor.h>
 
 #include <fastdds/dds/domain/DomainParticipantFactory.hpp>
 #include <fastdds/dds/domain/DomainParticipant.hpp>
@@ -28,32 +31,31 @@
 #include <fastdds/dds/subscriber/qos/DataReaderQos.hpp>
 #include <fastdds/dds/subscriber/SampleInfo.hpp>
 
-
 #include <linux/perf_event.h>
 #include <asm/unistd.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
 
 using namespace eprosima::fastdds::dds;
+using namespace eprosima::fastdds::rtps;
+using namespace eprosima::fastrtps::rtps;
 
 class HelloWorldSubscriber
 {
 private:
+    DomainParticipant *participant_;
 
-    DomainParticipant* participant_;
+    Subscriber *subscriber_;
 
-    Subscriber* subscriber_;
+    DataReader *reader_;
 
-    DataReader* reader_;
-
-    Topic* topic_;
+    Topic *topic_;
 
     TypeSupport type_;
 
     class SubListener : public DataReaderListener
     {
     public:
-
         SubListener()
             : samples_(0)
         {
@@ -63,85 +65,58 @@ private:
         {
         }
         void on_subscription_matched(
-                DataReader*,
-                const SubscriptionMatchedStatus& info) override
+            DataReader *,
+            const SubscriptionMatchedStatus &info) override
         {
             if (info.current_count_change == 1)
             {
-                this->count+=1;
-                //std::cout << "Subscriber matched.  " << this->count << std::endl;
+                this->count += 1;
+                // std::cout << "Subscriber matched.  " << this->count << std::endl;
             }
             else if (info.current_count_change == -1)
             {
-                this->count-=1;
+                this->count -= 1;
                 // std::cout << "Subscriber unmatched.  " << this->count << std::endl;
             }
             else
             {
                 std::cout << info.current_count_change
-                        << " is not a valid value for SubscriptionMatchedStatus current count change" << std::endl;
+                          << " is not a valid value for SubscriptionMatchedStatus current count change" << std::endl;
             }
-            if (this->count == 0){
+            if (this->count == 0)
+            {
                 // std::cout << "0 pubs remained." << std::endl;
-                this->goon=false;
+                this->goon = false;
                 return;
             }
         }
-        long long read_hw_counter(int fd) {
-            long long count = 0;
-            read(fd, &count, sizeof(long long));
-            return count;
-        }
+
         void on_data_available(
-                DataReader* reader) override
+            DataReader *reader) override
         {
             SampleInfo info;
 
-            struct perf_event_attr pe;
-            memset(&pe, 0, sizeof(struct perf_event_attr));
-            pe.type = PERF_TYPE_HARDWARE;
-            pe.config = PERF_COUNT_HW_BUS_CYCLES; //CHECK TIME Or any other desired event
-            pe.size = sizeof(struct perf_event_attr);
-            pe.disabled = 1;
-            pe.exclude_kernel = 1;
-            pe.exclude_hv = 1;
-            int fd = syscall(__NR_perf_event_open, &pe, 0, -1, -1, 0);
-            if (fd == -1) { std::cout << "open event error" <<std::endl; }
-            ioctl(fd, PERF_EVENT_IOC_RESET, 0);
-            ioctl(fd, PERF_EVENT_IOC_ENABLE, 0);
-            //HERE
             auto ret = reader->take_next_sample(&hello_, &info);
-            ioctl(fd, PERF_EVENT_IOC_DISABLE, 0);
-            long long cycles = read_hw_counter(fd);
-            close(fd);
-            if (ret == ReturnCode_t::RETCODE_OK)
-            {
-                if (info.valid_data)
-                {
-                    samples_++;
-                    std::cout << cycles << std::endl;
-                }
-            }
+            // std::cout << hello_.message() << " " << hello_.index() << std::endl;
+            this->received_time = std::chrono::high_resolution_clock::now();
+            this->goon = false;
         }
 
         HelloWorld hello_;
 
         std::atomic_int samples_;
-        
+
         bool goon;
+
+        std::chrono::high_resolution_clock::time_point received_time;
 
         int count;
 
     } listener_;
 
 public:
-
     HelloWorldSubscriber()
-        : participant_(nullptr)
-        , subscriber_(nullptr)
-        , topic_(nullptr)
-        , reader_(nullptr)
-        , type_(new HelloWorldPubSubType())
+        : participant_(nullptr), subscriber_(nullptr), topic_(nullptr), reader_(nullptr), type_(new HelloWorldPubSubType())
     {
     }
 
@@ -162,14 +137,26 @@ public:
         DomainParticipantFactory::get_instance()->delete_participant(participant_);
     }
 
-    //!Initialize the subscriber
-    bool init(int domain,char* partitions,char* topic)
+    //! Initialize the subscriber
+    bool init(int domain, char *partitions, char *topic)
     {
         DomainParticipantQos participantQos;
-        participantQos.name("perf_metric");
+        participantQos.name("Participant_subscriber");        
+        participantQos.wire_protocol().builtin.discovery_config.leaseDuration_announcementperiod = Duration_t(3, 2);
+        participantQos.wire_protocol().builtin.discovery_config.leaseDuration = eprosima::fastrtps::c_TimeInfinite;
+
+        if (false)
+        {
+            participantQos.wire_protocol().builtin.discovery_config.discoveryProtocol = DiscoveryProtocol_t::SIMPLE;
+            participantQos.wire_protocol().builtin.discovery_config.use_SIMPLE_EndpointDiscoveryProtocol = true;
+            participantQos.wire_protocol().builtin.discovery_config.m_simpleEDP.use_PublicationReaderANDSubscriptionWriter = true;
+            participantQos.wire_protocol().builtin.discovery_config.m_simpleEDP.use_PublicationWriterANDSubscriptionReader = true;
+            participantQos.transport().use_builtin_transports = false;
+            auto sm_transport = std::make_shared<SharedMemTransportDescriptor>();
+            sm_transport->segment_size(2 * 1024 * 1024);
+            participantQos.transport().user_transports.push_back(sm_transport);
+        }
         participant_ = DomainParticipantFactory::get_instance()->create_participant(domain, participantQos);
-        listener_.goon=true;
-        listener_.count=0;
         if (participant_ == nullptr)
         {
             return false;
@@ -178,56 +165,37 @@ public:
         // Register the Type
         type_.register_type(participant_);
         topic_ = participant_->create_topic(topic, "HelloWorld", TOPIC_QOS_DEFAULT);
-        if (topic_ == nullptr){return false;}
+        if (topic_ == nullptr)
+        {
+            return false;
+        }
         SubscriberQos subscriberQos = SUBSCRIBER_QOS_DEFAULT;
 
-        subscriberQos.partition().push_back(partitions);  //SET PARTITION PASSED IN argv
-       
+        subscriberQos.partition().push_back(partitions); // SET PARTITION PASSED IN argv
+
         subscriber_ = participant_->create_subscriber(subscriberQos, nullptr);
         if (subscriber_ == nullptr)
-        {return false;}
+        {
+            return false;
+        }
 
         reader_ = subscriber_->create_datareader(topic_, DATAREADER_QOS_DEFAULT, &listener_);
         if (reader_ == nullptr)
-        {return false;}
+        {
+            return false;
+        }
 
         return true;
     }
 
-    //!Run the Subscriber
-    void run(uint32_t samples)
+    //! Run the Subscriber
+    std::chrono::high_resolution_clock::time_point run()
     {
-        while(listener_.samples_ < samples && listener_.goon)
+        listener_.goon = true;
+        while (listener_.goon)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(300));
+            std::this_thread::sleep_for(std::chrono::microseconds(10));
         }
+        return std::chrono::high_resolution_clock::time_point(listener_.received_time);
     }
 };
-
-int main(
-        int argc,
-        char** argv)
-{
-
-    if (argc < 4) {
-        std::cout << "Please provide DOMAIN PARTITIONS TOPIC" << std::endl;
-        return 1;
-    }
-
-    int domain = atoi(argv[1]); 
-    std::string inputString1 = argv[2]; 
-    std::string inputString2 = argv[3]; 
-    // std::cout << "Starting subscriber with partition " << inputString <<std::endl;
-    char* partition = const_cast<char*>(inputString1.c_str());
-    char* topic = const_cast<char*>(inputString2.c_str());
-    int samples = 1000;
-
-    HelloWorldSubscriber* mysub = new HelloWorldSubscriber();
-    if(mysub->init(domain,partition,topic))
-    {
-        mysub->run(static_cast<uint32_t>(samples));
-    }
-
-    delete mysub;
-    return 0;
-}

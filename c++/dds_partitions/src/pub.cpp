@@ -178,6 +178,13 @@ public:
             if (publish())
             {
                 samples_sent++;
+                // if (samples_sent > 5) { // change partition at runtime
+                //     std::cout << "Changing partitions" << std::endl;
+                //     PublisherQos publisherQos = PUBLISHER_QOS_DEFAULT; 
+                //     auto save=this->publisher_->get_qos();
+                //     save.partition().push_back("1");
+                //     this->publisher_->set_qos(save);
+                // }
                 std::cout << "Message: " << hello_.message() << " with index: " << hello_.index()
                             << " SENT" << std::endl;
             }
