@@ -147,33 +147,35 @@ public:
         participantQos.name("transport_custom");
         participantQos.wire_protocol().builtin.discovery_config.leaseDuration = eprosima::fastrtps::c_TimeInfinite;
 
-
         if ("tcp" == transport){
-            std::cout << "used tcp" << std::endl;
-            uint32_t port = 5100;
+            std::cout << "using tcp" << std::endl;
+            // Client: do not configure listening port!
+            // Set up tcp transport mode
+            participantQos.transport().use_builtin_transports = false;
+            std::shared_ptr<TCPv4TransportDescriptor> descriptor = std::make_shared<TCPv4TransportDescriptor>();
+            participantQos.transport().user_transports.push_back(descriptor);
+            // Set initial peers
             Locator initial_peer_locator;
             initial_peer_locator.kind = LOCATOR_KIND_TCPv4;
-            std::shared_ptr<TCPv4TransportDescriptor> descriptor = std::make_shared<TCPv4TransportDescriptor>();
-            IPLocator::setIPv4(initial_peer_locator, "127.0.0.1");
-            initial_peer_locator.port = port;
+            initial_peer_locator.port = 5100 ;
+            // IPLocator::setIPv4(initial_peer_locator, "80.80.99.45"); // Here in localhost we should use 127.0.0.1; different nodes: ip's node 80.80.99.45
             participantQos.wire_protocol().builtin.initialPeersList.push_back(initial_peer_locator);
-            participantQos.transport().use_builtin_transports = false;
-            participantQos.transport().user_transports.push_back(descriptor);
+
         }
         else if ("udpM" == transport)
         {
-            std::cout << "used udp-multicast" << std::endl;
+            std::cout << "using udp-multicast" << std::endl;
         }
         else if ("shm" == transport)
         {
-            std::cout << "used sharedMemory" << std::endl;
+            std::cout << "using sharedMemory" << std::endl;
             participantQos.transport().use_builtin_transports = false;
             auto sm_transport = std::make_shared<SharedMemTransportDescriptor>();
             sm_transport->segment_size(2 * 1024 * 1024);
             participantQos.transport().user_transports.push_back(sm_transport);
         }
         else {
-            std::cout << "used udp" << std::endl;
+            std::cout << "using udp" << std::endl;
         }
 
         participant_ = DomainParticipantFactory::get_instance()->create_participant(0, participantQos);
@@ -214,12 +216,13 @@ public:
         }
         else if ("tcp" == transport)
         {
-            dr_qos.history().kind = eprosima::fastdds::dds::KEEP_LAST_HISTORY_QOS;
-            dr_qos.history().depth = 30;
-            dr_qos.resource_limits().max_samples = 50;
-            dr_qos.resource_limits().allocated_samples = 20;
-            dr_qos.reliability().kind = eprosima::fastdds::dds::RELIABLE_RELIABILITY_QOS;
-            dr_qos.durability().kind = eprosima::fastdds::dds::TRANSIENT_LOCAL_DURABILITY_QOS;
+            //ONLY QOS setting, not really useful to tcp
+            // dr_qos.history().kind = eprosima::fastdds::dds::KEEP_LAST_HISTORY_QOS;
+            // dr_qos.history().depth = 30;
+            // dr_qos.resource_limits().max_samples = 50;
+            // dr_qos.resource_limits().allocated_samples = 20;
+            // dr_qos.reliability().kind = eprosima::fastdds::dds::RELIABLE_RELIABILITY_QOS;
+            // dr_qos.durability().kind = eprosima::fastdds::dds::TRANSIENT_LOCAL_DURABILITY_QOS;
         }
         
         reader_ = subscriber_->create_datareader(topic_, dr_qos, &listener_);
