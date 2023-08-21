@@ -1,80 +1,108 @@
-\subsection{ROS2}
-ROS2 uses \texttt{rmw} (ROS Middleware) to manage this middleware and allows avoiding direct use of the \texttt{FastDDS} and \texttt{FastRTPS} libraries in the user space. In particular, the ROS2 structure utilizes two packages:
+% Caratteri : 20.000 disponibili.
+%TITLE {Analisi e sviluppo di un runtime per il power management di sistemi HPC basato su DDS}
 
-\begin{itemize}
-    \item \texttt{RWM\_IMPLEMENTATION}: Middleware that allows changing the implementation of \texttt{RTPS} dynamically, without the need for recompilation.
-    \item \texttt{RWM\_FASTRTPS}: Middleware for a specific \texttt{FastDDS} implementation.
-\end{itemize}
-
-This mechanism is made possible through an environment variable that needs to be set before starting a node, called \texttt{\$RMW\_IMPLEMENTATION}. Naturally, ROS2 defines a default implementation, which was \texttt{FastDDS} until ROS2 Galactic, after which it switched to \texttt{CycloneDDS} (Oracle).
-
-During the Discovery phase of \texttt{FastDDS} managed by the script \texttt{RWM\_FASTRTPS/participant.cpp}, \texttt{RWM\_FASTRTPS} allows configuring four cases:
-
-\begin{itemize}
-    \item \texttt{RMW\_AUTOMATIC\_DISCOVERY\_RANGE\_SYSTEM\_DEFAULT} \& \texttt{RMW\_AUTOMATIC\_DISCOVERY\_RANGE\_SUBNET} (default ones): Uses the simple \texttt{FastDDS} behavior.
-    \item \texttt{RMW\_AUTOMATIC\_DISCOVERY\_RANGE\_LOCALHOST}: Utilizes \texttt{SharedMemory} as the packet transport method.
-    \item \texttt{RMW\_AUTOMATIC\_DISCOVERY\_RANGE\_OFF}: Disables Discovery.
-\end{itemize}
-
-Finally, everything is set to start the Discovery phase on the FastDDS side with the above-requested settings. In this phase, Quality of Service (QoS) settings are also configured, either by reading from XML or using default settings if not declared.
-
-%todo:
+%Domande da fare:
+% Devo/posso citare REGALE ed i suoi compomenti?
 
 \section{Introduction}
-High-Performance Computing (HPC) plays a crucial role in addressing the computational demands of modern scientific and engineering applications. However, the escalating power requirements and environmental impact of traditional HPC systems have raised concerns about sustainability and energy efficiency. This proposal presents a novel approach to address these challenges through the development of a secure and distributed middleware for green computing, leveraging the Real-Time Publish-Subscribe (RTPS) protocol and the FastDDS stack. The primary objective of this research would be the design and implement an advanced middleware solution that promotes energy-efficient computing while ensuring robust measures. The proposed middleware will facilitate the seamless integration of HPC resources distributed across different nodes, enabling efficient resource utilization and minimizing power consumption. By leveraging the capabilities of RTPS and the FastDDS stack, the middleware will provide reliable and real-time communication channels among HPC components while optimizing resource allocation to achieve high performance. Furthermore, the proposed middleware will focus on promoting green computing practices by optimizing energy consumption. It will employ intelligent resource management techniques, such as dynamic workload balancing and power-aware scheduling algorithms, to minimize energy waste and maximize the utilization of available resources. The middleware will also provide monitoring and profiling capabilities to analyze energy consumption patterns and identify optimization opportunities. To evaluate the effectiveness of the proposed middleware, a comprehensive experimental setup will be established. Performance benchmarks will be conducted using representative HPC workloads, and energy consumption metrics will be measured. The results will be compared against existing HPC systems to quantify the energy savings achieved and validate the efficiency and scalability of the proposed solution. In summary, this PhD proposal aims to develop a secure and distributed middleware for green computing in the context of HPC. By leveraging the RTPS protocol and the FastDDS stack, the proposed middleware will enable efficient resource utilization, real-time communication, and enhanced security in HPC systems. The research outcomes will contribute to the advancement of sustainable and energy-efficient computing practices, ensuring a greener future for HPC applications.
+% Presentazione del progetto di ricerca: Includi una breve descrizione del tema trattato, mettendo in risalto l’importanza e l’eventuale originalità.
 
-\newpage
-\section{REGALE stack}
-The REGALE project conhsists of two main paths: (i) PowerStack and (ii) Workflow Engine. Within the project, we focuses on the PowerStack path, which aims to develop a software stack that enables comprehensive power management solutions for a supercomputing system.
+% WHY
+% OLD: In recent years, the rapid growth of super-computing systems has led to an increased demand for efficient power management strategies. As these systems continue to evolve, optimizing power consumption has become a critical challenge to address. Effective power management not only contributes to reducing energy costs but also has a positive impact on the environment by minimizing the carbon footprint associated with data centers and large-scale computing infrastructures. Inoltre, lo sviluppo power manager open source permette una maggiore flessibilità e adattabilità alle esigenze specifiche di diversi ambienti HPC. 
 
-\subsection{Integration Approaches}
-To integrate the different REGALE tools, two approaches were taken: component-to-component integration and the introduction of a middle layer.
+% In un sistema di power-management sono presenti diversi tipi di attori (node-manager, job-manager, monitor, etc.) ognuno dei quali deve interagire con centinaia di entità (nodi, cores). Tutto questo va a generare un traffico non indifferente di dati che deve essere gestito real-time in modo efficente e sicuro.  L'area di interesse di questo progetto, è quello di  implementare un servizio DDS tra i tanti disponibili, all'interno di uno stack oper-source di power management per HPC. 
 
-\subsubsection{Component-to-Component Integration}
-In the previous deliverable (D3.1), we proposed integrating the tools by restructuring the code to include interfaces between them. The following integrations were suggested:
-\begin{enumerate}
-\item Countdown - EXAMON
-\item EAR - EXAMON
-\item EAR - COUNTDOWN
-\item EAR - DCDB
-\item EAR - OAR
-\end{enumerate}
-However, this approach presents challenges, as the number of interfaces to be supported grows exponentially with the number of tools. It requires an interoperability layer to abstract communication from policy integration.
+In recent years, the rapid growth of supercomputing systems has led to an increased demand for efficient power management strategies. As these systems continue to evolve, optimizing power consumption has become a critical challenge to address. Effective power management not only contributes to reducing energy costs but also has a positive impact on the environment by minimizing the carbon footprint associated with data centers and large-scale computing infrastructures. Furthermore, the development of open-source power managers allows for greater flexibility and adaptability to the specific needs of different HPC environments.
 
-\subsubsection{Middle Layer Approach}
-In D3.2, we explored the possibility of implementing a unified middle layer. Various software approaches were considered, such as callbacks, virtual tables, and different communication frameworks with robust inter-agent messaging. One promising communication framework identified was the Data Distribution Service (DDS). DDS is fully distributed, enables low-latency messaging, and offers configurable Quality of Service (QoS) profiles for customizing messaging parameters. Additionally, being brokerless, DDS allows flexible communication topologies between REGALE actors (e.g., node, job, system managers) that may be located in different parts of the ICT infrastructure.
+In a power management system, there are several types of actors (node-manager, job-manager, monitor, etc.) each of which must interact with hundreds of entities (nodes, cores). All this generates a significant amount of data traffic that must be managed in real-time in an efficient and secure manner. The area of interest of this project is to implement a DDS service among the many available within an open-source power management stack for HPC.
 
-\subsection{REGALE Library}
-To facilitate communication and integration among REGALE tools in a loosely coupled fashion, we introduce the REGALE library in this document. The REGALE library serves as a standard communication layer to be used by all REGALE tools. It enables agnostic communication among the tools, ensuring that the REGALE Power Stack remains easily extensible and not dependent on any specific tool. This design allows for future expansion with the inclusion of new tools. The REGALE library is built on the eProsima FastDDS communication framework.
-\newpage
-\section{State of the Art}
-ROS2 is one of the most efficient and well-implemented implementations of FastDDS. For this reason, the state of the art, especially regarding the Discovery phase, has also been studied.
+\subsection{DDS \& RTPS}
 
-\section{FastDDS}
+DDS (Data Distribution Service) and RTPS (Real-Time Publish-Subscribe) constitute two pivotal technologies in the realm of distributed and real-time communications. These technologies play a critical role in enabling efficient and reliable data transmission among interconnected devices and applications, holding particular significance in intricate scenarios such as embedded systems, the Internet of Things (IoT), and high-performance applications like High-Performance Computing (HPC).
 
-\subsection{Discovery}
+Specifically, DDS serves as a distributed communication framework that facilitates data exchange among software components distributed across heterogeneous networks. Built upon a publish-subscribe model, DDS establishes a mechanism for efficient data sharing. On the other hand, RTPS serves as the underlying protocol employed by DDS to realize the publish-subscribe paradigm within real-time networks. RTPS focuses on the dependable delivery of real-time messages, ensuring that data reaches the appropriate recipients in the most efficient manner. This protocol manages critical aspects such as data flow control, node synchronization, and quality of service management.
+
+\subsection{Components}
+
+\section{State of the Art} \label{SEC:soa}
+% Stato dell’arte: Ricostruisci le teorie e gli studi che riguardano il tema studiato. Individua le ricerche utili alla tua ricerca e identifica le categorie chiave del dibattito sul tema di ricerca2.
+
+To the best of my knowledge, the current landscape of power management solutions for power management strategies are often characterized by proprietary hardware and software implementations.
+
+To the best of my knowledge, la maggior parte del panorama del power management, per le applicazioni di HPC, è affrontata tramite soluzioni hardware e software proprietarie, principalmente sviluppate in modo ad hoc dai diversi centri di calcolo. Le alternative più complete e open-source che coprono l'ambito trattato sono GEOPM \cite{GEOPM} e REGALE \cite{REGALE}. Inoltre, uno studio approfondito sull'implementazione e sull'utilizzo di DDS è rappresentato dal middleware implementato in ROS2 chiamato \emph{rmw\_rtps}.
+
+\subsection{GEOPM}
+\subsection{REGALE}
+\subsection{Middleware}
+% ROS: Uno dei più famosi esempi middleware che implementa DDS come canale di comunicazione è quello usato da ROS2. Infatti rmw
 
 
 
-% TOTO:
-Argomento principale? Su cosa devo puntare?
 
-Devo fare un abstract che parla della mia tesi il cui argomento è il seguente:
+\section{Project’s Description} \label{SEC:pd}
+% Definizione del problema e domande di ricerca: Definisci in termini chiari ed immediatamente comprensibili la questione che vuoi indagare. Articola il problema in domande di ricerca a cui vuoi rispondere.
 
-Problema: Ho un sistema HPC e voglio ridurre i consumi andando a cambiare la frequenza (_formula potenza dinamica_) di lavoro. E' possibile farlo anche lato tensione ma non dipende totalmente da noi. Per farlo è necessario avere informazioni in real-time dei job-scheduler e node-scheduler per andare a ridurre la frequenza nei _momenti di attesa delle chiamate in memoria_ e non a caso, andando ad impattare solo sui consumi ma mantenendo le performance. Una libreria in corso di sviluppo chiamata REGALE è presente, e nel seguente progetto sarebbe da sviluppare un sistema di scambio dei dati efficente e distribuito come FastDDS e FastRTPS tra i vari attori di questo sistema. Il mio scopo è quello di studiare e introdurre questo strumento con i relativi tipi e librerie a supporto dello scambio di messaggi.
+% A main point of the PhD project will be the analysis of the performance of different control designs and structures into answering the power and thermal control problem of current and future processors, with the focus on more comprehensive designs. This includes the investigation of more advanced and newer control structures with respect to the PI control, including also machine and deep learning. An interesting approach is investigating Spiking Neural Network (SNN) which are proved comparable to PID while also being capable to adapt at run-time and running on ultra-low power chips \cite{snn1}, \cite{snn2}.
 
-Mi serve tradotto e scritto meglio in inglese (mi servono non più di 500 parole) per latex. Inoltre al posto delle frasi tra "_ _" ci vogliono le parole corrispondenti
+% A second point of the project will be to try to fill the void in the open-source community regarding an open-source hardware/software power and thermal controller suitable to be integrated on a broad range of different processors. Carrying on a hardware/software co-design can lead to interesting design choices and the possibility to obtain a performing and efficient system. For example to improve parallel computation of some types of control structures (e.g. machine learning, multiple PIDs, Deep-Reinforcement Learning, Model Predictive Control) the hardware of the controller could contain a multicore cluster for parallel acceleration.
+
+% A middle step will be the development of a simulation framework, needed to develop the firmware in co-design with the hardware of the controller and to compare the various control designs.
+
+% The project will focus on High Power Computing (HPC) processors, but the results will be exported and adapted to other types of scenarios, like edge, mobile, automotive, and workstations.
+
+The primary objective of this research is to analyze, design, and develop a runtime system for power management that exploits and leverage the capabilities of the DDS protocol considering all entities that are included and all their interactions in the system. 
+By dynamically adjusting the power consumption of individual components based on their current workloads and communication patterns, the proposed system aims to achieve substantial energy savings without compromising system performance.
+A second point of the project is to explore the potential of utilizing DDS as a basis for runtime power management. By leveraging the advantages of DDS, we intend to develop an open-source power management solution that offers transparency, adaptability, and scalability. %TOTRANSALTE 
+Si proverà anche a fornire un middleware per poter scegliere a piacere una implementazione diversa di DDS
 
 
-Title: Real-time Power Management in High-Performance Computing (HPC) Systems using REGALE and FastDDS
+\section{Expected Results}
+% Obiettivi ed ipotesi della ricerca: Identifica lo scopo della tua ricerca e definisci le finalità conoscitive delle indagine. Esplicita come intendi rispondere alle domande di ricerca2.
+This project is expected to achieve three main contributions:
+\begin{itemize}
+    \item the analysis of several advanced control structures aimed at answering the new upcoming requirements and constraints originated from the increasing complexity of processors in the edge and high-performance computing domains;
+    \item The exploration of more compute-intensive control paradigm (model predictive control, deep reinforcement learning), and HW architectures to execute them efficiently.
+    \item the development of a simulation framework for the co-design of all the parts of the control system (HW, run-time/RTOS, control policy, interfaces with processors and sensors);
+    \item the development of an open-source power controller firmware based on open-source hardware, aimed at being implemented in a broad range of chips.
+\end{itemize}
 
-\sectionn {Abstract:}
-In this thesis, we address the problem of reducing power consumption in an HPC system by dynamically adjusting the operating frequency through the dynamic power formula. While voltage adjustments are feasible, they are not entirely within our control. To achieve power reduction, we propose leveraging real-time information from the job-scheduler and node-scheduler to optimize the frequency during moments of memory call waiting, minimizing power consumption while preserving system performance.
 
-To implement this approach, we introduce the ongoing development of REGALE, a promising library that facilitates power management in HPC systems. Within this project, we focus on developing an efficient and distributed data exchange system using FastDDS and FastRTPS. These technologies enable seamless communication among the various components of the system, allowing them to share real-time data and coordinate their efforts to optimize power consumption effectively.
+\section{Proposed project timeline}
+% Cronoprogramma e fattibilità: Includi un cronoprogramma per la realizzazione del tuo progetto di ricerca e discuti la fattibilità del tuo approccio.
+\begin{itemize}
+\item{Year 1:
+\begin{itemize}
+    \item Literature overview on advanced control designs and on the State of the Art control algorithms applicable to the power and thermal control of a processor.
+    \item Creation of a simulation framework. Development of system and controller models.
+    \item Initial Firmware architecture design.
+\end{itemize}
+}
 
-The primary objective of this thesis is to study and introduce the FastDDS and FastRTPS tools, along with their associated data structures and supporting libraries, to facilitate message exchange. By seamlessly integrating these tools into REGALE, we aim to create a robust and scalable solution for real-time power management in HPC systems.
+\item{Year 2:
+\begin{itemize}
+    \item Analysis and comparison of the identified control structure designs.
+    \item Intermediate version of the controller Firmware targeting an identified open-source hardware design.
+\end{itemize}
+}
 
-The proposed approach holds the potential to significantly reduce power consumption while maintaining optimal system performance. By intelligently adjusting the operating frequency during idle periods and memory call waiting times, we can achieve a greener and more sustainable HPC environment without compromising on computational efficiency.
+\item{Year 3:
+\begin{itemize}
+    \item SECURITY? 
+    \item Adapt the project to a broad range of scenarios and possible implementations.
+\end{itemize}
+}
+\end{itemize}
 
-Keywords: High-Performance Computing (HPC), power management, dynamic power formula, real-time data exchange, REGALE, FastDDS, FastRTPS, system optimization, green computing.
+
+
+\section{Outline of the proposed findings assessment criteria}
+The criteria to asses the proposed findings will be:
+\begin{itemize}
+    \item an open-source publication on GitHub of an operational firmware for a processor power controller, associated with an open-source RTL component regarding the controller hardware.
+    \item the possibility to consider the implementation of the open-source controller project in a real processor design.
+    \item an exhaustive analysis of the control structures relevant to the power and thermal control of a processor, publishable on a paper.
+    \item the development of a simulation framework able to provide reliable results.
+\end{itemize}
+
+
+% Referenze bibliografiche: Includi una lista di riferimenti bibliografici per le fonti citate nel tuo progetto di ricerca.
