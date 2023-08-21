@@ -1,20 +1,22 @@
 % Caratteri : 20.000 disponibili.
-%TITLE {Analisi e sviluppo di un runtime per il power management di sistemi HPC basato su DDS}
 
-%Domande da fare:
-% Devo/posso citare REGALE ed i suoi compomenti?
+%TITLE {An interoperable runtime for distributed power management of large-scale HPC systems based on DDS}
+
 
 \section{Introduction}
+% ==================================================================================================================================== 
 % Presentazione del progetto di ricerca: Includi una breve descrizione del tema trattato, mettendo in risalto l’importanza e l’eventuale originalità.
+% ==================================================================================================================================== 
+In recent years, the rapid growth of super-computing systems has led to an increased demand for efficient power management strategies. As the landscape of computational capabilities continues its rapid expansion, the imperative for sustainable power management solutions becomes even more pronounced. The formidable computational power wielded by modern supercomputers is often juxtaposed with the considerable energy consumption required to fuel their operations. In this context, the pursuit of innovative power management strategies becomes not only an economic consideration but a pivotal endeavor to curtail the ecological ramifications of escalating energy consumption.
 
-% WHY
-% OLD: In recent years, the rapid growth of super-computing systems has led to an increased demand for efficient power management strategies. As these systems continue to evolve, optimizing power consumption has become a critical challenge to address. Effective power management not only contributes to reducing energy costs but also has a positive impact on the environment by minimizing the carbon footprint associated with data centers and large-scale computing infrastructures. Inoltre, lo sviluppo power manager open source permette una maggiore flessibilità e adattabilità alle esigenze specifiche di diversi ambienti HPC. 
+Given the intricate interplay between power efficiency, computational performance, and environmental responsibility, the development of advanced power management frameworks assumes paramount significance. It is within this framework that the present research aims to contribute. By harnessing the capabilities of open-source technologies and leveraging the efficiency-enhancing potential of Data Distribution Service (DDS) and Real-Time Publish-Subscribe (RTPS), we endeavor to engineer a dynamic and responsive power management runtime for High-Performance Computing (HPC) environments.
 
-% In un sistema di power-management sono presenti diversi tipi di attori (node-manager, job-manager, monitor, etc.) ognuno dei quali deve interagire con centinaia di entità (nodi, cores). Tutto questo va a generare un traffico non indifferente di dati che deve essere gestito real-time in modo efficente e sicuro.  L'area di interesse di questo progetto, è quello di  implementare un servizio DDS tra i tanti disponibili, all'interno di uno stack oper-source di power management per HPC. 
+In light of the existing proprietary solutions that are often tailor-made for specific computing centers, the pursuit of open-source alternatives gains traction. Open-source power management solutions not only offer adaptability to the unique demands of different HPC ecosystems but also foster collaborative innovation across the broader scientific community.
 
-In recent years, the rapid growth of supercomputing systems has led to an increased demand for efficient power management strategies. As these systems continue to evolve, optimizing power consumption has become a critical challenge to address. Effective power management not only contributes to reducing energy costs but also has a positive impact on the environment by minimizing the carbon footprint associated with data centers and large-scale computing infrastructures. Furthermore, the development of open-source power managers allows for greater flexibility and adaptability to the specific needs of different HPC environments.
+In the subsequent sections of this research, we will delve deeper into the intricacies of designing and implementing our proposed runtime power management system. By integrating the efficiencies of DDS and drawing inspiration from successful open-source models, we aim to contribute to the evolving landscape of power management for HPC. Through this endeavor, we aspire to not only optimize computational efficiency and resource utilization but also to cultivate a greener and more sustainable future for supercomputing systems.% un po di meno 
+%TOCHECK
 
-In a power management system, there are several types of actors (node-manager, job-manager, monitor, etc.) each of which must interact with hundreds of entities (nodes, cores). All this generates a significant amount of data traffic that must be managed in real-time in an efficient and secure manner. The area of interest of this project is to implement a DDS service among the many available within an open-source power management stack for HPC.
+ %Si può fare il collegamento con lo stato dell'arte, che non ce ne sono molti disponibili
 
 \subsection{DDS \& RTPS}
 
@@ -22,39 +24,50 @@ DDS (Data Distribution Service) and RTPS (Real-Time Publish-Subscribe) constitut
 
 Specifically, DDS serves as a distributed communication framework that facilitates data exchange among software components distributed across heterogeneous networks. Built upon a publish-subscribe model, DDS establishes a mechanism for efficient data sharing. On the other hand, RTPS serves as the underlying protocol employed by DDS to realize the publish-subscribe paradigm within real-time networks. RTPS focuses on the dependable delivery of real-time messages, ensuring that data reaches the appropriate recipients in the most efficient manner. This protocol manages critical aspects such as data flow control, node synchronization, and quality of service management.
 
-\subsection{Components}
-
 \section{State of the Art} \label{SEC:soa}
+% ========================================================================================================================================= 
 % Stato dell’arte: Ricostruisci le teorie e gli studi che riguardano il tema studiato. Individua le ricerche utili alla tua ricerca e identifica le categorie chiave del dibattito sul tema di ricerca2.
 
-To the best of my knowledge, the current landscape of power management solutions for power management strategies are often characterized by proprietary hardware and software implementations.
+%Lo stato dell’arte a mio avviso può essere composto da una parte relativa al power management in HPC.
+    % Esistono soluzioni che non sono interoperabili, diversi componenti legati all’HPC powerstack, algoritmi, che possono essere portati ad esempio per il risolvere specifici problemi di power management ma che falliscono nell’essere interoperabili e mantenuti. Qui gli stessi countdown, ear, examon ecc possono rientrare nello stato dell’arte. Nel descriverle devi mettere enfasi sulle mancanze e problematiche che hanno portato all’esigenza di creare un layer di interoperabilità. Puoi anche citare variorum di LLNL, geopm di intel, HDEEM di atos, ecc ecc. Domani ti mando un po’ di paper.
 
-To the best of my knowledge, la maggior parte del panorama del power management, per le applicazioni di HPC, è affrontata tramite soluzioni hardware e software proprietarie, principalmente sviluppate in modo ad hoc dai diversi centri di calcolo. Le alternative più complete e open-source che coprono l'ambito trattato sono GEOPM \cite{GEOPM} e REGALE \cite{REGALE}. Inoltre, uno studio approfondito sull'implementazione e sull'utilizzo di DDS è rappresentato dal middleware implementato in ROS2 chiamato \emph{rmw\_rtps}.
+%Ortogonalmente ci sarebbe lo stato dell’arte relativo a DDS. Qui partirei da ROS spiegando che si è posto un simile problema in robotica e che è stato risolto creando un interoperability layer, ROS basato su DDS. Poi dovresti evidenziare le parti simili, dove un approccio simil ROS funziona e quelle dove non funziona motivando per risposte.
+% ====================================================================================================================================
+The state of the art can be delineated into two key realms pertinent to the research study. Firstly, a comprehensive overview of the existing landscape in HPC power management reveals noteworthy developments and challenges that lay the groundwork for the pursuit of interoperable solutions. Additionally, an exploration of the domain of Data Distribution Service (DDS) %TODO: sbagliato highlights parallels with existing interoperability solutions, while also spotlighting areas where challenges persist.
+\subsection{HPC Power Management}
+In the landscape of power management within High-Performance Computing exhibits a dichotomy marked by non-interoperable solutions and various components interwoven within the HPC powerstack. Despite the presence of algorithms and tools such as Countdown, EAR (Energy Aware Runtime), and Examon, designed to address specific power management challenges, their limited interoperability and maintainability underscore the exigency for a comprehensive interoperability layer. These tools, though efficacious for specific use cases, often fail to cohesively integrate and cooperate due to varying interfaces and implementations.
 
-\subsection{GEOPM}
-\subsection{REGALE}
-\subsection{Middleware}
-% ROS: Uno dei più famosi esempi middleware che implementa DDS come canale di comunicazione è quello usato da ROS2. Infatti rmw
+Within this context, certain solutions have emerged, each with their own strengths and shortcomings. Some of the most well-known solutions include \emph{Variorum} (LLNL), \emph{GEOPM} (Intel), and \emph{HDEEM} (Atos), to name a few. These solutions demonstrate efforts to address power management issues but exhibit varying degrees of interoperability. The need for a unified framework that bridges the gaps between different power management tools and techniques surfaces as a critical issue that necessitates exploration.
+
+\subsection{DDS}
+
+Drawing parallels from the field of robotics, ROS (Robot Operating System) confronted a similar dilemma and subsequently birthed a solution in the form of an interoperability layer built upon DDS. This successfully facilitated seamless communication among disparate robotic components.
+
+In juxtaposing DDS's successes in robotics with the HPC domain, certain parallels emerge. Instances where a ROS-like approach thrives are evident, primarily in scenarios where uniform communication paradigms foster cooperation. However, challenges also manifest in areas where the robotics-inspired solution falls short of delivering adequate interoperability. The manifestation of these challenges serves as a motivation for more nuanced responses that cater to the unique intricacies of HPC power management.
+
+Moreover, our exploration delves into the realm of DDS and its application within the power management context. The middleware implementation, exemplified by \emph{rmw\_dds\_common} in ROS2, provides valuable insights into the practical implementation and utilization of DDS as a generalized middleware in real-world scenarios. This exploration becomes a stepping stone towards achieving the seamless communication and data coordination necessary for effective power management across distributed HPC environments.
 
 
+%TODO: In summary, the current state of the art presents a landscape where diverse power management solutions within HPC grapple with issues of interoperability and cohesiveness. The existing solutions, though valuable, underscore the need for an overarching interoperability layer. Furthermore, the cross-disciplinary lessons garnered from DDS and its success in robotics spotlight areas where similar approaches could be efficacious in HPC, as well as delineating the challenges that necessitate innovative adaptations for successful implementation.
 
-
-\section{Project’s Description} \label{SEC:pd}
+\section{Project's Description} \label{SEC:pd}
+% ====================================================================================================================================
 % Definizione del problema e domande di ricerca: Definisci in termini chiari ed immediatamente comprensibili la questione che vuoi indagare. Articola il problema in domande di ricerca a cui vuoi rispondere.
+% ====================================================================================================================================
 
-% A main point of the PhD project will be the analysis of the performance of different control designs and structures into answering the power and thermal control problem of current and future processors, with the focus on more comprehensive designs. This includes the investigation of more advanced and newer control structures with respect to the PI control, including also machine and deep learning. An interesting approach is investigating Spiking Neural Network (SNN) which are proved comparable to PID while also being capable to adapt at run-time and running on ultra-low power chips \cite{snn1}, \cite{snn2}.
+%Il nucleo centrale del mio progetto di dottorato si concentrerà innanzitutto sull'analisi empirica delle prestazioni di diverse implementazioni di DDS, nonché sulla variazione di configurazioni in una ricerca mirata a determinare l'approccio ottimale. Una volta delineata con chiarezza la soluzione più adatta, l'obiettivo si sposterà verso una maggiore astrazione (leveraging) di tale implementazione, allo scopo di agevolare l'interoperabilità tra i diversi attori coinvolti. Un affascinante percorso di esplorazione sarà rappresentato dall'adozione dell'approccio di stato dell'arte offerto da ROS2 con il suo middleware Ros-Middleware (rmw).
+%TOCHECK GRAMMAR
+The central theme of my PhD project will primarily analyze the performance of various DDS implementations, along with different configurations, in a quest to ascertain the most suitable approach. Once the optimal solution becomes apparent, the focus will shift towards leveraging of this implementation to enable interoperability among the different actors involved. An intriguing approach will be to employ the state-of-the-art framework proposed by ROS2, along with its Ros-Middleware (\emph{rmw}).
 
-% A second point of the project will be to try to fill the void in the open-source community regarding an open-source hardware/software power and thermal controller suitable to be integrated on a broad range of different processors. Carrying on a hardware/software co-design can lead to interesting design choices and the possibility to obtain a performing and efficient system. For example to improve parallel computation of some types of control structures (e.g. machine learning, multiple PIDs, Deep-Reinforcement Learning, Model Predictive Control) the hardware of the controller could contain a multicore cluster for parallel acceleration.
+%Un secondo tassello cruciale del progetto sarà l'effettiva implementazione del middleware creato in tutti gli elementi componenti l'HPC powerstack. Tale implementazione consentirà di illuminare un "interoperable runtime for distributed power management of large-scale HPC systems based on DDS", permettendo l'armoniosa gestione della potenza su larga scala in un ambiente distribuito. Questo ambito si propone di consolidare l'interconnessione tra i vari attori, abilitando una regolazione dinamica e cooperativa delle risorse energetiche nel contesto dei sistemi ad alte prestazioni.
+A second pivotal aspect of the project will encompass the actual implementation of the previously developed middleware across all components constituting the HPC powerstack. This implementation will shed light on an \textbf{"interoperable runtime for distributed power management of large-scale HPC systems based on DDS"}, facilitating the seamless management of power on a significant scale within a distributed environment. This endeavor aims to solidify the interconnection between various actors, enabling dynamic and collaborative resource management within the realm of high-performance systems.
 
-% A middle step will be the development of a simulation framework, needed to develop the firmware in co-design with the hardware of the controller and to compare the various control designs.
+A middle step will be the development of a empiric simulation, needed to test and compare different level of leverages (bare DDS with DDS middleware) considering also increasing entities involved in the communication process.
 
-% The project will focus on High Power Computing (HPC) processors, but the results will be exported and adapted to other types of scenarios, like edge, mobile, automotive, and workstations.
 
-The primary objective of this research is to analyze, design, and develop a runtime system for power management that exploits and leverage the capabilities of the DDS protocol considering all entities that are included and all their interactions in the system. 
-By dynamically adjusting the power consumption of individual components based on their current workloads and communication patterns, the proposed system aims to achieve substantial energy savings without compromising system performance.
-A second point of the project is to explore the potential of utilizing DDS as a basis for runtime power management. By leveraging the advantages of DDS, we intend to develop an open-source power management solution that offers transparency, adaptability, and scalability. %TOTRANSALTE 
-Si proverà anche a fornire un middleware per poter scegliere a piacere una implementazione diversa di DDS
-
+%The primary objective of this research is to analyze, design, and develop a runtime system for power management that exploits and leverage the capabilities of the DDS protocol considering all entities that are included and all their interactions in the system. 
+%By dynamically adjusting the power consumption of individual components based on their current workloads and communication patterns, the proposed system aims to achieve substantial energy savings without compromising system performance.
+%A second point of the project is to explore the potential of utilizing DDS as a basis for runtime power management. By leveraging the advantages of DDS, we intend to develop an open-source power management solution that offers transparency, adaptability, and scalability. 
 
 \section{Expected Results}
 % Obiettivi ed ipotesi della ricerca: Identifica lo scopo della tua ricerca e definisci le finalità conoscitive delle indagine. Esplicita come intendi rispondere alle domande di ricerca2.
