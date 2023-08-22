@@ -15,3 +15,320 @@
   urldate = {}
 }
 
+
+@INPROCEEDINGS{Node-leve-power-manager,
+  author={Sherin M A and Arun Kumar V and Prasanth P and Vasudevan, Raja and Shamshudeen J},
+  booktitle={2016 2nd International Conference on Green High Performance Computing (ICGHPC)}, 
+  title={Node level Power Profiling and Thermal Management in HPC system}, 
+  year={2016},
+  volume={},
+  number={},
+  pages={1-6},
+  doi={10.1109/ICGHPC.2016.7508064}}
+
+
+
+@ARTICLE{thermal_dis,
+  author={Chaparro, Pedro and Gonzáles, José and Magklis, Grigorios and Cai, Qiong and González, Antonio},
+  journal={IEEE Transactions on Parallel and Distributed Systems}, 
+  title={Understanding the Thermal Implications of Multi-Core Architectures}, 
+  year={2007},
+  volume={18},
+  number={8},
+  pages={1055-1065},
+  doi={10.1109/TPDS.2007.1092}}
+  
+@article{power_dis,
+author = {Esmaeilzadeh, Hadi and Blem, Emily and Amant, Ren\'{e}e St. and Sankaralingam, Karthikeyan and Burger, Doug},
+title = {Power Challenges May End the Multicore Era},
+year = {2013},
+issue_date = {February 2013},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {56},
+number = {2},
+issn = {0001-0782},
+url = {https://doi.org/10.1145/2408776.2408797},
+doi = {10.1145/2408776.2408797},
+journal = {Commun. ACM},
+month = feb,
+pages = {93–102},
+numpages = {10}
+}
+  
+  
+@article {Leisersoneaam9744,
+	author = {Leiserson, Charles E. and Thompson, Neil C. and Emer, Joel S. and Kuszmaul, Bradley C. and Lampson, Butler W. and Sanchez, Daniel and Schardl, Tao B.},
+	title = {There{\textquoteright}s plenty of room at the Top: What will drive computer performance after Moore{\textquoteright}s law?},
+	volume = {368},
+	number = {6495},
+	elocation-id = {eaam9744},
+	year = {2020},
+	doi = {10.1126/science.aam9744},
+	publisher = {American Association for the Advancement of Science},
+	issn = {0036-8075},
+	URL = {https://science.sciencemag.org/content/368/6495/eaam9744},
+	eprint = {https://science.sciencemag.org/content/368/6495/eaam9744.full.pdf},
+	journal = {Science}
+}
+
+  
+@inproceedings{fbv,
+author = {Qiu, Pengfei and Wang, Dongsheng and Lyu, Yongqiang and Qu, Gang},
+title = {VoltJockey: Breaching TrustZone by Software-Controlled Voltage Manipulation over Multi-Core Frequencies},
+year = {2019},
+isbn = {9781450367479},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3319535.3354201},
+doi = {10.1145/3319535.3354201},
+pages = {195–209},
+numpages = {15},
+keywords = {dynamic voltage and frequency scaling (DVFS), trustzone, voltage manipulation, low voltage error, fault injection attack},
+location = {London, United Kingdom},
+series = {CCS '19}
+}
+
+@INPROCEEDINGS{pnv,
+author={Tenentes, Vasileios and Das, Shidhartha and Rossi, Daniele and Al-Hashimi, Bashir M.},
+booktitle={2019 IEEE 25th International Symposium on On-Line Testing and Robust System Design (IOLTS)}, 
+title={Run-time Detection and Mitigation of Power-Noise Viruses}, 
+year={2019},
+volume={},
+number={},
+pages={275-280},
+doi={10.1109/IOLTS.2019.8854375}
+}
+
+@book{book11,
+author = {Hennessy, John L. and Patterson, David A.},
+title = {Computer Architecture, Sixth Edition: A Quantitative Approach},
+year = {2017},
+isbn = {0128119055},
+publisher = {Morgan Kaufmann Publishers Inc.},
+address = {San Francisco, CA, USA},
+edition = {6th},
+}
+
+@misc{ibm_repo,
+  author = {IBM},
+  title = {OpenPower OCC},
+  year = {2020},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/open-power/occ}},
+  commit = {ab4dc96fd6cf584c42bd0b45be25458c0e61ad63}
+}
+
+@online{fossi,
+  author = {FOSSi Foundation},
+  title = {The Free and Open Source Silicon Foundation},
+  url = {https://www.fossi-foundation.org/},
+  urldate = {2021-05-16}
+}
+
+
+
+@article{RAPL_data1,
+    author = {Khan, Kashif Nizam and Hirki, Mikael and Niemi, Tapio and Nurminen, Jukka K. and Ou, Zhonghong},
+    title = {RAPL in Action: Experiences in Using RAPL for Power Measurements},
+    year = {2018},
+    issue_date = {April 2018},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    volume = {3},
+    number = {2},
+    issn = {2376-3639},
+    url = {https://doi.org/10.1145/3177754},
+    doi = {10.1145/3177754},
+    abstract = {To improve energy efficiency and comply with the power budgets, it is important to be able to measure the power consumption of cloud computing servers. Intel’s Running Average Power Limit (RAPL) interface is a powerful tool for this purpose. RAPL provides power limiting features and accurate energy readings for CPUs and DRAM, which are easily accessible through different interfaces on large distributed computing systems. Since its introduction, RAPL has been used extensively in power measurement and modeling. However, the advantages and disadvantages of RAPL have not been well investigated yet. To fill this gap, we conduct a series of experiments to disclose the underlying strengths and weaknesses of the RAPL interface by using both customized microbenchmarks and three well-known application level benchmarks: Stream, Stress-ng, and ParFullCMS. Moreover, to make the analysis as realistic as possible, we leverage two production-level power measurement datasets from the Taito, a supercomputing cluster of the Finnish Center of Scientific Computing and also replicate our experiments on Amazon EC2. Our results illustrate different aspects of RAPL and document the findings through comprehensive analysis. Our observations reveal that RAPL readings are highly correlated with plug power, promisingly accurate enough, and have negligible performance overhead. Experimental results suggest RAPL can be a very useful tool to measure and monitor the energy consumption of servers without deploying any complex power meters. We also show that there are still some open issues, such as driver support, non-atomicity of register updates, and unpredictable timings that might weaken the usability of RAPL in certain scenarios. For such scenarios, we pinpoint solutions and workarounds.},
+    journal = {ACM Trans. Model. Perform. Eval. Comput. Syst.},
+    month = mar,
+    articleno = {9},
+    numpages = {26},
+    keywords = {RAPL accuracy, RAPL validation, RAPL, DRAM power, power modeling}
+}
+
+@online{Examon,
+  title = {Examon HPC Monitoring},
+  url = {https://github.com/EEESlab/examon},
+  urldate = {2023-05-16}
+}
+
+@misc{oar,
+  title = {OAR: Resource and Task Manager for Clusters and other Computing Infrastructures},
+  author = {OAR Team},
+  howpublished = {GitHub repository},
+  year = {2011},
+  url = {https://github.com/oar-team/oar}
+}
+TODO:
+ROS
+
+@misc{ear,
+  title = {EAR: Energy Management Framework for High-Performance Computing},
+  author = {Corbalan, Julita and Brochard, Luigi},
+  howpublished = {Barcelona Supercomputing Center (BSC-CNS)},
+  url = {https://www.bsc.es/research-and-development/software-and-apps/software-list/ear}
+}
+
+
+@misc{cesarini2019countdown,
+      title={COUNTDOWN: a Run-time Library for Performance-Neutral Energy Saving in MPI Applications}, 
+      author={Daniele Cesarini and Andrea Bartolini and Pietro Bonfà and Carlo Cavazzoni and Luca Benini},
+      year={2019},
+      eprint={1806.07258},
+      archivePrefix={arXiv},
+      primaryClass={cs.DC}
+}
+
+@INPROCEEDINGS{schone_sky1,
+  author={R. {Schöne} and T. {Ilsche} and M. {Bielert} and A. {Gocht} and D. {Hackenberg}},
+  booktitle={2019 International Conference on High Performance Computing   Simulation (HPCS)}, 
+  title={Energy Efficiency Features of the Intel Skylake-SP Processor and Their Impact on Performance}, 
+  year={2019},
+  volume={},
+  number={},
+  pages={399-406},
+  doi={10.1109/HPCS48598.2019.9188239}
+}
+  
+@INPROCEEDINGS{haswell1,
+  author={D. {Hackenberg} and R. {Schöne} and T. {Ilsche} and D. {Molka} and J. {Schuchart} and R. {Geyer}},
+  booktitle={2015 IEEE International Parallel and Distributed Processing Symposium Workshop}, 
+  title={An Energy Efficiency Feature Survey of the Intel Haswell Processor}, 
+  year={2015},
+  volume={},
+  number={},
+  pages={896-904},
+  doi={10.1109/IPDPSW.2015.70}
+}
+ 
+@ARTICLE{sandy1,
+  author={E. {Rotem} and A. {Naveh} and A. {Ananthakrishnan} and E. {Weissmann} and D. {Rajwan}},
+  journal={IEEE Micro}, 
+  title={Power-Management Architecture of the Intel Microarchitecture Code-Named Sandy Bridge}, 
+  year={2012},
+  volume={32},
+  number={2},
+  pages={20-27},
+  doi={10.1109/MM.2012.12}
+}
+
+@online{linuxKernel,
+  author = {Rafael J. Wysocki},
+  title = {The Linux Kernel: intel\_pstate CPU Performance Scaling Driver},
+  year = 2017,
+  url = {https://www.kernel.org/doc/html/v4.12/admin-guide/pm/intel_pstate.html},
+  urldate = {2021-02-05}
+}
+
+@online{intel_site2,
+  author = {Intel},
+  title = {C-States, P-States, Where the Heck are Those T-States?},
+  year = 2013,
+  url = {https://software.intel.com/content/www/us/en/develop/blogs/c-states-p-states-where-the-heck-are-those-t-states.html},
+  urldate = {2021-02-05}
+}
+
+@inproceedings{intel_avx1,
+author = {Gottschlag, Mathias and Bellosa, Frank},
+year = {2019},
+month = {03},
+pages = {},
+title = {Reducing AVX-Induced Frequency Variation With Core Specialization}
+}
+
+@ARTICLE{zeppelin1,
+  author={T. {Burd} and N. {Beck} and S. {White} and M. {Paraschou} and N. {Kalyanasundharam} and G. {Donley} and A. {Smith} and L. {Hewitt} and S. {Naffziger}},
+  journal={IEEE Journal of Solid-State Circuits}, 
+  title={“Zeppelin”: An SoC for Multichip Architectures}, 
+  year={2019},
+  volume={54},
+  number={1},
+  pages={133-143},
+  doi={10.1109/JSSC.2018.2873584}
+}
+
+@online{DDS,
+  author = {Object Management Group},
+  title = {Data Distribution Service},
+  year = 2004,
+  url = {https://www.omg.org/spec/DDS/1.0}
+}
+
+
+
+@online{RTPS,
+  author = {Object Management Group},
+  title = {DDS Interoperability Wire Protocol},
+  year = 2008,
+  url = {https://www.omg.org/spec/DDSI-RTPS/2.0}
+}
+
+
+@online{hardvard,
+  author = {The Hardvard Gazette},
+  title = {Smaller, faster, greener},
+  year = 2021,
+  url = {https://news.harvard.edu/gazette/story/2021/03/what-will-green-computing-look-like-in-the-future/}
+}
+
+
+@INPROCEEDINGS{Zen3,
+  author={T. {Singh} and S. {Rangarajan} and D. {John} and C. {Henrion} and S. {Southard} and H. {McIntyre} and A. {Novak} and S. {Kosonocky} and R. {Jotwani} and A. {Schaefer} and E. {Chang} and J. {Bell} and M. {Co}},
+  booktitle={2017 IEEE International Solid-State Circuits Conference (ISSCC)}, 
+  title={3.2 Zen: A next-generation high-performance ×86 core}, 
+  year={2017},
+  volume={},
+  number={},
+  pages={52-53},
+  doi={10.1109/ISSCC.2017.7870256}
+ }
+
+ @Inbook{Green2,
+ author="Biedenkopf, Katja
+ and Vanderschueren, Ellen
+ and Petri, Franziska",
+ editor="Costa, Olivier
+ and Van Hecke, Steven",
+ title="Riding the Green Wave? Green Electoral Success and the European Green Deal",
+ bookTitle="The EU Political System After the 2019 European Elections",
+ year="2023",
+ publisher="Springer International Publishing",
+ address="Cham",
+ isbn="978-3-031-12338-2",
+ doi="10.1007/978-3-031-12338-2_17",
+ url="https://doi.org/10.1007/978-3-031-12338-2_17"
+ }
+
+@article{Green,
+  title={Developing a Sustainable IT Capability: Lessons From Intel's Journey},
+  author={Edward Curry and Bill Guyon and Charlie Sheridan and Brian Donnellan},
+  journal={MIS Q. Executive},
+  year={2012},
+  volume={11},
+  pages={3},
+  url={https://api.semanticscholar.org/CorpusID:1690698}
+}
+
+@INPROCEEDINGS{HDEEM,
+  author={Hackenberg, Daniel and Ilsche, Thomas and Schuchart, Joseph and Schöne, Robert and Nagel, Wolfgang E. and Simon, Marc and Georgiou, Yiannis},
+  booktitle={2014 Energy Efficient Supercomputing Workshop}, 
+  title={HDEEM: High Definition Energy Efficiency Monitoring}, 
+  year={2014},
+  volume={},
+  number={},
+  pages={1-10},
+  doi={10.1109/E2SC.2014.13}}
+
+
+@ARTICLE{MOSFET-Scaling,
+  author={Bohr, Mark},
+  journal={IEEE Solid-State Circuits Society Newsletter}, 
+  title={A 30 Year Retrospective on Dennard's MOSFET Scaling Paper}, 
+  year={2007},
+  volume={12},
+  number={1},
+  pages={11-13},
+  doi={10.1109/N-SSC.2007.4785534}}
