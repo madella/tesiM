@@ -20,7 +20,7 @@ The ultimate goal would in fact be to connect the different tools available usin
 \subsection{DDS \& RTPS} \label{SEC:dds}
 DDS (Data Distribution Service)\cite{DDS} and RTPS (Real-Time Publish-Subscribe)\cite{RTPS} constitute two pivotal technologies in the realm of distributed and real-time communications. These technologies play a critical role in enabling efficient and reliable data transmission among interconnected devices and applications, holding particular significance in intricate scenarios such as embedded systems, the Internet of Things, and high-performance applications like HPC.
 
-Specifically, DDS serves as a distributed communication framework that facilitates data exchange among software components distributed across heterogeneous network and allows to define the quality of service policy. On the other hand, RTPS serves as the underlying protocol employed by DDS to realize the publish-subscribe paradigm within real-time networks. RTPS focuses on the dependable delivery of real-time messages, ensuring that data reaches the appropriate recipients in the most efficient manner. This protocol also manages critical aspects such as data flow control and node synchronization.
+Specifically, DDS serves as a distributed communication framework that facilitates data exchange among software components distributed across heterogeneous network and allows to define the quality of service (QoS) policy. On the other hand, RTPS serves as the underlying protocol employed by DDS to realize the publish-subscribe paradigm within real-time networks. RTPS focuses on the dependable delivery of real-time messages, ensuring that data reaches the appropriate recipients in the most efficient manner. This protocol also manages critical aspects such as data flow control and node synchronization.
 
 \section{State of the Art} \label{SEC:soa}
 % ========================================================================================================================================= 
@@ -36,13 +36,24 @@ The state of the art can be delineated into two key realms pertinent to the rese
 
 \subsection{Power Management Demand in HPC}
 In the wake of the termination of Moore's Law and the cessation of Dennard scaling, the gradual reduction in semiconductor manufacturing processes has concomitantly yielded a marked augmentation in power density\cite{MOSFET-Scaling}. This factor, coupled with the escalating exigencies of performance enhancements, and the increase of carbon dioxide emissions associated, has forged an imperative to address and improve the power consumption quandary prevalent within High-Performance-Computing.
+Various mechanism have emerged as a result like: 
+\begin{itemize}
 
-Various solutions have emerged as a result like: (i) Node-Level Energy Limitation\cite{Node-leve-power-manager} that aims to control the energy consumed by each computing node and it is based on dynamically adjusting the power or frequencies of hardware components such as CPUs, GPUs, and memory, based on the running workloads; (ii) Dynamic Voltage and Frequency Scaling\cite{DVFS} (DVFS) that involves dynamically adjusting the voltages and frequencies of hardware components based on the current workload. For example, when the computation demand is low, components can operate at lower frequencies and reduced voltages, thereby reducing energy consumption; (iii) Predictive Analysis and Machine Learning\cite{MLEC}: The use of predictive analysis and machine learning can help optimize energy consumption. Predictive algorithms can forecast load spikes and take preventive measures to reduce consumption, while machine learning can optimize energy management strategies based on historical and real-time data; (iiii) Thermal/Power Capping\cite{intel2023reducing} technologies used to keep operating temperatures and energy consumption in check. When a node or component reaches a certain temperature or power threshold, the system applies automatic restrictions, such as lowering clock frequency or limiting the use of specific components.
+    \item Dynamic Frequency Scaling: a power management technique used in processors that adjust the frequency of the CPU dynamically based on the workload;
+    \item Clock Gating: a technique used in digital circuits to save power by turning off the clock signal to specific sections of a circuit when they are not needed;
+    \item Throttling: controlled reduction of a device's performance by skipping clock cycles in a proportional manner;
+    \item Dynamic Voltage and Frequency Scaling\cite{DVFS} (DVFS): involves dynamically adjusting the voltages and frequencies of hardware components based on the current workload; 
+    \item Power Gating: involves completely shutting off power to specific sections or components of a device when they are not in use;
+    \item Power Capping (RAPL): a strategy to cap or limit the maximum power consumption of a device or system;
+
+\end{itemize}
+% (iii) Predictive Analysis and Machine Learning\cite{MLEC}: The use of predictive analysis and machine learning can help optimize energy consumption. Predictive algorithms can forecast load spikes and take preventive measures to reduce consumption, while machine learning can optimize energy management strategies based on historical and real-time data. Moreover, predictive algorithms often based on ML models are essential for estimating the workload sensitivity to a given power reduction or operating point selection. Indeed, it is essential for energy management and power management algorithm to reason on an implicit or explicit performance model;
 
 \noindent All these methods need to be coordinated and orchestrated by different actors such as system manager, node manager, job manager, task manager and monitors.
 
-\subsubsection {Runtimes \& Interoperability} \label{SSEC:runtimes}
-Within this context, certain solutions have emerged, each with their own strengths and shortcomings. These power-stack utilities have been proposed targeting specific optimizations such as:
+\subsubsection{Algorithms and Interoperability}\label{SSEC:runtimes}
+
+Within this context, certain solutions have come up, each with their own strengths and shortcomings. These power-stack utilities have been proposed targeting specific optimizations such as:
 \begin{itemize}
     \item Countdown\cite{cesarini2019countdown}:\@ an open-source runtime library that is able to identify and automatically reduce the power consumption of the computing elements during communication and synchronization of MPI-based applications;
     \item EAR\cite{ear}:\@ an open-source software that provides monitoring, as well as job accounting focused on power and application performance;
@@ -50,13 +61,15 @@ Within this context, certain solutions have emerged, each with their own strengt
     \item Examon\cite{Examon}:\@  a lightweight monitoring framework for supporting accurate monitoring of power/energy/thermal and architectural parameters in distributed and large-scale high-performance computing installations.
 \end{itemize}
 
-Also some of the most well-known software include \emph{Variorum} (LLNL), \emph{GEOPM} (Intel) \cite{GEOPM}, and \emph{HDEEM} (Atos)\cite{HDEEM}, to name a few.
+Also some of the most well-known software include \emph{Variorum} (LLNL), \emph{GEOPM} (Intel)\cite{GEOPM}, and \emph{HDEEM} (Atos)\cite{HDEEM}, to name a few.
+Additionally, have been introduced predictive analysis and machine learning\cite{MLEC} algorithms. Predictive algorithms can predict load spikes and implement precautionary measures to lower consumption, while machine learning can fine-tune energy management strategies using historical and real-time data. Moreover, predictive algorithms often based on ML models are essential for estimating the workload sensitivity to a given power reduction or operating point selection. Indeed, it is essential for energy management and power management algorithm to reason on an implicit or explicit performance model.
+
 All these solutions represent attempts to tackle power management challenges, yet they display differing levels of compatibility. This lack highlights the urgent need for a comprehensive interoperability framework. These tools, though efficacious for specific use cases, often fail to cohesively integrate and cooperate due to varying interfaces and implementations.
 
 \subsection{DDS \& ROS} \label{SSEC:rosiface}
 % Drawing parallels from the field of robotics, ROS (Robot Operating System) confronted a similar dilemma and subsequently birthed a solution in the form of an interoperability layer built upon DDS. This successfully facilitated seamless communication among disparate robotic components.
 
-Ros Middleware interface\cite{ros2iface}, developed within the context of the Robot Operating System (ROS), stands as a pinnacle of innovation in the realm of creating middleware for Distributed Data Systems. The middleware leverages advanced data serialization techniques, optimized for real-time performance and efficient data exchange. Its incorporation of Quality of Service (QoS) parameters and support for both publish-subscribe and request-response communication patterns underscores its sophistication, making it a state-of-the-art choice for building DDS middleware in distributed environments.
+Ros Middleware interface\cite{ros2iface}, developed within the context of the Robot Operating System (ROS), stands as a pinnacle of innovation in the realm of creating middleware for Distributed Data Systems. The middleware leverages advanced data serialization techniques, optimized for real-time performance and efficient data exchange. Its incorporation of Quality of Service parameters and support for both publish-subscribe and request-response communication patterns underscores its sophistication, making it a state-of-the-art choice for building DDS middleware in distributed environments.
 
 In fact ROS capitalizes on the Data Distribution Service as a foundational communication middleware protocol\cite{ros2iron}, which plays a pivotal role in enabling seamless and efficient data exchange and interaction between the myriad components that constitute a robotic ecosystem.
 
@@ -76,7 +89,7 @@ The central theme of my PhD project will primarily analyze the performance of va
 A second pivotal aspect of the project will encompass the actual implementation of the previously developed middleware across all components constituting the HPC power-stack. This implementation will shed light on an \textbf{"interoperable runtime for distributed power management of large-scale HPC systems based on DDS"}, facilitating the seamless management of power on a significant scale within a distributed environment. This endeavor aims to solidify the interconnection between various actors, enabling dynamic and collaborative resource management within the realm of high-performance systems.
 
 Moreover, the final phase of the project involves studying and implementing a security layer for the previously developed implementation (both DDS and power-stack utilities). This step ensures the safeguarding of the intricate power management interactions and data exchanges, reinforcing the overall reliability and resilience of the system.
-
+\newpage
 \section{Expected Results}
 % Obiettivi ed ipotesi della ricerca: Identifica lo scopo della tua ricerca e definisci le finalità conoscitive delle indagine. Esplicita come intendi rispondere alle domande di ricerca2.
 This project is expected to achieve three main contributions:
@@ -89,7 +102,6 @@ This project is expected to achieve three main contributions:
 \end{itemize}
 
 \section{Proposed project timeline}
-% Cronoprogramma e fattibilità: Includi un cronoprogramma per la realizzazione del tuo progetto di ricerca e discuti la fattibilità del tuo approccio.
 \begin{itemize}
 \item{Year 1:
 \begin{itemize}
@@ -112,9 +124,8 @@ This project is expected to achieve three main contributions:
 \section{Outline of the proposed findings assessment criteria}
 The criteria to asses the proposed findings will be:
 \begin{itemize}
-    \item An open-source middleware capable of using different implementation of DDS able to allow the interoperability of the entire power stack;
-    \item An exhaustive analysis of different DDS configurations and different implementations relevant to the power management;
+    \item An open-source middleware capable of using different implementation of DDS able to allow the interoperability of the entire power stack;    
     \item The development of a simulation environment able to provide reliable results;
-    \item The possibility to integrate the complete power manager into a real supercomputer;
-    %TODO: metterei analisi e caratterizzazione del problema di power management in production HPC environment.
+    \item An exhaustive analysis of different DDS configurations and different implementations relevant to power management;
+    \item Analysis and characterization of the power management problem in a production HPC environment;
 \end{itemize}
