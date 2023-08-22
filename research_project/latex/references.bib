@@ -125,26 +125,21 @@ edition = {6th},
 }
 
 
-
-@article{RAPL_data1,
-    author = {Khan, Kashif Nizam and Hirki, Mikael and Niemi, Tapio and Nurminen, Jukka K. and Ou, Zhonghong},
-    title = {RAPL in Action: Experiences in Using RAPL for Power Measurements},
-    year = {2018},
-    issue_date = {April 2018},
-    publisher = {Association for Computing Machinery},
-    address = {New York, NY, USA},
-    volume = {3},
-    number = {2},
-    issn = {2376-3639},
-    url = {https://doi.org/10.1145/3177754},
-    doi = {10.1145/3177754},
-    abstract = {To improve energy efficiency and comply with the power budgets, it is important to be able to measure the power consumption of cloud computing servers. Intel’s Running Average Power Limit (RAPL) interface is a powerful tool for this purpose. RAPL provides power limiting features and accurate energy readings for CPUs and DRAM, which are easily accessible through different interfaces on large distributed computing systems. Since its introduction, RAPL has been used extensively in power measurement and modeling. However, the advantages and disadvantages of RAPL have not been well investigated yet. To fill this gap, we conduct a series of experiments to disclose the underlying strengths and weaknesses of the RAPL interface by using both customized microbenchmarks and three well-known application level benchmarks: Stream, Stress-ng, and ParFullCMS. Moreover, to make the analysis as realistic as possible, we leverage two production-level power measurement datasets from the Taito, a supercomputing cluster of the Finnish Center of Scientific Computing and also replicate our experiments on Amazon EC2. Our results illustrate different aspects of RAPL and document the findings through comprehensive analysis. Our observations reveal that RAPL readings are highly correlated with plug power, promisingly accurate enough, and have negligible performance overhead. Experimental results suggest RAPL can be a very useful tool to measure and monitor the energy consumption of servers without deploying any complex power meters. We also show that there are still some open issues, such as driver support, non-atomicity of register updates, and unpredictable timings that might weaken the usability of RAPL in certain scenarios. For such scenarios, we pinpoint solutions and workarounds.},
-    journal = {ACM Trans. Model. Perform. Eval. Comput. Syst.},
-    month = mar,
-    articleno = {9},
-    numpages = {26},
-    keywords = {RAPL accuracy, RAPL validation, RAPL, DRAM power, power modeling}
+@misc{ros2iron,
+  title = {ROS 2 Documentation: Iron documentation},
+  author = {Open Robotics},
+  year = {2023},
+  howpublished = {\url{https://docs.ros.org/en/iron/index.html}}
 }
+
+
+@misc{ros2iface,
+  title = {ROS 2 middleware interface},
+  author = {Thomas, Dirk},
+  year = {2017},
+  howpublished = {\url{https://design.ros2.org/articles/ros_middleware_interface.html}}
+}
+
 
 @online{Examon,
   title = {Examon HPC Monitoring},
@@ -159,8 +154,32 @@ edition = {6th},
   year = {2011},
   url = {https://github.com/oar-team/oar}
 }
-TODO:
-ROS
+
+@misc{intel2023reducing,
+  title = {Reducing Energy Consumption and Costs},
+  author = {Intel},
+  year = {2018},
+  howpublished = {\url{https://www.intel.com/content/dam/www/public/us/en/documents/case-studies/reducing-energy-consumption-and-costs.pdf}}
+}
+
+
+@unknown{MLEC,
+author = {Mosavi, Amir and Bahmani, Abdullah},
+year = {2019},
+month = {03},
+pages = {},
+title = {Energy Consumption Prediction Using Machine Learning}
+}
+
+@article{DVFS,
+  title={Latency-aware DVFS for efficient power state transitions on many-core architectures},
+  author={Lai, Zhiquan and Lam, King Tin and Wang, Cho-Li and Su, Jinshu},
+  journal={The Journal of Supercomputing},
+  volume={71},
+  pages={2720--2747},
+  year={2015},
+  publisher={Springer}
+}
 
 @misc{ear,
   title = {EAR: Energy Management Framework for High-Performance Computing},
