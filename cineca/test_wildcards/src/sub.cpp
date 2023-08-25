@@ -99,7 +99,7 @@ private:
                     clock_gettime(CLOCK_MONOTONIC,&received_time_);
                     received_vector_.push_back(received_time_);
                     samples_++;
-                    std::cout << "Message: " << hello_.message() << " after time: " << received_time_.tv_nsec << " RECEIVED." << std::endl;
+                    // std::cout << "Message: " << hello_.message() << " after time: " << received_time_.tv_nsec << " RECEIVED." << std::endl;
                 }
             }
         }
@@ -246,7 +246,7 @@ public:
     {
         while(listener_.pubPresent)
         {
-            std::this_thread::sleep_for(std::chrono::microseconds(100));
+            std::this_thread::sleep_for(std::chrono::microseconds(150));
         }
         return listener_.received_vector_;
     }
@@ -280,6 +280,8 @@ int main(
     std::string inputString = argv[1];
     std::string transport = argv[2];  
     std::string write = argv[3]; 
+    std::string group = argv[4]; 
+
     char* partition = const_cast<char*>(inputString.c_str());
     std::vector<timespec> save;
     HelloWorldSubscriber* mysub = new HelloWorldSubscriber();
@@ -287,10 +289,8 @@ int main(
     {
         save = mysub->run();
     }
-    // for (const auto& element : save) {
-    //     std::cout << " received_ns: " <<  element.tv_nsec << std::endl;
-    // }
-    std::string filename= "sub_"+ transport + "_" + inputString + "_" + write +".data";
+
+    std::string filename= "group" + group +"/sub_" + "_" + transport + "_" + inputString + "_" + write +".data";
     printDataToFile(filename,save);
 
     delete mysub;

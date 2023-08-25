@@ -138,46 +138,36 @@ public:
     {
         hello_.index(0);
         hello_.message("customTOPIC");
-        // Init DPQos
+        
         DomainParticipantQos participantQos;
         participantQos.name("transport_custom");
-        // Set leaseDuration (for discovery)
         participantQos.wire_protocol().builtin.discovery_config.leaseDuration = eprosima::fastrtps::c_TimeInfinite;
-        // Setting up the transport protocol
+
         if ("tcp" == transport){
-            std::cout << "using tcp" << std::endl;
-            // Disable default-auto configuration
+            std::cout << "used tcp" << std::endl;
+            uint32_t port = 5100;
             participantQos.transport().use_builtin_transports = false;
-            // Setting up the descriptor for tcpv4 and adding to DPQos
+
             std::shared_ptr<TCPv4TransportDescriptor> descriptor = std::make_shared<TCPv4TransportDescriptor>();
-            descriptor->add_listener_port(5100);
+            descriptor->sendBufferSize = 0;
+            descriptor->receiveBufferSize = 0;
+            descriptor->add_listener_port(port);
             participantQos.transport().user_transports.push_back(descriptor);
-            // descriptor->set_WAN_address("80.80.99.45"); no needed on localhost.// On different node ips,it needs to be checked
-
-            // This part is not mandatory, but maybe useful to make entities communicate in different nodes. This i s TCP-SERVER configuration
-
-            // eprosima::fastrtps::rtps::Locator_t locator;
-            // eprosima::fastrtps::rtps::IPLocator::setIPv4(locator, "127.0.0.1");  /// Here in localhost we should use 127.0.0.1;different nodes: ip's node 80.80.99.45
-            // eprosima::fastrtps::rtps::IPLocator::setWan(locator, "127.0.0.1");  // Here in localhost we should use 127.0.0.1;different nodes: ip's node 80.80.99.45
-            // eprosima::fastrtps::rtps::IPLocator::setPhysicalPort(locator, 5100);
-            // eprosima::fastrtps::rtps::IPLocator::setLogicalPort(locator, 5100);
-            // participantQos.wire_protocol().builtin.metatrafficUnicastLocatorList.push_back(locator);
-            // participantQos.wire_protocol().default_unicast_locator_list.push_back(locator);
         }
         else if ("udpM" == transport)
         {
-            std::cout << "using udp-multicast" << std::endl;
+            std::cout << "used udp-multicast" << std::endl;
         }
         else if ("shm" == transport)
         {
-            std::cout << "using sharedMemory" << std::endl;
+            std::cout << "used sharedMemory" << std::endl;
             participantQos.transport().use_builtin_transports = false;
             auto sm_transport = std::make_shared<SharedMemTransportDescriptor>();
             sm_transport->segment_size(2 * 1024 * 1024);
             participantQos.transport().user_transports.push_back(sm_transport);
         }
         else {
-            std::cout << "using udp" << std::endl;
+            std::cout << "used udp" << std::endl;
         }
 
 
@@ -211,13 +201,13 @@ public:
 
         DataWriterQos wqos=DATAWRITER_QOS_DEFAULT;
         if ("tcp" == transport){
-            // wqos.history().kind = KEEP_LAST_HISTORY_QOS;
-            // wqos.history().depth = 30;
-            // wqos.resource_limits().max_samples = 50;
-            // wqos.resource_limits().allocated_samples = 20;
-            // wqos.reliable_writer_qos().times.heartbeatPeriod.seconds = 2;
-            // wqos.reliable_writer_qos().times.heartbeatPeriod.nanosec = 200 * 1000 * 1000;
-            // wqos.reliability().kind = RELIABLE_RELIABILITY_QOS;
+            wqos.history().kind = KEEP_LAST_HISTORY_QOS;
+            wqos.history().depth = 30;
+            wqos.resource_limits().max_samples = 50;
+            wqos.resource_limits().allocated_samples = 20;
+            wqos.reliable_writer_qos().times.heartbeatPeriod.seconds = 2;
+            wqos.reliable_writer_qos().times.heartbeatPeriod.nanosec = 200 * 1000 * 1000;
+            wqos.reliability().kind = RELIABLE_RELIABILITY_QOS;
         }
         wqos.publish_mode().kind= SYNCHRONOUS_PUBLISH_MODE; //  ensure sync mode
         writer_ = publisher_->create_datawriter(topic_, wqos, &listener_);
@@ -272,9 +262,8 @@ public:
         {
             
             uint64_t tsc_start(0),tsc_end(0);
-            // Get PE syscall
+
             auto pe_instruction=get_pe(PERF_COUNT_HW_INSTRUCTIONS);
-            // 
             ioctl(pe_instruction, PERF_EVENT_IOC_RESET, 0);
             clock_gettime(CLOCK_MONOTONIC, &metrics_.start_time);
             ioctl(pe_instruction, PERF_EVENT_IOC_ENABLE, 0);
@@ -343,17 +332,13 @@ int main(
     }
     std::string inputString = argv[1]; 
     std::string write = argv[2]; 
-    char* transportMode = const_cast<char*>(inputString.c_str());
+    char* topicName = const_cast<char*>(inputString.c_str());
     uint32_t samples = 10;
     std::vector<metrics_return> save;
     HelloWorldPublisher* mypub = new HelloWorldPublisher();
-    if(mypub->init(transportMode))
+    if(mypub->init(topicName))
     {
         save = mypub->run(samples);
-    }
-
-    if (!save.empty()) {
-        save.erase(save.begin());
     }
     // for (const auto& element : save) {
     //     std::cout << "cycles: " << element.cycles << " instruction: "<< element.instructions << " start_ns: " <<  element.start_time.tv_nsec << " end_ns: " << element.end_time.tv_nsec << std::endl;

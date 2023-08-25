@@ -345,12 +345,9 @@ int main(
         save = mypub->run(samples);
     }
 
-    if (!save.empty()) {
-        save.erase(save.begin());
-    } 
-    std::string filename= "pub_"+ transport +"_" + inputString + "_" + write +".data";
+    std::string filename= "pubs/pub_"+ transport +"_" + inputString + "_" + write +".data";
     printDataToFile(filename,save);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000)); //To wait that all message is received
+    std::this_thread::sleep_for(std::chrono::milliseconds(1500)); //To wait that all message is received
     delete mypub;
     return 0;
 }
