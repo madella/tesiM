@@ -38,9 +38,11 @@ Baically 4 things
 - [ ] Redo all the tests inside the same node# (__how?__) one of g100_prod_part [how](https://slurm.schedmd.com/srun.html)
 - [ ] with both eth and infinband
 - [ ] boxplot
-- [ ] more than 10 messages for latency & THROUGHPUT
+- [ ] more than 100 messages for latency & THROUGHPUT
+  - [ ] prepare the test
 - [ ] metrics in S
 - [ ] tcp on different nodes (hostname -i)
+  - [ ] prepare the test
 - [ ] check time shifting
 - [ ] request for thesis
 
