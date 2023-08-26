@@ -19,7 +19,7 @@
 
 #include "HelloWorldPubSubTypes.h"
 
-
+#include <inttypes.h>
 #include <functional>
 #include <fastdds/dds/domain/DomainParticipantFactory.hpp>
 #include <fastdds/dds/domain/DomainParticipant.hpp>
@@ -141,27 +141,22 @@ public:
     }
 
     //!Initialize the subscriber
-    bool init(std::string transport,char * partition)
+    bool init(std::string transport,std::string partition,std::string ip, uint16_t port)
     {
         DomainParticipantQos participantQos;
         participantQos.name("transport_custom");
         participantQos.wire_protocol().builtin.discovery_config.leaseDuration = eprosima::fastrtps::c_TimeInfinite;
 
         if ("tcp" == transport){
-            std::cout << "using tcp" << std::endl;
-            // Client: do not configure listening port!
-            // Set up tcp transport mode
-            participantQos.transport().use_builtin_transports = false;
-            std::shared_ptr<TCPv4TransportDescriptor> descriptor = std::make_shared<TCPv4TransportDescriptor>();
-            participantQos.transport().user_transports.push_back(descriptor);
-            // Set initial peers
+            std::cout << "used tcp" << std::endl;
             Locator initial_peer_locator;
             initial_peer_locator.kind = LOCATOR_KIND_TCPv4;
-            //IPLocator::setIPv4(initial_peer_locator, "80.80.99.45"); // Here in localhost we should use 127.0.0.1; different nodes: ip's node ex. 80.80.99.45. 
-            eprosima::fastrtps::rtps::IPLocator::setPhysicalPort(initial_peer_locator, 5100);
-            eprosima::fastrtps::rtps::IPLocator::setLogicalPort(initial_peer_locator, 5100);
+            std::shared_ptr<TCPv4TransportDescriptor> descriptor = std::make_shared<TCPv4TransportDescriptor>();
+            IPLocator::setIPv4(initial_peer_locator, ip);
+            initial_peer_locator.port = port;
             participantQos.wire_protocol().builtin.initialPeersList.push_back(initial_peer_locator);
-
+            participantQos.transport().use_builtin_transports = false;
+            participantQos.transport().user_transports.push_back(descriptor);
         }
         else if ("udpM" == transport)
         {
@@ -204,7 +199,7 @@ public:
         // Create the Subscriber
         SubscriberQos subscriberQos = SUBSCRIBER_QOS_DEFAULT;
 
-        subscriberQos.partition().push_back(partition);  //SET PARTITION PASSED IN argv
+        subscriberQos.partition().push_back(partition.c_str());  //SET PARTITION PASSED IN argv
        
         subscriber_ = participant_->create_subscriber(subscriberQos, nullptr);
 
@@ -271,26 +266,47 @@ void printDataToFile(const std::string& filename, std::vector<timespec> vector_t
 int main(
         int argc,
         char** argv)
-{
-
+{        
     if (argc < 4) {
-        std::cout << "USAGE: /$0 partition transport N" << std::endl;
-        return 1;
+            std::cout << "USAGE: partition transport #sub group tcp[ip,port] N" << std::endl;
+            return 1;
     }
-    std::string inputString = argv[1];
-    std::string transport = argv[2];  
-    std::string write = argv[3]; 
+    std::string ip ;
+    uint16_t port ;
+
+    std::string partition(argv[1]);
+    std::string transport = argv[2]; 
+    std::string n_of_sub = argv[3]; 
     std::string group = argv[4]; 
 
-    char* partition = const_cast<char*>(inputString.c_str());
+    if ("tcp" == transport){
+        if (argc < 7) {
+             std::cout << "USAGE: partition transport #sub group tcp[ip,port] N" << std::endl;
+            return 1;
+        }
+
+        char *end;
+        intmax_t val = strtoimax(argv[6], &end, 10);        
+        port = (uint16_t) val;
+        ip = argv[5];
+        }
+    else{
+
+        ip = "nullptr";
+        port = 5100;
+    }
+
+
+
+
     std::vector<timespec> save;
     HelloWorldSubscriber* mysub = new HelloWorldSubscriber();
-    if(mysub->init(transport,partition))
+    if(mysub->init(transport,partition,ip,port))
     {
         save = mysub->run();
     }
 
-    std::string filename= "group" + group +"/sub_" + "_" + transport + "_" + inputString + "_" + write +".data";
+    std::string filename= "group" + group +"/sub_" + transport + "_" + partition + "_" + n_of_sub +".data";
     printDataToFile(filename,save);
 
     delete mysub;

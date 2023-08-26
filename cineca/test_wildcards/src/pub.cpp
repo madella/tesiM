@@ -20,7 +20,7 @@
 #include <fastdds/rtps/transport/shared_mem/SharedMemTransportDescriptor.h>
 #include <fastdds/rtps/transport/UDPv4TransportDescriptor.h>
 #include <thread>
-
+#include <inttypes.h>
 #include "HelloWorldPubSubTypes.h"
 
 #include <fastdds/dds/domain/DomainParticipantFactory.hpp>
@@ -134,7 +134,7 @@ public:
         DomainParticipantFactory::get_instance()->delete_participant(participant_);
     }
 
-    bool init(std::string transport,char * partition)
+    bool init(std::string transport,std::string partition,std::string ip, uint16_t port)
     {
         hello_.index(0);
         hello_.message("customTOPIC");
@@ -145,13 +145,13 @@ public:
         participantQos.wire_protocol().builtin.discovery_config.leaseDuration = eprosima::fastrtps::c_TimeInfinite;
         // Setting up the transport protocol
         if ("tcp" == transport){
-            std::cout << "using tcp" << std::endl;
-            // Disable default-auto configuration
+            std::cout << "used tcp" << std::endl;
             participantQos.transport().use_builtin_transports = false;
-            // Setting up the descriptor for tcpv4 and adding to DPQos
             std::shared_ptr<TCPv4TransportDescriptor> descriptor = std::make_shared<TCPv4TransportDescriptor>();
-            descriptor->add_listener_port(5100);
-            participantQos.transport().user_transports.push_back(descriptor);
+            descriptor->sendBufferSize = 0;
+            descriptor->receiveBufferSize = 0;
+            descriptor->add_listener_port(port);
+            participantQos.transport().user_transports.push_back(descriptor)
         }
         else if ("udpM" == transport)
         {
@@ -192,7 +192,7 @@ public:
         // Create the Publisher
 
         PublisherQos publisherQos = PUBLISHER_QOS_DEFAULT; 
-        publisherQos.partition().push_back(partition); 
+        publisherQos.partition().push_back(partition.c_str()); 
         publisher_ = participant_->create_publisher(publisherQos, nullptr);
 
         if (publisher_ == nullptr)
@@ -325,27 +325,46 @@ void printDataToFile(const std::string& filename, std::vector<metrics_return> ve
 }
 
 
-int main(
-        int argc,
-        char** argv)
-{
+int main(int argc,char** argv){
+
     if (argc < 4) {
-        std::cout << "USAGE: /$0 partition transport N" << std::endl;
+        std::cout << "USAGE: partition transport #pub tcp[ip,port] N" << std::endl;
         return 1;
     }
-    std::string inputString = argv[1]; 
+    std::string ip ;
+    uint16_t port ;
+
+    std::string partition(argv[1]);
     std::string transport = argv[2]; 
     std::string write = argv[3]; 
-    char* partition = const_cast<char*>(inputString.c_str());
-    uint32_t samples = 10;
+    
+    if ("tcp" == transport){
+        if (argc < 6) {
+             std::cout << "USAGE: partition transport #pub tcp[ip,port] N" << std::endl;
+            return 1;
+        }
+
+        char *end;
+        intmax_t val = strtoimax(argv[5], &end, 10);        
+        port = (uint16_t) val;
+        ip = argv[4];
+        }
+    else{
+        ip = "127.0.0.1";
+        port = 5100;
+    }
+    std::cout << "pub started with ip: " << ip << " port: " << port << std::endl;
+    uint32_t samples = 100;
     std::vector<metrics_return> save;
     HelloWorldPublisher* mypub = new HelloWorldPublisher();
-    if(mypub->init(transport,partition))
+    
+    if(mypub->init(transport,partition,ip,port))
     {
         save = mypub->run(samples);
     }
+    if ("part*" == partition){partition="part+";} // For not messing windows    
 
-    std::string filename= "pubs/pub_"+ transport +"_" + inputString + "_" + write +".data";
+    std::string filename= "pubs/pub_"+ transport +"_" + partition + "_" + write +".data";
     printDataToFile(filename,save);
     std::this_thread::sleep_for(std::chrono::milliseconds(1500)); //To wait that all message is received
     delete mypub;

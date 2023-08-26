@@ -41,3 +41,4 @@ In order to be more clear for this and for the next weeks, for each **data_proce
 #### Monitor
 
 ## Latex
+Inside this folder my thesis will be written

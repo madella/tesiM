@@ -1,0 +1,6 @@
+scp -r A:\tesi\tesiM\cineca\test_wildcards gmadella@login.g100.cineca.it:/g100/home/userexternal/gmadella/test_2
+
+ssh giacomo.madella@studio.unibo.it --provisioner cineca-hpc
+
+# Avvio del secondo comando SSH
+ssh gmadella@login.g100.cineca.it
