@@ -29,4 +29,8 @@ echo "waiting 10 second to let everythin close by their own"
 sleep 10
 pkill sub
 pkill pub
+echo "movin files"
+if [ ! -d "data" ]; then mkdir "data" ;fi # Make all directory necessary for store datas
+mv group* data/
+mv pubs data/
 exit 0

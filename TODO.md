@@ -38,13 +38,14 @@ Baically 4 things
 - [ ] Redo all the tests inside the same node# (__how?__) one of g100_prod_part [how](https://slurm.schedmd.com/srun.html)
 - [ ] with both eth and infinband
 - [ ] boxplot
-- [ ] more than 100 messages for latency 
+- [x] more than 100 messages for latency 
   - [x] prepare the test
 - [ ] THROUGHPUT
 - [x] metrics in S
 - [ ] tcp on different nodes (hostname -i)
   - [x] prepare the test
-- [ ] check time shifting
+- [x] check time shifting: non mi è permesso controllare lo stato di NTP con ntpd -p
+  - [ ] In qualsiasi caso è stato cambiato da CLOCK_MONOTONIC a CLOCK_REALTIME
 - [ ] request for thesis
 
 ---
