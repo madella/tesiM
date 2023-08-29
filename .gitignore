@@ -38,4 +38,6 @@ wrap_rwm/
 build/
 *.data
 
+data/
+
 windows_utils.txt
