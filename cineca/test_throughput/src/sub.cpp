@@ -96,12 +96,11 @@ private:
             {
                 if (info.valid_data)
                 {
-                    clock_gettime(CLOCK_REALTIME,&received_time_);
+                    clock_gettime(CLOCK_MONOTONIC,&received_time_);
                     received_vector_.push_back(received_time_);
                     samples_++;
                     // std::cout << "Message: " << hello_.message() << " after time: " << received_time_.tv_nsec << " RECEIVED." << std::endl;
                 }
-                else { std::cout << "message not valid" << std::endl;}
             }
         }
         HelloWorld hello_;
@@ -145,6 +144,9 @@ public:
     bool init(std::string transport,std::string partition,std::string ip, uint16_t port)
     {
         DomainParticipantQos participantQos;
+        participantQos.name("transport_custom");
+        participantQos.wire_protocol().builtin.discovery_config.leaseDuration = eprosima::fastrtps::c_TimeInfinite;
+
         if ("tcp" == transport){
             std::cout << "used tcp" << std::endl;
             Locator initial_peer_locator;
@@ -155,7 +157,6 @@ public:
             participantQos.wire_protocol().builtin.initialPeersList.push_back(initial_peer_locator);
             participantQos.transport().use_builtin_transports = false;
             participantQos.transport().user_transports.push_back(descriptor);
-
         }
         else if ("udpM" == transport)
         {
@@ -172,10 +173,7 @@ public:
         else {
             std::cout << "using udp" << std::endl;
         }
-        participantQos.name("transport_custom");
-        participantQos.wire_protocol().builtin.discovery_config.leaseDuration = 
-        
-        eprosima::fastrtps::c_TimeInfinite;
+
         participant_ = DomainParticipantFactory::get_instance()->create_participant(0, participantQos);
 
         if (participant_ == nullptr)
@@ -243,7 +241,7 @@ public:
     {
         while(listener_.pubPresent)
         {
-            std::this_thread::sleep_for(std::chrono::microseconds(150));
+            std::this_thread::sleep_for(std::chrono::microseconds(100));
         }
         return listener_.received_vector_;
     }
@@ -279,28 +277,20 @@ int main(
     std::string partition(argv[1]);
     std::string transport = argv[2]; 
     std::string n_of_sub = argv[3]; 
-    std::string group = argv[4]; 
 
     if ("tcp" == transport){
         if (argc < 7) {
              std::cout << "USAGE: partition transport #sub group tcp[ip,port] N" << std::endl;
             return 1;
         }
-
+        ip = argv[4];
         char *end;
-        intmax_t val = strtoimax(argv[6], &end, 10);        
+        intmax_t val = strtoimax(argv[5], &end, 10);        
         port = (uint16_t) val;
-        ip = argv[5];
-        }
-    else{
-
-        ip = "nullptr";
-        port = port;
+        } else {
+        ip = "127.0.0.1";
+        port = 5100;
     }
-
-
-
-
     std::vector<timespec> save;
     HelloWorldSubscriber* mysub = new HelloWorldSubscriber();
     if(mysub->init(transport,partition,ip,port))
@@ -308,10 +298,9 @@ int main(
         save = mysub->run();
     }
 
-    delete mysub;
-
-    std::string filename= "group" + group +"/sub_" + transport + "_" + partition + "_" + n_of_sub +".data";
+    std::string filename= "/sub_" + transport + "_" + partition + "_" + n_of_sub +".data";
     printDataToFile(filename,save);
 
+    delete mysub;
     return 0;
 }

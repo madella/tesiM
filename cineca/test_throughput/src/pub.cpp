@@ -151,7 +151,7 @@ public:
             descriptor->sendBufferSize = 0;
             descriptor->receiveBufferSize = 0;
             descriptor->add_listener_port(port);
-            participantQos.transport().user_transports.push_back(descriptor);
+            participantQos.transport().user_transports.push_back(descriptor)
         }
         else if ("udpM" == transport)
         {
@@ -199,16 +199,17 @@ public:
         {
             return false;
         }
-        
+
+
         DataWriterQos wqos=DATAWRITER_QOS_DEFAULT;
         if ("tcp" == transport){
-            wqos.history().kind = KEEP_LAST_HISTORY_QOS;
-            wqos.history().depth = 30;
-            wqos.resource_limits().max_samples = 50;
-            wqos.resource_limits().allocated_samples = 20;
-            wqos.reliable_writer_qos().times.heartbeatPeriod.seconds = 2;
-            wqos.reliable_writer_qos().times.heartbeatPeriod.nanosec = 200 * 1000 * 1000;
-            wqos.reliability().kind = RELIABLE_RELIABILITY_QOS;
+            // wqos.history().kind = KEEP_LAST_HISTORY_QOS;
+            // wqos.history().depth = 30;
+            // wqos.resource_limits().max_samples = 50;
+            // wqos.resource_limits().allocated_samples = 20;
+            // wqos.reliable_writer_qos().times.heartbeatPeriod.seconds = 2;
+            // wqos.reliable_writer_qos().times.heartbeatPeriod.nanosec = 200 * 1000 * 1000;
+            // wqos.reliability().kind = RELIABLE_RELIABILITY_QOS;
         }
         wqos.publish_mode().kind= SYNCHRONOUS_PUBLISH_MODE; //  ensure sync mode
         writer_ = publisher_->create_datawriter(topic_, wqos, &listener_);
@@ -267,7 +268,7 @@ public:
             auto pe_instruction=get_pe(PERF_COUNT_HW_INSTRUCTIONS);
             // 
             ioctl(pe_instruction, PERF_EVENT_IOC_RESET, 0);
-            clock_gettime(CLOCK_REALTIME, &metrics_.start_time);
+            clock_gettime(CLOCK_MONOTONIC, &metrics_.start_time);
             ioctl(pe_instruction, PERF_EVENT_IOC_ENABLE, 0);
 
             read_tsc(&tsc_start);
@@ -275,7 +276,7 @@ public:
             read_tsc(&tsc_end);
             
             ioctl(pe_instruction, PERF_EVENT_IOC_DISABLE, 0);
-            clock_gettime(CLOCK_REALTIME, &metrics_.end_time);
+            clock_gettime(CLOCK_MONOTONIC, &metrics_.end_time);
             metrics_.instructions = read_hw_counter(pe_instruction);
             close(pe_instruction);
 
@@ -302,8 +303,6 @@ public:
                 // std::cout << "published in cycles: " << metric.cycles << " instruction: "<< metric.instructions << " time: " << metric.end_time.tv_nsec - metric.start_time.tv_nsec << " and sec: " << metric.end_time.tv_sec - metric.start_time.tv_sec << std::endl;
                 metric_vector.push_back(metric);
             }
-
-            //std::this_thread::sleep_for(std::chrono::milliseconds(200));
         }
         return metric_vector;
     }
@@ -347,12 +346,13 @@ int main(int argc,char** argv){
         intmax_t val = strtoimax(argv[5], &end, 10);        
         port = (uint16_t) val;
         ip = argv[4];
-        std::cout << "pub started with ip: " << ip << " port: " << port << std::endl;
-    } else {
+        }
+    else{
         ip = "127.0.0.1";
         port = 5100;
     }
-    uint32_t samples = 100;
+    std::cout << "pub started with ip: " << ip << " port: " << port << std::endl;
+    uint32_t samples = 10000;
     std::vector<metrics_return> save;
     HelloWorldPublisher* mypub = new HelloWorldPublisher();
     
@@ -361,10 +361,10 @@ int main(int argc,char** argv){
         save = mypub->run(samples);
     }
     if ("part*" == partition){partition="part+";} // For not messing windows    
-    
-    std::this_thread::sleep_for(std::chrono::milliseconds(5000)); //To wait that all message is received
-    delete mypub; // Così i sub quittano
-    std::string filename= "pubs/pub_"+ transport +"_" + partition + "_" + write +".data";
+
+    std::string filename= "pub_"+ transport +"_" + partition + "_" + write +".data";
     printDataToFile(filename,save);
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000)); //To wait that all message is received
+    delete mypub;
     return 0;
 }

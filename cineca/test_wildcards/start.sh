@@ -3,7 +3,7 @@ BASE="./test_wildcards/build"
 
 if [ ! -d "pubs" ]; then mkdir "pubs" ;fi # Make all directory necessary for store datas
 
-for transp in "udp" "udpM" ; do
+for transp in "udp" ; do
     echo "Starting $transp protocol tests..."
     echo "
     Starting dummy pub"
@@ -11,17 +11,19 @@ for transp in "udp" "udpM" ; do
     secondpub= $!
     echo "waiting for pub..."
     wait $secondpub
+    pkill sub
 
     echo "
     Starting real pub"
-    for (( jj=1; jj < 13; jj+=2)); do
+    for (( jj=1; jj < 17; jj+=2)); do
+        echo "Sleeping $jj to permit subs of creating structures"
+        sleep $jj
         if [ $jj -eq 3 ]; then jj=2 ; fi
         taskset -c 0 $BASE/pub "part*" $transp $jj &
         fisrtpub=$!
         echo "waiting for pub..."
         wait $fisrtpub
-        echo "waiting 5 seconds..."
-        sleep 5
+        echo "deleting remained subs..."
     done
 
 done

@@ -20,7 +20,7 @@
 #include <fastdds/rtps/transport/shared_mem/SharedMemTransportDescriptor.h>
 #include <fastdds/rtps/transport/UDPv4TransportDescriptor.h>
 #include <thread>
-
+#include <inttypes.h>
 #include "HelloWorldPubSubTypes.h"
 
 #include <fastdds/dds/domain/DomainParticipantFactory.hpp>
@@ -134,20 +134,19 @@ public:
         DomainParticipantFactory::get_instance()->delete_participant(participant_);
     }
 
-    bool init(std::string transport)
+    bool init(std::string transport,std::string partition,std::string ip, uint16_t port)
     {
         hello_.index(0);
         hello_.message("customTOPIC");
-        
+        // Init DPQos
         DomainParticipantQos participantQos;
         participantQos.name("transport_custom");
+        // Set leaseDuration (for discovery)
         participantQos.wire_protocol().builtin.discovery_config.leaseDuration = eprosima::fastrtps::c_TimeInfinite;
-
+        // Setting up the transport protocol
         if ("tcp" == transport){
             std::cout << "used tcp" << std::endl;
-            uint32_t port = 5100;
             participantQos.transport().use_builtin_transports = false;
-
             std::shared_ptr<TCPv4TransportDescriptor> descriptor = std::make_shared<TCPv4TransportDescriptor>();
             descriptor->sendBufferSize = 0;
             descriptor->receiveBufferSize = 0;
@@ -156,18 +155,18 @@ public:
         }
         else if ("udpM" == transport)
         {
-            std::cout << "used udp-multicast" << std::endl;
+            std::cout << "using udp-multicast" << std::endl;
         }
         else if ("shm" == transport)
         {
-            std::cout << "used sharedMemory" << std::endl;
+            std::cout << "using sharedMemory" << std::endl;
             participantQos.transport().use_builtin_transports = false;
             auto sm_transport = std::make_shared<SharedMemTransportDescriptor>();
             sm_transport->segment_size(2 * 1024 * 1024);
             participantQos.transport().user_transports.push_back(sm_transport);
         }
         else {
-            std::cout << "used udp" << std::endl;
+            std::cout << "using udp" << std::endl;
         }
 
 
@@ -191,14 +190,16 @@ public:
         }
 
         // Create the Publisher
-        publisher_ = participant_->create_publisher(PUBLISHER_QOS_DEFAULT, nullptr);
+
+        PublisherQos publisherQos = PUBLISHER_QOS_DEFAULT; 
+        publisherQos.partition().push_back(partition.c_str()); 
+        publisher_ = participant_->create_publisher(publisherQos, nullptr);
 
         if (publisher_ == nullptr)
         {
             return false;
         }
-
-
+        
         DataWriterQos wqos=DATAWRITER_QOS_DEFAULT;
         if ("tcp" == transport){
             wqos.history().kind = KEEP_LAST_HISTORY_QOS;
@@ -262,10 +263,11 @@ public:
         {
             
             uint64_t tsc_start(0),tsc_end(0);
-
+            // Get PE syscall
             auto pe_instruction=get_pe(PERF_COUNT_HW_INSTRUCTIONS);
+            // 
             ioctl(pe_instruction, PERF_EVENT_IOC_RESET, 0);
-            clock_gettime(CLOCK_MONOTONIC, &metrics_.start_time);
+            clock_gettime(CLOCK_REALTIME, &metrics_.start_time);
             ioctl(pe_instruction, PERF_EVENT_IOC_ENABLE, 0);
 
             read_tsc(&tsc_start);
@@ -273,12 +275,11 @@ public:
             read_tsc(&tsc_end);
             
             ioctl(pe_instruction, PERF_EVENT_IOC_DISABLE, 0);
-            clock_gettime(CLOCK_MONOTONIC, &metrics_.end_time);
+            clock_gettime(CLOCK_REALTIME, &metrics_.end_time);
             metrics_.instructions = read_hw_counter(pe_instruction);
             close(pe_instruction);
 
             metrics_.cycles=tsc_end-tsc_start;
-            std::cout << tsc_end-tsc_start << std::endl;
             
             return true;
         }
@@ -322,30 +323,46 @@ void printDataToFile(const std::string& filename, std::vector<metrics_return> ve
 }
 
 
-int main(
-        int argc,
-        char** argv)
-{
-    if (argc < 3) {
-        std::cout << "Please provide a string as a command-line argument." << std::endl;
+int main(int argc,char** argv){
+
+    if (argc < 4) {
+        std::cout << "USAGE: partition transport #pub tcp[ip,port] N" << std::endl;
         return 1;
     }
-    std::string inputString = argv[1]; 
-    std::string write = argv[2]; 
-    char* topicName = const_cast<char*>(inputString.c_str());
-    uint32_t samples = 10;
+    std::string ip ;
+    uint16_t port ;
+
+    std::string partition(argv[1]);
+    std::string transport = argv[2]; 
+    std::string write = argv[3]; 
+    
+    if ("tcp" == transport){
+        if (argc < 6) {
+             std::cout << "USAGE: partition transport #pub tcp[ip,port] N" << std::endl;
+            return 1;
+        }
+        ip = argv[4];
+        char *end;
+        intmax_t val = strtoimax(argv[5], &end, 10);        
+        port = (uint16_t) val;
+        std::cout << "pub started with ip: " << ip << " port: " << port << std::endl;
+    } else {
+        ip = "127.0.0.1";
+        port = 5100;
+    }
+    uint32_t samples = 100;
     std::vector<metrics_return> save;
     HelloWorldPublisher* mypub = new HelloWorldPublisher();
-    if(mypub->init(topicName))
+    
+    if(mypub->init(transport,partition,ip,port))
     {
         save = mypub->run(samples);
     }
-    // for (const auto& element : save) {
-    //     std::cout << "cycles: " << element.cycles << " instruction: "<< element.instructions << " start_ns: " <<  element.start_time.tv_nsec << " end_ns: " << element.end_time.tv_nsec << std::endl;
-    // }
-    std::string filename= "pub_" + inputString + "_" + write +".data";
+    if ("part*" == partition){partition="part+";} // For not messing windows    
+    
+    std::this_thread::sleep_for(std::chrono::milliseconds(130*samples)); //To wait that all message is received
+    delete mypub; // Così i sub quittano
+    std::string filename= "pub_"+ transport + "_" + write +".data";
     printDataToFile(filename,save);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000)); //To wait that all message is received
-    delete mypub;
     return 0;
 }

@@ -19,7 +19,7 @@
 
 #include "HelloWorldPubSubTypes.h"
 
-
+#include <inttypes.h>
 #include <functional>
 #include <fastdds/dds/domain/DomainParticipantFactory.hpp>
 #include <fastdds/dds/domain/DomainParticipant.hpp>
@@ -96,11 +96,12 @@ private:
             {
                 if (info.valid_data)
                 {
-                    clock_gettime(CLOCK_MONOTONIC,&received_time_);
+                    clock_gettime(CLOCK_REALTIME,&received_time_);
                     received_vector_.push_back(received_time_);
                     samples_++;
-                    std::cout << "Message: " << hello_.message() << " after time: " << received_time_.tv_nsec << " RECEIVED." << std::endl;
+                    // std::cout << "Message: " << hello_.message() << " after time: " << received_time_.tv_nsec << " RECEIVED." << std::endl;
                 }
+                else { std::cout << "message not valid" << std::endl;}
             }
         }
         HelloWorld hello_;
@@ -141,47 +142,47 @@ public:
     }
 
     //!Initialize the subscriber
-    bool init(std::string transport)
+    bool init(std::string transport,std::string partition,std::string ip, uint16_t port)
     {
         DomainParticipantQos participantQos;
-        participantQos.name("transport_custom");
-        participantQos.wire_protocol().builtin.discovery_config.leaseDuration = eprosima::fastrtps::c_TimeInfinite;
-
-
         if ("tcp" == transport){
             std::cout << "used tcp" << std::endl;
-            uint32_t port = 5100;
             Locator initial_peer_locator;
             initial_peer_locator.kind = LOCATOR_KIND_TCPv4;
             std::shared_ptr<TCPv4TransportDescriptor> descriptor = std::make_shared<TCPv4TransportDescriptor>();
-            IPLocator::setIPv4(initial_peer_locator, "127.0.0.1");
+            IPLocator::setIPv4(initial_peer_locator, ip);
             initial_peer_locator.port = port;
             participantQos.wire_protocol().builtin.initialPeersList.push_back(initial_peer_locator);
             participantQos.transport().use_builtin_transports = false;
             participantQos.transport().user_transports.push_back(descriptor);
+
         }
         else if ("udpM" == transport)
         {
-            std::cout << "used udp-multicast" << std::endl;
+            std::cout << "using udp-multicast" << std::endl;
         }
         else if ("shm" == transport)
         {
-            std::cout << "used sharedMemory" << std::endl;
+            std::cout << "using sharedMemory" << std::endl;
             participantQos.transport().use_builtin_transports = false;
             auto sm_transport = std::make_shared<SharedMemTransportDescriptor>();
             sm_transport->segment_size(2 * 1024 * 1024);
             participantQos.transport().user_transports.push_back(sm_transport);
         }
         else {
-            std::cout << "used udp" << std::endl;
+            std::cout << "using udp" << std::endl;
         }
-
+        participantQos.name("transport_custom");
+        participantQos.wire_protocol().builtin.discovery_config.leaseDuration = 
+        
+        eprosima::fastrtps::c_TimeInfinite;
         participant_ = DomainParticipantFactory::get_instance()->create_participant(0, participantQos);
 
         if (participant_ == nullptr)
         {
             return false;
         }
+
 
         listener_.pubPresent=true;
         listener_.count=0;
@@ -198,7 +199,11 @@ public:
         }
 
         // Create the Subscriber
-        subscriber_ = participant_->create_subscriber(SUBSCRIBER_QOS_DEFAULT, nullptr);
+        SubscriberQos subscriberQos = SUBSCRIBER_QOS_DEFAULT;
+
+        subscriberQos.partition().push_back(partition.c_str());  //SET PARTITION PASSED IN argv
+       
+        subscriber_ = participant_->create_subscriber(subscriberQos, nullptr);
 
         if (subscriber_ == nullptr)
         {
@@ -214,12 +219,13 @@ public:
         }
         else if ("tcp" == transport)
         {
-            dr_qos.history().kind = eprosima::fastdds::dds::KEEP_LAST_HISTORY_QOS;
-            dr_qos.history().depth = 30;
-            dr_qos.resource_limits().max_samples = 50;
-            dr_qos.resource_limits().allocated_samples = 20;
-            dr_qos.reliability().kind = eprosima::fastdds::dds::RELIABLE_RELIABILITY_QOS;
-            dr_qos.durability().kind = eprosima::fastdds::dds::TRANSIENT_LOCAL_DURABILITY_QOS;
+            //ONLY QOS setting, not really useful to tcp
+            // dr_qos.history().kind = eprosima::fastdds::dds::KEEP_LAST_HISTORY_QOS;
+            // dr_qos.history().depth = 30;
+            // dr_qos.resource_limits().max_samples = 50;
+            // dr_qos.resource_limits().allocated_samples = 20;
+            // dr_qos.reliability().kind = eprosima::fastdds::dds::RELIABLE_RELIABILITY_QOS;
+            // dr_qos.durability().kind = eprosima::fastdds::dds::TRANSIENT_LOCAL_DURABILITY_QOS;
         }
         
         reader_ = subscriber_->create_datareader(topic_, dr_qos, &listener_);
@@ -237,7 +243,7 @@ public:
     {
         while(listener_.pubPresent)
         {
-            std::this_thread::sleep_for(std::chrono::microseconds(100));
+            std::this_thread::sleep_for(std::chrono::microseconds(150));
         }
         return listener_.received_vector_;
     }
@@ -262,27 +268,43 @@ void printDataToFile(const std::string& filename, std::vector<timespec> vector_t
 int main(
         int argc,
         char** argv)
-{
-
-    if (argc < 3) {
-        std::cout << "Please provide a string as a command-line argument." << std::endl;
-        return 1;
+{        
+    if (argc < 4) {
+            std::cout << "USAGE: partition transport #sub group tcp[ip,port] N" << std::endl;
+            return 1;
     }
-    std::string inputString = argv[1]; 
-    std::string write = argv[2]; 
-    char* transportType = const_cast<char*>(inputString.c_str());
+    std::string ip ;
+    uint16_t port ;
+
+    std::string partition(argv[1]);
+    std::string transport = argv[2]; 
+    std::string n_of_sub = argv[3]; 
+
+    if ("tcp" == transport){
+        if (argc < 6) {
+             std::cout << "USAGE: partition transport #sub group tcp[ip,port] N" << std::endl;
+            return 1;
+        }
+        ip = argv[4];
+        char *end;
+        intmax_t val = strtoimax(argv[5], &end, 10);        
+        port = (uint16_t) val;
+    } else {
+        ip = "127.0.0.1";
+        port = 5100;
+    }
+
     std::vector<timespec> save;
     HelloWorldSubscriber* mysub = new HelloWorldSubscriber();
-    if(mysub->init(transportType))
+    if(mysub->init(transport,partition,ip,port))
     {
         save = mysub->run();
     }
-    // for (const auto& element : save) {
-    //     std::cout << " received_ns: " <<  element.tv_nsec << std::endl;
-    // }
-    std::string filename= "sub_" + inputString + "_" + write +".data";
-    printDataToFile(filename,save);
 
     delete mysub;
+
+    std::string filename= "sub_" + transport + "_" + n_of_sub +".data";
+    printDataToFile(filename,save);
+
     return 0;
 }
