@@ -25,14 +25,13 @@ Here link for todos:        [TODO.md](./TODO.md)
 ## Cineca
 Inside this folder it is contained all test done on Cineca's Galileo100 
 
-In order to be more clear for this and for the next weeks, for each [data_processing](./cineca/data_processing.ipynb) python script i'll create notebooks.
+In order to be more clear for this and for the next weeks, for each [data_processing](./cineca/d_proc_transport.ipynb) python script i'll create notebooks.
 
 #### TEST_1: transport protocol
 
 #### TEST_2: wildcards
 
 #### TEST_3: throughput 
-
 
 ## Dummy
 [Skeleton](./SKELETON.md)
