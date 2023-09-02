@@ -35,32 +35,42 @@ Baically 4 things
 
 --- 
 ## up to sunday 3
-- [ ] Redo all the tests inside the same node# (__how?__) one of g100_prod_part [how](https://slurm.schedmd.com/srun.html)
+- [x] Redo all the tests inside the same node# (__how?__) one of g100_prod_part [how](https://slurm.schedmd.com/srun.html)
 - [ ] with both eth and infinband
-- [ ] boxplot
+- [x] boxplot
 - [x] more than 100 messages for latency 
   - [x] prepare the test
 - [ ] THROUGHPUT
 - [x] metrics in S
-- [ ] tcp on different nodes (hostname -i)
+- [x] tcp on different nodes (hostname -i)
   - [x] prepare the test
 - [x] check time shifting: non mi è permesso controllare lo stato di NTP con ntpd -p
-  - [ ] In qualsiasi caso è stato cambiato da CLOCK_MONOTONIC a CLOCK_REALTIME
 - [ ] request for thesis
 
 ---
-## up to sunday 27
 [Skeleton](./SKELETON.md)
 
+## up to 8/09
 - [x] guarda il derivarable (anche 1.2)
 - [ ] dummy monitoring (francesco)
   - [ ] + articolato (servirebbe anche un broker mqtt) bridge 
     - [ ] TIMESTAMP + STRINGRA
     - [ ] fastdds subscriba a tutti i topic e li manda al broker
     - [ ] è necessario poter ricostruire le informazioni di chi invia le info (lato dds)
+  - [ ] start to implement part in REGALE deliverable
 - [ ] dummy jobmanager (federico)
 
+# tests
+- [ ] UML sequence diagram of my tests (  )
+- [x] do graph for tsc
+- [x] restore MONOTINIC
+
+- [x] MPI barrier test
+
+- [ ] search for difference in "wqos.publish_mode().kind= SYNCHRONOUS_PUBLISH_MODE;"
+
 ## minor
+
 - [x] remove the first data (that contain discovery latency) from measured metrics
 - [x] store data out in a file, not in std-output (and manage that)
 - [x] check how to change partition at runtime (on dds_partitions)
@@ -68,7 +78,5 @@ Baically 4 things
 - [x] asyncronous-sincronous mode
 - [x] implement Federico's metrics
 
-- [ ] tcp on different galileo100's nodes
-  - [ ] doable with specific srun command
+- [x] tcp on different galileo100's nodes
 
-LOAD CORE - avg LATENCY per message- THROUGHPUT

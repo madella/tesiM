@@ -1,4 +1,7 @@
 scp -r gmadella@login.g100.cineca.it:/g100/home/userexternal/gmadella/test_2/data/* A:\tesi\tesiM\cineca\data\wildcards\100shotv4
+
+scp -r gmadella@login.g100.cineca.it:/g100/home/userexternal/gmadella/test_1/data/* A:\tesi\tesiM\cineca\data\transport\50ns
+
 scp -r A:\tesi\tesiM\cineca\test_throughput gmadella@login.g100.cineca.it:/g100/home/userexternal/gmadella/test_3
 
 ssh giacomo.madella@studio.unibo.it --provisioner cineca-hpc

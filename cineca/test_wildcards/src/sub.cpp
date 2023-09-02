@@ -96,7 +96,10 @@ private:
             {
                 if (info.valid_data)
                 {
+                    
                     clock_gettime(CLOCK_REALTIME,&received_time_);
+
+
                     received_vector_.push_back(received_time_);
                     samples_++;
                     // std::cout << "Message: " << hello_.message() << " after time: " << received_time_.tv_nsec << " RECEIVED." << std::endl;

@@ -268,7 +268,7 @@ public:
             auto pe_instruction=get_pe(PERF_COUNT_HW_INSTRUCTIONS);
             // 
             ioctl(pe_instruction, PERF_EVENT_IOC_RESET, 0);
-            clock_gettime(CLOCK_MONOTONIC, &metrics_.start_time);
+            clock_gettime(CLOCK_REALTIME, &metrics_.start_time);
             ioctl(pe_instruction, PERF_EVENT_IOC_ENABLE, 0);
 
             read_tsc(&tsc_start);
@@ -276,7 +276,7 @@ public:
             read_tsc(&tsc_end);
             
             ioctl(pe_instruction, PERF_EVENT_IOC_DISABLE, 0);
-            clock_gettime(CLOCK_MONOTONIC, &metrics_.end_time);
+            clock_gettime(CLOCK_REALTIME, &metrics_.end_time);
             metrics_.instructions = read_hw_counter(pe_instruction);
             close(pe_instruction);
 
