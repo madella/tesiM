@@ -1,15 +1,33 @@
-\documentclass[runningheads]{llncs}
+\documentclass[12pt,a4paper,twoside]{book}
+\usepackage[italian]{babel}
+
+\title{Analisi e sviluppo di middleware DDS per la gestione dei consumi in sistemi HPC}
+\author{Giacomo Madella}
+\date{Aprile 2021}
 
 \input{setup/setup.tex}
 
-\begin{document}
+\begin{document}  
+\thispagestyle{empty}
+%\setmarginsrb{3 cm}{2 cm}{3 cm}{0 cm}{-1 cm}{1 cm}{0 cm}{1.5 cm}
 \input{setup/frontpage.tex}
+\blankpage
+\pagestyle{empty}
 \input{abstract.tex}
+\thispagestyle{empty}
 \tableofcontents
+\thispagestyle{empty}
 
-\include{introduction.tex}
-\include{conclusion.tex}
 
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries}{}{0pt}{\Huge}
+
+\input{introduction.tex}
+\input{Power_Management_HPC.tex}
+\input{DDS_RTPS_ROS.tex}
+\input{Experiment_Results_Analysis.tex}
+
+\input{conclusion.tex}
 \printbibliography
 
 % \bibliography{references}
