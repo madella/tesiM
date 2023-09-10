@@ -11,6 +11,10 @@ if(NOT fastcdr_FOUND)
     find_package(fastcdr REQUIRED)
 endif()
 
+if(NOT foonathan_memory_FOUND)
+    find_package(foonathan_memory REQUIRED)
+endif()
+
 if(NOT fastrtps_FOUND)
     find_package(fastrtps REQUIRED)
 endif()
@@ -35,9 +39,3 @@ target_link_libraries(pub fastrtps fastcdr)
 
 add_executable(sub src/sub.cpp ${DDS_HELLOWORLD_SOURCES_CXX})
 target_link_libraries(sub fastrtps fastcdr)
-
-add_executable(serv src/serv.cpp ${DDS_HELLOWORLD_SOURCES_CXX})
-target_link_libraries(serv fastrtps fastcdr)
-
-# add_executable(backup src/backup.cpp ${DDS_HELLOWORLD_SOURCES_CXX})
-# target_link_libraries(backup fastrtps fastcdr)

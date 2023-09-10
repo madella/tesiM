@@ -1,17 +1,23 @@
 #!/bin/bash
-BASE="./build"
+BASE="/g100/home/userexternal/gmadella/fastdds/build"
+#USAGE: transport sleep_time(nanoseconds) n_of_message partition #sub tcp[ip,port]
+syncB="/g100/home/userexternal/gmadella/sync/build"
+
+transport=udp
+sleep=10000000 # 1000000000ns = 1 s
+n_of_message=1000
+partition="part*"
 
 N=$(nproc --all)
 if [ ! -d "groupd" ]; then mkdir "groupd"; fi
 
-for transp in "udp" "udpM" ; do
-    for (( i=1; i < $N; i++)); do
-        taskset -c $i $BASE/sub outsider $transp $i d &
+for transport in "udp" "udpM" ; do
+    for (( i=0; i < $N; i++)); do
+        taskset -c $i $BASE/sub $transport $sleep $n_of_message outsider $i groupd/ &
+        firstsub=$!
     done
-    taskset -c 0 $BASE/sub outsider $transp 0 d &
-    fistsub=$!
-    echo "waiting for last sub"
-    wait $fistsub
+    echo "waiting for last dummy-sub..."
+    wait $fisrtpub
 done
 exit 0
 

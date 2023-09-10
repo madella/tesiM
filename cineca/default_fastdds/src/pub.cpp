@@ -199,16 +199,17 @@ public:
         {
             return false;
         }
-        
+
+
         DataWriterQos wqos=DATAWRITER_QOS_DEFAULT;
         if ("tcp" == transport){
-            wqos.history().kind = KEEP_LAST_HISTORY_QOS;
-            wqos.history().depth = 30;
-            wqos.resource_limits().max_samples = 50;
-            wqos.resource_limits().allocated_samples = 20;
-            wqos.reliable_writer_qos().times.heartbeatPeriod.seconds = 2;
-            wqos.reliable_writer_qos().times.heartbeatPeriod.nanosec = 200 * 1000 * 1000;
-            wqos.reliability().kind = RELIABLE_RELIABILITY_QOS;
+            // wqos.history().kind = KEEP_LAST_HISTORY_QOS;
+            // wqos.history().depth = 30;
+            // wqos.resource_limits().max_samples = 50;
+            // wqos.resource_limits().allocated_samples = 20;
+            // wqos.reliable_writer_qos().times.heartbeatPeriod.seconds = 2;
+            // wqos.reliable_writer_qos().times.heartbeatPeriod.nanosec = 200 * 1000 * 1000;
+            // wqos.reliability().kind = RELIABLE_RELIABILITY_QOS;
         }
         wqos.publish_mode().kind= SYNCHRONOUS_PUBLISH_MODE; //  ensure sync mode
         writer_ = publisher_->create_datawriter(topic_, wqos, &listener_);
@@ -261,13 +262,12 @@ public:
     {
         if (listener_.matched_ > 0)
         {
-            
             uint64_t tsc_start(0),tsc_end(0);
             // Get PE syscall
             auto pe_instruction=get_pe(PERF_COUNT_HW_INSTRUCTIONS);
             // 
             ioctl(pe_instruction, PERF_EVENT_IOC_RESET, 0);
-            clock_gettime(CLOCK_REALTIME, &metrics_.start_time);
+            clock_gettime(CLOCK_MONOTONIC, &metrics_.start_time);
             ioctl(pe_instruction, PERF_EVENT_IOC_ENABLE, 0);
 
             read_tsc(&tsc_start);
@@ -275,20 +275,19 @@ public:
             read_tsc(&tsc_end);
             
             ioctl(pe_instruction, PERF_EVENT_IOC_DISABLE, 0);
-            clock_gettime(CLOCK_REALTIME, &metrics_.end_time);
+            clock_gettime(CLOCK_MONOTONIC, &metrics_.end_time);
             metrics_.instructions = read_hw_counter(pe_instruction);
             close(pe_instruction);
-
             metrics_.cycles=tsc_end-tsc_start;
-            std::cout << tsc_end-tsc_start << std::endl;
-            
+
+            hello_.index(hello_.index() + 1);
             return true;
         }
         return false;
     }
 
     //!Run the Publisher
-    std::vector<metrics_return> run(uint32_t samples)
+    std::vector<metrics_return> run(uint32_t samples,uint32_t sleep_time)
     {
         uint32_t samples_sent = 0;
         std::vector<metrics_return> metric_vector; 
@@ -301,9 +300,9 @@ public:
                 auto metric = get_metric();
                 // std::cout << "published in cycles: " << metric.cycles << " instruction: "<< metric.instructions << " time: " << metric.end_time.tv_nsec - metric.start_time.tv_nsec << " and sec: " << metric.end_time.tv_sec - metric.start_time.tv_sec << std::endl;
                 metric_vector.push_back(metric);
-            }
+                std::this_thread::sleep_for(std::chrono::nanoseconds(sleep_time));
 
-            //std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            }
         }
         return metric_vector;
     }
@@ -323,48 +322,82 @@ void printDataToFile(const std::string& filename, std::vector<metrics_return> ve
     }
 }
 
+// Function to calculate the time difference in nanoseconds
+uint64_t timespec_diff_nsec(const struct timespec& start, const struct timespec& end) {
+    return static_cast<uint64_t>((end.tv_sec - start.tv_sec) * 1e9 + (end.tv_nsec - start.tv_nsec));
+}
+
+
+void avg_calculator(std::vector<metrics_return> metric_vector){
+    uint64_t total_cycles = 0;
+    uint64_t total_instructions = 0;
+    uint64_t total_time_diff = 0;
+
+    for (const auto& metric : metric_vector) {
+        // Accumulate values for each field
+        total_cycles += metric.cycles;
+        total_instructions += metric.instructions;
+        // Calculate time difference in nanoseconds
+        uint64_t time_diff = timespec_diff_nsec(metric.start_time, metric.end_time);
+        total_time_diff += time_diff;
+    }
+
+    // Calculate averages by dividing by the number of elements
+    size_t num_elements = metric_vector.size();
+    double avg_cycles = static_cast<double>(total_cycles) / num_elements;
+    double avg_instructions = static_cast<double>(total_instructions) / num_elements;
+    double avg_time_diff = static_cast<double>(total_time_diff) / num_elements;
+
+    // Print the averages to stdout
+    std::cout << "Average Cycles: " << avg_cycles << std::endl;
+    std::cout << "Average Instructions: " << avg_instructions << std::endl;
+    std::cout << "Average Time Difference (ns): " << avg_time_diff << std::endl;
+
+}
 
 int main(int argc,char** argv){
 
-    if (argc < 4) {
-        std::cout << "USAGE: partition transport #pub tcp[ip,port] N" << std::endl;
-        return 1;
+    std::string usage("USAGE: transport sleep_time(nanoseconds) n_of_message partition #pub base/ tcp[ip,port]");
+    std::string ip("127.0.0.1");
+    uint16_t    port(5100);
+    char *port_tmp;
+    std::vector<metrics_return> save;
+   
+    if (argc < 7) {
+            std::cout << usage << std::endl;
+            return 1;
     }
-    std::string ip ;
-    uint16_t port ;
 
-    std::string partition(argv[1]);
-    std::string transport = argv[2]; 
-    std::string write = argv[3]; 
+    std::string transport = argv[1]; 
+    uint32_t sleep = std::stoi(argv[2]);
+    uint32_t samples = std::stoi(argv[3]);
+    std::string partition(argv[4]);
+    std::string write = argv[5]; 
+    std::string base= argv[6];
     
     if ("tcp" == transport){
-        if (argc < 6) {
-             std::cout << "USAGE: partition transport #pub tcp[ip,port] N" << std::endl;
-            return 1;
+        if (argc < 9) {
+            std::cout << "Using default port and ip" << std::endl;
         }
-
-        char *end;
-        intmax_t val = strtoimax(argv[5], &end, 10);        
-        port = (uint16_t) val;
-        ip = argv[4];
-        std::cout << "pub started with ip: " << ip << " port: " << port << std::endl;
-    } else {
-        ip = "127.0.0.1";
-        port = 5100;
+        else{
+            ip = argv[7];
+            intmax_t val = strtoimax(argv[8], &port_tmp, 10);        
+            port = (uint16_t) val;
+        }
     }
-    uint32_t samples = 100;
-    std::vector<metrics_return> save;
-    HelloWorldPublisher* mypub = new HelloWorldPublisher();
-    
+
+    std::cout << "Starting pub with #samples " << samples << " sleeps: " << sleep << " transport: " << transport << " partition: " << partition << " ip: " << ip << " port: " << port << std::endl;
+
+    HelloWorldPublisher* mypub = new HelloWorldPublisher(); 
     if(mypub->init(transport,partition,ip,port))
     {
-        save = mypub->run(samples);
+        save = mypub->run(samples,sleep);
     }
     if ("part*" == partition){partition="part+";} // For not messing windows    
-    
-    std::this_thread::sleep_for(std::chrono::milliseconds(5000)); //To wait that all message is received
-    delete mypub; // Così i sub quittano
-    std::string filename= "pubs/pub_"+ transport +"_" + partition + "_" + write +".data";
+    avg_calculator(save);
+    std::string filename= base + "pub_"+ transport +"_" + partition + "_" + write +".data";
     printDataToFile(filename,save);
+    std::this_thread::sleep_for(std::chrono::milliseconds(3*samples+1000)); //To wait that all message is received
+    delete mypub;
     return 0;
 }

@@ -1,32 +1,37 @@
 #!/bin/bash
-BASE="./test_wildcards/build"
+BASE="/g100/home/userexternal/gmadella/fastdds/build"
+#"USAGE: transport sleep_time(nanoseconds) n_of_message partition #sub base/ tcp[ip,port]"
+syncB="/g100/home/userexternal/gmadella/sync/build"
+rm -rfd data/*
+ip=$(hostname -i)
+echo $ip
+transport=udp
+sleep=1000000 
+n_of_message=1000
+partition="part*"
 
 if [ ! -d "pubs" ]; then mkdir "pubs" ;fi # Make all directory necessary for store datas
 
-for transp in "udp" ; do
-    echo "Starting $transp protocol tests..."
-    echo "
-    Starting dummy pub"
-    taskset -c 1 $BASE/pub outsider $transp 0 &
-    secondpub= $!
-    echo "waiting for pub..."
+for transport in "udp" "udpM" ; do
+    sleep 4
+    echo "Starting $transport protocol tests..."
+    taskset -c 1 $BASE/pub $transport $sleep $n_of_message "outsider" 0 "pubs/" &
+    secondpub=$!
+    echo "waiting for outsider-pub..."
     wait $secondpub
-    pkill sub
-
-    echo "
-    Starting real pub"
+    
     for (( jj=1; jj < 17; jj+=2)); do
-        echo "Sleeping $jj to permit subs of creating structures"
-        sleep $jj
+        taskset -c 1 $syncB/pub tcp "TEST2START$jj" $ip 5100; sleep 4
+
         if [ $jj -eq 3 ]; then jj=2 ; fi
-        taskset -c 0 $BASE/pub "part*" $transp $jj &
+        taskset -c 0 $BASE/pub $transport $sleep $n_of_message "part*" $jj "pubs/" &
         fisrtpub=$!
-        echo "waiting for pub..."
+        echo "waiting for real-pub..."
         wait $fisrtpub
-        echo "deleting remained subs..."
     done
 
 done
+
 echo "waiting 10 second to let everythin close by their own"
 sleep 10
 pkill sub

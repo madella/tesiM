@@ -40,7 +40,10 @@
 using namespace eprosima::fastdds::dds;
 using namespace eprosima::fastdds::rtps;
 using namespace eprosima::fastrtps::rtps;
-timespec received_time_;
+struct received_time_struct{
+    timespec time;
+    unsigned long index;
+};
 
 class HelloWorldSubscriber
 {
@@ -79,7 +82,7 @@ private:
             else if (info.current_count_change == -1)
             {
                 this->count-=1;
-                std::cout << "Partecipant exited" << this->count <<std::endl;
+                //std::cout << "Publisher exited" << this->count <<std::endl;
 
             }
             if (this->count == 0){
@@ -97,22 +100,21 @@ private:
                 if (info.valid_data)
                 {
                     
-                    clock_gettime(CLOCK_REALTIME,&received_time_);
+                    clock_gettime(CLOCK_MONOTONIC,&received_time_.time);
 
-
+                    received_time_.index=hello_.index();
                     received_vector_.push_back(received_time_);
                     samples_++;
-                    // std::cout << "Message: " << hello_.message() << " after time: " << received_time_.tv_nsec << " RECEIVED." << std::endl;
+                    //std::cout << "RECEIVED" << std::endl;
                 }
-                else { std::cout << "message not valid" << std::endl;}
             }
         }
         HelloWorld hello_;
         std::atomic_int samples_;
         bool pubPresent;
         int count;
-        timespec received_time_;
-        std::vector<timespec> received_vector_; 
+        received_time_struct received_time_;
+        std::vector<received_time_struct> received_vector_; 
 
     } listener_;
 
@@ -127,8 +129,7 @@ public:
     {
     }
 
-    virtual ~HelloWorldSubscriber()
-    {
+    virtual ~HelloWorldSubscriber(){
         if (reader_ != nullptr)
         {
             subscriber_->delete_datareader(reader_);
@@ -145,9 +146,11 @@ public:
     }
 
     //!Initialize the subscriber
-    bool init(std::string transport,std::string partition,std::string ip, uint16_t port)
-    {
+    bool init(std::string transport,std::string partition,std::string ip, uint16_t port){
         DomainParticipantQos participantQos;
+        participantQos.name("transport_custom");
+        participantQos.wire_protocol().builtin.discovery_config.leaseDuration = eprosima::fastrtps::c_TimeInfinite;
+
         if ("tcp" == transport){
             std::cout << "used tcp" << std::endl;
             Locator initial_peer_locator;
@@ -158,7 +161,6 @@ public:
             participantQos.wire_protocol().builtin.initialPeersList.push_back(initial_peer_locator);
             participantQos.transport().use_builtin_transports = false;
             participantQos.transport().user_transports.push_back(descriptor);
-
         }
         else if ("udpM" == transport)
         {
@@ -173,12 +175,9 @@ public:
             participantQos.transport().user_transports.push_back(sm_transport);
         }
         else {
-            std::cout << "using udp" << std::endl;
+            //std::cout << "using udp" << std::endl;
         }
-        participantQos.name("transport_custom");
-        participantQos.wire_protocol().builtin.discovery_config.leaseDuration = 
-        
-        eprosima::fastrtps::c_TimeInfinite;
+
         participant_ = DomainParticipantFactory::get_instance()->create_participant(0, participantQos);
 
         if (participant_ == nullptr)
@@ -238,83 +237,105 @@ public:
             return false;
         }
 
-        return true;
-    }
+        return true; }
 
-    //!Run the Subscriber
-    std::vector<timespec> run()
+    std::vector<received_time_struct> run(uint32_t sleep_time)
     {
         while(listener_.pubPresent)
         {
-            std::this_thread::sleep_for(std::chrono::microseconds(150));
+            std::this_thread::sleep_for(std::chrono::nanoseconds(sleep_time));
         }
-        return listener_.received_vector_;
+        return listener_.received_vector_; 
     }
 };
 
 
-void printDataToFile(const std::string& filename, std::vector<timespec> vector_to_print ) {
+uint64_t timespec_diff_nsec(const struct timespec& start, const struct timespec& end) {
+    return static_cast<uint64_t>((end.tv_sec - start.tv_sec) * 1e9 + (end.tv_nsec - start.tv_nsec));
+}
+
+
+void avg_calculator(std::vector<received_time_struct> metric_vector,uint32_t samples){
+
+    uint64_t total_time_diff = 0;
+    auto last(metric_vector[1]);
+    for (const auto& metric : metric_vector) {
+        // Calculate time difference in nanoseconds
+        uint64_t time_diff = timespec_diff_nsec(last.time, metric.time);
+        total_time_diff += time_diff;
+        //std::cout << "  " <<time_diff;
+        last=metric;
+    }
+    size_t num_elements = metric_vector.size();
+    if (((num_elements / samples) * 100)== 0 ){
+        std::cout << "Numelements seems 0:  " << num_elements << std::endl;
+    }
+    double avg_time_diff = static_cast<double>(total_time_diff) / num_elements;
+    // Print the averages to stdout
+    std::cout << "Average Time Difference (ns): " << avg_time_diff / 1e9 << " receiving rate: " << ((num_elements / samples) * 100)<< "% " << std::endl;
+
+}
+
+void printDataToFile(const std::string& filename, std::vector<received_time_struct> vector_to_print ) {
     std::ofstream outputFile(filename);
     if (outputFile.is_open()) {
         // Print the data structure elements to the file
         for (const auto& element : vector_to_print) { // or dataDeque
-            outputFile  << "received_s: " << element.tv_sec << " received_ns: " <<  element.tv_nsec << std::endl;
+            outputFile  << element.index << " received_s: " << element.time.tv_sec << " received_ns: " <<  element.time.tv_nsec << std::endl;
         }
         outputFile.close();
-        std::cout << "Data has been written to the file: " << filename << std::endl;
+        //std::cout << "Data has been written to the file: " << filename << std::endl;
     } else {
         std::cout << "Error opening the file: " << filename << std::endl;
     }
 }
 
 
-int main(
-        int argc,
-        char** argv)
-{        
-    if (argc < 4) {
-            std::cout << "USAGE: partition transport #sub group tcp[ip,port] N" << std::endl;
+int main(int argc, char** argv){        
+
+
+    std::string usage("USAGE: transport sleep_time(nanoseconds) n_of_message partition #sub base/ tcp[ip,port]");
+    std::string ip("127.0.0.1");
+    uint16_t    port(5100);
+    char *port_tmp;
+    std::vector<received_time_struct> save;
+
+    if (argc < 7) {
+            std::cout << usage << std::endl;
             return 1;
     }
-    std::string ip ;
-    uint16_t port ;
 
-    std::string partition(argv[1]);
-    std::string transport = argv[2]; 
-    std::string n_of_sub = argv[3]; 
-    std::string group = argv[4]; 
+    std::string transport = argv[1]; 
+    uint32_t sleep = std::stoi(argv[2]);
+    uint32_t samples = std::stoi(argv[3]);
+
+    std::string partition(argv[4]);
+    std::string n_of_sub = argv[5]; 
+    std::string base= argv[6];
 
     if ("tcp" == transport){
-        if (argc < 7) {
-             std::cout << "USAGE: partition transport #sub group tcp[ip,port] N" << std::endl;
-            return 1;
+        if (argc < 8) {
+            std::cout << "Using default port and ip" << std::endl;
         }
-
-        char *end;
-        intmax_t val = strtoimax(argv[6], &end, 10);        
-        port = (uint16_t) val;
-        ip = argv[5];
+        else{
+            ip = argv[7];
+            intmax_t val = strtoimax(argv[8], &port_tmp, 10);        
+            port = (uint16_t) val;
         }
-    else{
-
-        ip = "nullptr";
-        port = port;
     }
-
-
-
-
-    std::vector<timespec> save;
+    
     HelloWorldSubscriber* mysub = new HelloWorldSubscriber();
-    if(mysub->init(transport,partition,ip,port))
+    auto ret = mysub->init(transport,partition,ip,port);
+    if(ret)
     {
-        save = mysub->run();
+        save = mysub->run(sleep);
     }
-
-    delete mysub;
-
-    std::string filename= "group" + group +"/sub_" + transport + "_" + partition + "_" + n_of_sub +".data";
+    
+    if ("part*" == partition){partition="part+";} // For not messing windows    
+    avg_calculator(save,samples);
+    std::string filename= base + "sub_" + transport + "_" + partition + "_" + n_of_sub +".data";
     printDataToFile(filename,save);
 
+    delete mysub;
     return 0;
 }
