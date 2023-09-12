@@ -14,6 +14,8 @@
 % \usepackage{mathtools}
 \usepackage{mathptmx}
 
+\def\arraystretch{1.5}% tabular stretch
+
 % Pacchetto per l'inclusione di immagini
 \usepackage{graphicx}
 \graphicspath{ {../img/} }
@@ -29,6 +31,10 @@
 
 % Pacchetto per la creazione di liste personalizzate
 \usepackage{enumitem}
+
+\usepackage{graphicx} % utils per le immagini
+\usepackage{float} % Per le immagini [H]
+\usepackage{subcaption} % Per le immagini affiancate
 
 
 % Pacchetto per la creazione di collegamenti ipertestuali
@@ -68,6 +74,7 @@
     \thispagestyle{empty}%
     \addtocounter{page}{-1}%
     \newpage}
+
 \usepackage[sorting=none]{biblatex}
 \addbibresource{setup/references.bib}
 
