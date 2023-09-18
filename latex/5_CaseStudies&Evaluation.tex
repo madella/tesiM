@@ -25,6 +25,7 @@ In questa sezione verranno riportati i casi studio e i test effettuati sul frame
     MPI & Open MPI  4.1.1 \\
     \hline
 \end{tabular}
+\label{table:hpc}
 \end{center}
 
 
@@ -46,19 +47,52 @@ Per ottenere risultati attendibili sulla metrica del tempo è stato necessario s
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{./results/time_sync_node.png}
-    \caption{Scostamento del tempo su nodi divers}\label{fig:sync_time_shift}
+    \caption{Scostamento del tempo su nodi diversi}
+    \label{fig:sync_time_shift}
     \includegraphics[width=0.99\textwidth]{./results/time_shift_clean.png}
-    \caption{Scostamento senza outliers}\label{fig:sync_diff_distr}
+    \caption{Scostamento senza outliers}
+    \label{fig:sync_diff_distr}
     \includegraphics[width=\textwidth]{./results/time_sync_distribution.png}
-    \caption{Distribuzione delle differenze}\label{fig:sync_diff_distr}
+    \caption{Distribuzione delle differenze}
+    \label{fig:sync_diff_distr}
 \end{figure}
 
 Come possibile vedere nella figura \ref{fig:sync_time_shift} nonostante le mpi\_barrier, sono presenti degli scostamenti di tempo tra 2 nodi durante diversi test effettuati (in particolare 1000), e si è scelto di utilizzare il valore modale di questa differenza,sulla base del quale, si sono elaborati tutti i dati successivi.
 
 \subsection{Impatto del numero di sub in un dominio}
+Visto lo schema %TODO: UML
+risulta facile capire, che il numero di subscriber presenti in un dominio comporta un overhead di comunicazione che va ad influenzare sia i tempi, che i cicli impiegati nella singola \emph{publish} su un topic
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{./results/test3_sending_multiplesub.png} %TODO, sqeunce is an error
+    \caption{overhead sulla publish all'aumentare dei subscriber}
+    \label{fig:test3_overhead}
+\end{figure}
+che viene facilmente dimostrato nella figura\ref{fig:test3_overhead}. Ovviamente l'impatto è poco significativo in quei protocolli che applicano strutture di multicasting %TODO: aggiungere nel glossario
+come udp-Multicast e Shared-Memory. Questo può portare una singola publish a impiegare più cicli e più tempo della singola ricezione dei messaggi, come si vede nella figura\ref{fig:test3_different_protocols}
+\begin{figure}[H]
+\includegraphics[width=\textwidth]{./results/test3_different_protocol_send_receive.png} %TODO, sqeunce is an error
+    \caption{differenza tra solo publish e publish-subscribe per ogni protocollo}
+    \label{fig:test3_different_protocols}
+\end{figure}
+In tutti i test successivi, ove non specificato diversamente sono stati usati 1 publisher e 48 subscriber su diversi nodi. Questo è stato fatto per provare la scalabilità, visto che nel testbed che è stato utilizzato, erano presenti 48 core (1 core per ogni subscriber).
 
 \subsection{Test1}
-Nel primo test si è valutata la differenza di diversi protocolli di trasporto 
+Nel primo test si è valutata la differenza di diversi protocolli di trasporto utilizzando la rete infiniband \ref{table:hpc} su diversi nodi di un supercalcolatore. In particolare si è voluta sottolineare la differenza di tempi e cicli usando i diversi protocolli di comunicazione offerti da RTPS:
+\begin{itemize}
+    \item udp
+    \item tcp 
+    \item udp-multicast % TODO: uml
+    \item shared-memory
+\end{itemize}
+
+io risultati che sono stati trovati forniscono importanti informazioni,
+\begin{figure}[H]
+    \includegraphics[width=\textwidth]{./results/test3_udpvsudpM.png} %TODO, sqeunce is an error
+        \caption{}
+        \label{}
+\end{figure}
+
 %NPUB NSub
 \subsection{Test2}
 \subsection{Test3}

@@ -262,6 +262,8 @@ public:
     {
         if (listener_.matched_ > 0)
         {
+            std::cout << "size of message: %u" << sizeof(hello_); 
+
             uint64_t tsc_start(0),tsc_end(0);
             // Get PE syscall
             auto pe_instruction=get_pe(PERF_COUNT_HW_INSTRUCTIONS);
