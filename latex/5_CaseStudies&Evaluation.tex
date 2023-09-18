@@ -1,5 +1,5 @@
 \chapter{Casi di studio e valutazioni}
-\noindent In questa sezione verranno riportati i casi studio e i test effettuati sul framework. Tutti questi casi studio sono stati eseguiti su un sistema HPC Galielo-100 Cineca con le specifiche riportate nella tabella sotto
+In questa sezione verranno riportati i casi studio e i test effettuati sul framework. Tutti questi casi studio sono stati eseguiti su un sistema HPC Galielo-100 Cineca con le specifiche riportate nella tabella sotto
 
 \vspace{.7cm}
 \begin{center}
@@ -26,19 +26,49 @@
     \hline
 \end{tabular}
 \end{center}
-\section{Sincronizzazione orologi su nodi diversi}
-Per ottenere risultati attendibili sulla metrica del tempo è stato necessario sincronizzare i nodi utilizzati prima di poter far partire i test. Per farlo è stato necessario implementare delle MPI\_Barrier dopo il quale una \emph{clock\_getTime(MONOTONIC)} per più volte, andando successivaemtene a ripulire ed elaborare i dati riportati.
 
-\begin{figure}
-    \centering
-    \includegraphics[width=\textwidth]{./results/time_sync_node.png}
-    \includegraphics[width=\textwidth]{./results/time_sync_distribution.png}
-\end{figure}
 
 \section{Test}
+Sono stati svolti diversi test al fine di creare un modello per l'utilizzo e la caratterizzazione di DDS, ed in particolare è stata usato FastDDS, all'interno di sitemi HPC, nel contesto del Power Management. 
+
+In particolare nel Publisher \ref{actor:publisher} prima e dopo la chiamata a funzione di write() %TODO: inserire nella tesi?
+si sono presi i valori time-invio, istruzioni, e TSC, mentre al lato ricevente, di Subscriber \ref{actor:subscriber} è stato preso il tempo al momento dell'arrivo del messaggio. In questo modo si sono misurati i seguenti parametri:
+\begin{itemize}
+    \item Tempo solo invio
+    \item Tempo invio-ricezione
+    \item Perf-Event Instructions
+    \item TSC (read\_tsc)
+\end{itemize}
+%TODO: se serve approfondire TSC, e metriche eseguite prima e dopo
+%TODO: Struttura SUB e PUB con i vari UML
+\subsection{Sincronizzazione orologi su nodi diversi}
+Per ottenere risultati attendibili sulla metrica del tempo è stato necessario sincronizzare i nodi utilizzati prima di poter far partire i test. Per farlo è stato usata una funzione \emph{CLOCK\_MONOTONIC} che rappresenta un \textit{un orologio non impostabile a livello di sistema che rappresenta il tempo monotono da un punto non specificato nel passato. Su Linux, quel punto corrisponde al numero di secondi di esecuzione del sistema da quando è stato avviato. L'orologio CLOCK\_MONOTONIC non è influenzato da salti discontinui nell'ora del sistema, ma è influenzato dalle regolazioni incrementali eseguite da  NTP.} Il problema che si è presentato, è che avendo nodi diversi su cui far eseguire i test, per provare ad esempio nel modo più affidabile i protocolli di trasporto, è stato necessario implementare delle MPI\_Barrier prima di diverse esecuzioni di \emph{clock\_gettime(CLOCK\_MONOTONIC)}. Di seguito sono stati riportati i grafici del risultato ottenuto.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{./results/time_sync_node.png}
+    \caption{Scostamento del tempo su nodi divers}\label{fig:sync_time_shift}
+    \includegraphics[width=0.99\textwidth]{./results/time_shift_clean.png}
+    \caption{Scostamento senza outliers}\label{fig:sync_diff_distr}
+    \includegraphics[width=\textwidth]{./results/time_sync_distribution.png}
+    \caption{Distribuzione delle differenze}\label{fig:sync_diff_distr}
+\end{figure}
+
+Come possibile vedere nella figura \ref{fig:sync_time_shift} nonostante le mpi\_barrier, sono presenti degli scostamenti di tempo tra 2 nodi durante diversi test effettuati (in particolare 1000), e si è scelto di utilizzare il valore modale di questa differenza,sulla base del quale, si sono elaborati tutti i dati successivi.
+
+\subsection{Impatto del numero di sub in un dominio}
+
+\subsection{Test1}
+Nel primo test si è valutata la differenza di diversi protocolli di trasporto 
+%NPUB NSub
+\subsection{Test2}
+\subsection{Test3}
 
 \section{Risultati}
-
 \section{Modello}
-
 \section{Scheletro componenti}
+Nel seguente capitolo viene stilato uno scheletro dei componenti con i relativi topic usati al fine di dare una visione completa e aggiuntiva rispetto al modello precedentemente stilato  
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{./img/dummies_skeleton.png}
+    \includegraphics[width=\textwidth]{./img/server_skeleton.png}
+\end{figure}

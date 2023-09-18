@@ -1,16 +1,28 @@
 \chapter{DDS \& RTPS}\label{SEC:dds}
 DDS (Data Distribution Service)\cite{DDS} e RTPS (Real-Time Publish-Subscribe)\cite{RTPS} costituiscono due soluzioni fondamentali nel campo delle comunicazioni distribuite e real-time. Queste tecnologie svolgono un ruolo importante nella la trasmissione di dati tra dispositivi e applicazioni interconnesse, rivestendo particolare importanza in scenari complessi come i sistemi embedded, in IoT e applicazioni ad alte prestazioni come l'HPC (High-Performance Computing). 
 
+
+\section{Implementazione usasta}
+DDS e RTPS sono dei protocolli di comunicazione per specifici casi di utilizzo. Ci sono state diverse implementazioni di questi protocolli da diversi società e organizzazioni, come:
+\begin{itemize}
+  \item FastDDS (eprosima)
+  \item CycloneDDS (Oracle)
+  \item ConnextDDS
+  \item GurumDDS
+\end{itemize}
+
+E tante altre. In tutti i successivi capitoli verrà preso come riferimento FastDDS, una implementazione specifica per le comunicazione Real-Time. %TODO: Da migliorare
+
 \section{DDS}
 Data Distribution Service è un protocollo di comunicazione incentrato sullo scambio di dati per sistemi distribuiti. Questo si basa su modello chiamato Data-Centric Publish Subscribe (DCPS) I principali attori che vengono coinvolti sono:
 \begin{itemize}
-    \item Publisher: responsabile della creazione e configurazione dei DataWriter. Il DataWriter è l'entità responsabile della pubblicazione effettiva dei messaggi. Ciascuno avrà un Topic assegnato sotto il quale vengono pubblicati i messaggi;
+    \item Publisher: responsabile della creazione e configurazione dei DataWriter. Il DataWriter è l'entità responsabile della pubblicazione effettiva dei messaggi. Ciascuno avrà un Topic assegnato sotto il quale vengono pubblicati i messaggi;\label{actor:publisher}
 
-    \item Subscriber: responsabile di ricevere i dati pubblicati sotto i topic ai quali si iscrive. Serve uno o più oggetti DataReader, che sono responsabili di comunicare la disponibilità di nuovi dati all'applicazione;
+    \item Subscriber: responsabile di ricevere i dati pubblicati sotto i topic ai quali si iscrive. Serve uno o più oggetti DataReader, che sono responsabili di comunicare la disponibilità di nuovi dati all'applicazione;\label{actor:subscriber}
 
-    \item Topic: collega i DataWriter con i DataReader. È univoco all'interno di un dominio DDS;
+    \item Topic: collega i DataWriter con i DataReader. È univoco all'interno di un dominio DDS;\@
     
-    \item Dominio: utilizzato per collegare tutti i publisher e subscriber appartenenti a una o più domini di appartenenza, che scambiano dati sotto diversi topic. Il DomainParticipant funge da contenitore per altre entità DCPS, e svolge anche la funzione di costruttore di entità Publisher, Subscriber e Topic fornendo anche servizi di QoS;
+    \item Dominio: utilizzato per collegare tutti i publisher e subscriber appartenenti a una o più domini di appartenenza, che scambiano dati sotto diversi topic. Il DomainParticipant funge da contenitore per altre entità DCPS, e svolge anche la funzione di costruttore di entità Publisher, Subscriber e Topic fornendo anche servizi di QoS;\@
 
     \item Partizione: costituisce un isolamento logico di entità all'interno dell'isolamento fisico offerto dal dominio;
 
@@ -37,15 +49,22 @@ In particolare la sequenza di scambio è:
     \begin{subfigure}{0.45\linewidth} % Prima immagine
       \centering
       \includegraphics[width=\linewidth]{./img/dds_architecture.png}
-      \caption{Schema DDS}
-      \label{fig:dds}
+      \caption{Schema DDS}\label{fig:dds}
     \end{subfigure}
     \begin{subfigure}{0.45\linewidth} % Seconda immagine
       \centering
       \includegraphics[width=\linewidth]{./img/rtps_architecture.png}
-      \caption{Schema RTPS}
-      \label{fig:rtps}
+      \caption{Schema RTPS}\label{fig:rtps}
     \end{subfigure}
-    \caption{Confronto tra architettura DDS e RTPS}
-    \label{fig:confrontodds_rtps}
+    \caption{Confronto tra architettura DDS e RTPS}\label{fig:confrontodds_rtps}
   \end{figure}
+
+%TODO: ROS
+
+% \subsection{DDS \& ROS}\label{SSEC:rosiface}
+% Ros Middleware interface\cite{ros2iface}, developed within the context of the Robot Operating System (ROS), stands as a pinnacle of innovation in the realm of creating middleware for Distributed Data Systems. The middleware leverages advanced data serialization techniques, optimized for real-time performance and efficient data exchange. Its incorporation of Quality of Service parameters and support for both publish-subscribe and request-response communication patterns underscores its sophistication, making it a state-of-the-art choice for building DDS middleware in distributed environments.
+
+% In fact ROS capitalizes on the Data Distribution Service as a foundational communication middleware protocol\cite{ros2iron}, which plays a pivotal role in enabling seamless and efficient data exchange and interaction between the myriad components that constitute a robotic ecosystem.
+
+% The structure of the middleware-ROS, exemplified by \emph{rmw\_dds\_common}\cite{ros2iron}, combined with various middleware specific to each DDS service provider, also allows for easy switching of the DDS implementation using a simple variable change, invoked before launching the ROS-node, among the many available options (FastDDS, CycloneDDS, ConnextDDS, etc.). 
+% This approach permits choosing the most suitable DDS implementation for specific use case. For instance, if we intend to use FastDDS (most suitable one for real-time communications) as the primary DDS service, we can set \emph{rmw\_implementation=fastdds}, and ROS will be able to abstract all of its functions.

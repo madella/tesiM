@@ -1,4 +1,4 @@
-\documentclass[12pt,a4paper,twoside]{book}
+\documentclass[12pt,a4paper,oneside]{book} %TODO: Per stampare metti in twoside
 \usepackage[italian]{babel}
 
 \title{Analisi e sviluppo di middleware DDS per la gestione dei consumi in sistemi HPC}
@@ -17,17 +17,14 @@
 \thispagestyle{empty}
 \tableofcontents
 \thispagestyle{empty}
-
-
+%TODO: Glossario outliers0 publisher e subscriber
 \titleformat{\chapter}[display]
   {\normalfont\bfseries}{}{0pt}{\Huge}
-
 \input{1_Introduzione.tex}
 \input{2_PowerManagementHPC.tex}
 \input{3_Regale.tex}
 \input{4_DdsRtpsRps.tex}
 \input{5_CaseStudies&Evaluation.tex}
-
 \input{6_Conclusione.tex}
 \printbibliography
 

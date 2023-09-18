@@ -1,15 +1,9 @@
 \chapter{Power management}
-
-
-
-
-
-
-%Il controller di potenza ha il compito di interfacciarsi con tutti i sensori fisici e gli attuatori, nonché con il sistema operativo e le applicazioni dell'utente. Grazie a queste interfacce, il controller di potenza legge periodicamente lo stato degli elementi di elaborazione principali (Processore, Temperatura e Tensione) e imposta di conseguenza, in base alle politiche di gestione della potenza, il punto di funzionamento di essi (Tensione, Frequenza). Oltre a queste metriche, il controller di potenza legge periodicamente il consumo energetico delle tensioni dei binari dal Resource Manager (RM) e riceve dall'OS le richieste in termini di livello di prestazioni (Frequenza Obiettivo), budget energetico e caratteristiche del carico di lavoro da eseguire. La politica di gestione della potenza determina, in base a questi parametri, il miglior punto di funzionamento in cui eseguire gli elementi di elaborazione, garantendo al contempo la stabilità termica, il budget energetico e i vincoli dell'applicazione. La gestione della potenza consente all'applicazione e al modello di programmazione in esecuzione di richiedere modifiche al punto di funzionamento in modo asincrono per seguire le fasi dell'applicazione ed entrare in punti di funzionamento a basso consumo energetico durante le fasi limitate dall'I/O, dalla memoria e dalla comunicazione per aumentare l'efficienza energetica.
+%Il Power Management ha il compito di interfacciarsi con tutti i sensori fisici e gli attuatori, nonché con il sistema operativo e le applicazioni dell'utente. Grazie a queste interfacce, il Power Management legge periodicamente lo stato degli elementi di elaborazione principali (Processore, Temperatura e Tensione) e imposta di conseguenza, in base alle politiche di gestione della potenza, il punto di funzionamento di essi (Tensione, Frequenza). Oltre a queste metriche, il Power Management legge periodicamente il consumo energetico delle tensioni dei binari dal Resource Manager (RM) e riceve dall'OS le richieste in termini di livello di prestazioni (Frequenza Obiettivo), budget energetico e caratteristiche del carico di lavoro da eseguire. La politica di gestione della potenza determina, in base a questi parametri, il miglior punto di funzionamento in cui eseguire gli elementi di elaborazione, garantendo al contempo la stabilità termica, il budget energetico e i vincoli dell'applicazione. La gestione della potenza consente all'applicazione e al modello di programmazione in esecuzione di richiedere modifiche al punto di funzionamento in modo asincrono per seguire le fasi dell'applicazione ed entrare in punti di funzionamento a basso consumo energetico durante le fasi limitate dall'I/O, dalla memoria e dalla comunicazione per aumentare l'efficienza energetica.
 
 \section{Stato dell'arte}
 
-Come mostrato nella Figura 1, il controller di potenza è collegato: (i) on-chip ai controlli di potenza (gestendo il consumo energetico e le prestazioni degli elementi di elaborazione principali) e ai sensori (monitorando il processo, la temperatura e la tensione degli elementi di elaborazione principali); (ii) off-chip ai Moduli Regolatori di Tensione (VRM) che alimentano il chip, gli altri componenti a bordo e il Controller di Gestione della Scheda (BMC).
+Come mostrato nella Figura 1, il Power Management è collegato: (i) on-chip ai Power Management (gestendo il consumo energetico e le prestazioni degli elementi di elaborazione principali) e ai sensori (monitorando il processo, la temperatura e la tensione degli elementi di elaborazione principali); (ii) off-chip ai Moduli Regolatori di Tensione (VRM) che alimentano il chip, gli altri componenti a bordo e il Controller di Gestione della Scheda (BMC).
 
 La gestione della potenza utilizza questi componenti hardware e connessioni per supportare un insieme di servizi in-band e out-of-band.
 
@@ -17,15 +11,19 @@ I servizi in-band vengono forniti alle applicazioni e ai sistemi operativi in es
 
 \subsection{Servizi In-Band}
 %\subsection{Interfacce SO}
-Il Power Management condivide una regione di memoria interna con lo spazio degli indirizzi I/O degli elementi di elaborazione. Questa interfaccia consente all'OS di accedere periodicamente a un insieme di strutture dati di stato contenenti lo stato del controller di potenza, le statistiche e il consumo energetico dei diversi binari di tensione e componenti. Queste informazioni possono essere utilizzate e accessibili dalle applicazioni e dagli utenti per monitorare in modo dettagliato l'energia consumata dalle applicazioni, consentendo la consapevolezza energetica.
+Il Power Management condivide una regione di memoria interna con lo spazio degli indirizzi I/O degli elementi di elaborazione. Questa interfaccia consente all'OS di accedere periodicamente a un insieme di strutture dati di stato contenenti lo stato del Power Management, le statistiche e il consumo energetico dei diversi binari di tensione e componenti. Queste informazioni possono essere utilizzate e accessibili dalle applicazioni e dagli utenti per monitorare in modo dettagliato l'energia consumata dalle applicazioni, consentendo la consapevolezza energetica.
 
 \subsection{Servizi Out-of-Band}
 %\subsection{Board Management COntroller}
-Oltre alla politica di gestione della potenza e ai servizi In-Band, il controller di potenza si interfaccia con il BMC per supportare servizi Out-of-Band. Questi includono la telemetria dettagliata sullo stato di potenza e prestazioni del chip, il capping di potenza a livello di chip e a livello di sistema e la segnalazione di errori e guasti nel chip e nei processi principali.
+Oltre alla politica di gestione della potenza e ai servizi In-Band, il Power Management si interfaccia con il BMC per supportare servizi Out-of-Band. Questi includono la telemetria dettagliata sullo stato di potenza e prestazioni del chip, il Power Management a livello di chip e a livello di sistema e la segnalazione di errori e guasti nel chip e nei processi principali.
 
 \subsection{Interfacce di alto livello}
 %TODO
-% slide 3-4 presentazione
+
+% Also some of the most well-known software include \emph{Variorum} (LLNL), \emph{GEOPM} (Intel)\cite{GEOPM}, and \emph{HDEEM} (Atos)\cite{HDEEM}, to name a few.
+% Additionally, have been introduced predictive analysis and machine learning\cite{MLEC} algorithms. Predictive algorithms can predict load spikes and implement precautionary measures to lower consumption, while machine learning can fine-tune energy management strategies using historical and real-time data. Moreover, predictive algorithms often based on ML models are essential for estimating the workload sensitivity to a given power reduction or operating point selection. Indeed, it is essential for energy management and power management algorithm to reason on an implicit or explicit performance model.
+
+% All these solutions represent attempts to tackle power management challenges, yet they display differing levels of compatibility. This lack highlights the urgent need for a comprehensive interoperability framework. These tools, though efficacious for specific use cases, often fail to cohesively integrate and cooperate due to varying interfaces and implementations.
 
 \section{Componenti PowerStack}
 \begin{figure}

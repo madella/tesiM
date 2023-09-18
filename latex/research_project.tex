@@ -17,12 +17,12 @@ In addition to this, there is the lack of complete, interoperable and open-sourc
 
 The ultimate goal would in fact be to connect the different tools available using a distributed approach, exploiting the potential of the Data Distribution Service (DDS) and the Real-Time Publish-Subscribe (RTPS).% [\ref{SEC:dds}].
 
-\subsection{DDS \& RTPS} \label{SEC:dds}
+\subsection{DDS \& RTPS}\label{SEC:dds}
 DDS (Data Distribution Service)\cite{DDS} and RTPS (Real-Time Publish-Subscribe)\cite{RTPS} constitute two pivotal technologies in the realm of distributed and real-time communications. These technologies play a critical role in enabling efficient and reliable data transmission among interconnected devices and applications, holding particular significance in intricate scenarios such as embedded systems, the Internet of Things, and high-performance applications like HPC.
 
 Specifically, DDS serves as a distributed communication framework that facilitates data exchange among software components distributed across heterogeneous network and allows to define the quality of service (QoS) policy. On the other hand, RTPS serves as the underlying protocol employed by DDS to realize the publish-subscribe paradigm within real-time networks. RTPS focuses on the dependable delivery of real-time messages, ensuring that data reaches the appropriate recipients in the most efficient manner. This protocol also manages critical aspects such as data flow control and node synchronization.
 
-\section{State of the Art} \label{SEC:soa}
+\section{State of the Art}\label{SEC:soa}
 % ========================================================================================================================================= 
 % Stato dell’arte: Ricostruisci le teorie e gli studi che riguardano il tema studiato. Individua le ricerche utili alla tua ricerca e identifica le categorie chiave del dibattito sul tema di ricerca2.
 
@@ -49,7 +49,7 @@ Various mechanism have emerged as a result like:
 \end{itemize}
 % (iii) Predictive Analysis and Machine Learning\cite{MLEC}: The use of predictive analysis and machine learning can help optimize energy consumption. Predictive algorithms can forecast load spikes and take preventive measures to reduce consumption, while machine learning can optimize energy management strategies based on historical and real-time data. Moreover, predictive algorithms often based on ML models are essential for estimating the workload sensitivity to a given power reduction or operating point selection. Indeed, it is essential for energy management and power management algorithm to reason on an implicit or explicit performance model;
 
-\noindent All these methods need to be coordinated and orchestrated by different actors such as system manager, node manager, job manager, task manager and monitors.
+All these methods need to be coordinated and orchestrated by different actors such as system manager, node manager, job manager, task manager and monitors.
 
 \subsubsection{Algorithms and Interoperability}\label{SSEC:runtimes}
 
@@ -66,7 +66,7 @@ Additionally, have been introduced predictive analysis and machine learning\cite
 
 All these solutions represent attempts to tackle power management challenges, yet they display differing levels of compatibility. This lack highlights the urgent need for a comprehensive interoperability framework. These tools, though efficacious for specific use cases, often fail to cohesively integrate and cooperate due to varying interfaces and implementations.
 
-\subsection{DDS \& ROS} \label{SSEC:rosiface}
+\subsection{DDS \& ROS}\label{SSEC:rosiface}
 % Drawing parallels from the field of robotics, ROS (Robot Operating System) confronted a similar dilemma and subsequently birthed a solution in the form of an interoperability layer built upon DDS. This successfully facilitated seamless communication among disparate robotic components.
 
 Ros Middleware interface\cite{ros2iface}, developed within the context of the Robot Operating System (ROS), stands as a pinnacle of innovation in the realm of creating middleware for Distributed Data Systems. The middleware leverages advanced data serialization techniques, optimized for real-time performance and efficient data exchange. Its incorporation of Quality of Service parameters and support for both publish-subscribe and request-response communication patterns underscores its sophistication, making it a state-of-the-art choice for building DDS middleware in distributed environments.
@@ -76,7 +76,7 @@ In fact ROS capitalizes on the Data Distribution Service as a foundational commu
 The structure of the middleware-ROS, exemplified by \emph{rmw\_dds\_common}\cite{ros2iron}, combined with various middleware specific to each DDS service provider, also allows for easy switching of the DDS implementation using a simple variable change, invoked before launching the ROS-node, among the many available options (FastDDS, CycloneDDS, ConnextDDS, etc.). 
 This approach permits choosing the most suitable DDS implementation for specific use case. For instance, if we intend to use FastDDS (most suitable one for real-time communications) as the primary DDS service, we can set \emph{rmw\_implementation=fastdds}, and ROS will be able to abstract all of its functions.
 
-\section{Project's Description} \label{SEC:pd}
+\section{Project's Description}\label{SEC:pd}
 % ====================================================================================================================================
 % Definizione del problema e domande di ricerca: Definisci in termini chiari ed immediatamente comprensibili la questione che vuoi indagare. Articola il problema in domande di ricerca a cui vuoi rispondere.
 % ====================================================================================================================================
