@@ -1,4 +1,4 @@
-\chapter{DDS \& RTPS}\label{SEC:dds}
+\chapter{DDS \& RTPS}\label{Chapter:dds}
 DDS (Data Distribution Service)\cite{DDS} e RTPS (Real-Time Publish-Subscribe)\cite{RTPS} costituiscono due soluzioni fondamentali nel campo delle comunicazioni distribuite e real-time. Queste tecnologie svolgono un ruolo importante nella la trasmissione di dati tra dispositivi e applicazioni interconnesse, rivestendo particolare importanza in scenari complessi come i sistemi embedded, in IoT e applicazioni ad alte prestazioni come l'HPC (High-Performance Computing). 
 
 
@@ -11,7 +11,7 @@ DDS e RTPS sono dei protocolli di comunicazione per specifici casi di utilizzo. 
   \item GurumDDS
 \end{itemize}
 
-E tante altre. In tutti i successivi capitoli verrà preso come riferimento FastDDS, una implementazione specifica per le comunicazione Real-Time. %TODO: Da migliorare
+e tante altre. In tutti i successivi capitoli verrà preso come riferimento FastDDS ed in particolare la sua versione 2.11.2 \cite{FastDDS}. E' stato scelto di utilizzare questa implementazione  dato il supporto per le comunicazione Real-Time, e le impostazioni delle Qualità del servizio(QoS) che la rendevano perfetta per un utilizzo su sistemi di HPC. %TODO: Da migliorare
 
 \section{DDS}
 Data Distribution Service è un protocollo di comunicazione incentrato sullo scambio di dati per sistemi distribuiti. Questo si basa su modello chiamato Data-Centric Publish Subscribe (DCPS) I principali attori che vengono coinvolti sono:
@@ -46,12 +46,12 @@ In particolare la sequenza di scambio è:
 
 \begin{figure}[H]
     \centering
-    \begin{subfigure}{0.45\linewidth} % Prima immagine
+    \begin{subfigure}{0.45\linewidth}
       \centering
       \includegraphics[width=\linewidth]{./img/dds_architecture.png}
       \caption{Schema DDS}\label{fig:dds}
     \end{subfigure}
-    \begin{subfigure}{0.45\linewidth} % Seconda immagine
+    \begin{subfigure}{0.45\linewidth}
       \centering
       \includegraphics[width=\linewidth]{./img/rtps_architecture.png}
       \caption{Schema RTPS}\label{fig:rtps}
