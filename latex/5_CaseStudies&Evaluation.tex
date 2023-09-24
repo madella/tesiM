@@ -128,20 +128,19 @@ Il dominio è la segmentazione di più "forte" e di più alto livello. Va a part
     
 \subsubsection*{Topic}
 All'interno di un dominio i topic definiscono il metodo principale di instradamento dei messaggi, essendo però limitato dal tipo di messaggio che si vuole inviare. Infatti topic diversi supportano tipi di dato diversi, e non sono modificabili a run-time. %TODO: glossario
-Inoltre il topic non permette gerarchie
+Inoltre il topic non permette gerarchie ed è difficilmente modificabile a run-time
 
 \subsubsection*{Partizione}
-
-
-Partizione: molto flessibile, gerarchico, segmentazione virtuale.
-Topic: flessibile ma a costo elevato, non gerarchico, segmentazione virtuale.
+Questo strumento risulta molto interessante, in quanto all'interno di un topic permette di definire gerarchie (è possibile sottoscriversi a più partizioni contemporaneamente), definisce wildcards e crea una segmentazione virtuale. Inoltre è facilmente modificabile a run-time.
 
 \subsubsection{Wildcards}
-
+Le wildcards sono un costrutto appartenente alla partizione che permette di definire dei pattern testuali sulla base del quale vengono instradati i messaggi. Un esempio può essere \textit{Node*} che va a corrisponde a tutti i messaggi sotto il topic precedentemente definito, a tutte le partizioni che iniziano con Node.
 \subsection{Test3}
 
 \section{Risultati}
+
 \section{Modello}
+
 \section{Scheletro componenti}
 Nel seguente capitolo viene stilato uno scheletro dei componenti con i relativi topic usati al fine di dare una visione completa e aggiuntiva rispetto al modello precedentemente stilato  
 \begin{figure}[H]

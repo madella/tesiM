@@ -14,7 +14,7 @@
 
 # August
 Baically 4 things
-- [ ] Google-doc skeleton of entities and protagonist envolved in HPC communication with type, request etc.
+- [x] Google-doc skeleton of entities and protagonist envolved in HPC communication with type, request etc.
   - [x] TESTcpp create a 4 entities scheme (sender - 1 pub 1 sub on callback; receiver 1sub 1 pub for callback)
 - [x] Perform metric in which we record difference on atomic (shared_mem udp_multicas udp_unicast tcp?)
   - [x] do custom dds_on specific implementation
@@ -45,7 +45,7 @@ Baically 4 things
 - [x] tcp on different nodes (hostname -i)
   - [x] prepare the test
 - [x] check time shifting: non mi è permesso controllare lo stato di NTP con ntpd -p
-- [ ] request for thesis
+- [X] request for thesis
 
 ---
 [Skeleton](./SKELETON.md)
@@ -58,7 +58,7 @@ Baically 4 things
     - [ ] fastdds subscriba a tutti i topic e li manda al broker
     - [ ] è necessario poter ricostruire le informazioni di chi invia le info (lato dds)
   - [ ] start to implement part in REGALE deliverable
-- [ ] dummy jobmanager (federico)
+- [x] dummy jobmanager (federico)
 
 # tests
 - [ ] UML sequence diagram of my tests (  )
