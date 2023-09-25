@@ -2,7 +2,6 @@
 TITOLO: Interoperabilità
 Analisi e sviluppo di middleware DDS per la gestione dei consumi in sistemi HPC
 
-
 abstract
 - Introduzione (contesto: power management, hpc, dds)
   - problematica 
@@ -10,17 +9,18 @@ abstract
   non eccessivamente lunga
 - Power Management in HPC enviroment
   - Stato dell'arte ( bottom up )
-    -  Interfacce SO power manager (cpu-freq) [in-band]
+    -  Interfacce SO power manager (cpu-freq,rapl) [in-band]
     - Board Management Controller (OpenComputeProject) [out-of-band]
       - HDEEM Estende bmc con FPGA che legge le potenze HFrequency
     - Interfacce Alto lvello
-  - ( vari attori )  
+      - ( vari attori )  
 - DDS-RTPS & ROS
   - REGALE (scheletro BSC)
 - Lavoro svolto (REGALE library)
   - Caratterizzazione DDS HPC
   - Modello per utilizzo di DDS per REGALE
   - Sviluppo dei scheletro di due componenti
+    - schema componenti
     - monitor 
 
 
@@ -56,4 +56,4 @@ PVT sensors, process, voltage e temperature sensor. Servono per misurare la velo
 Come sfrutti le manopole di sopra per realizzare i goal di ancora più sopra.
 Esempi sono Countdown, EAR, linux governors, ecc ecc.
  
-Una parte fondamentale di tutti gli algoritmi di energy management è capire preventivamente di quanto si rallenterà l’applicazione riducendo le performance (frequency scaling o throttlingo o power capping RAPL). Questo perché non sempre è conveniente andare piano. Il motivo è il leakage e la potenza statica.
+Una parte fondamentale di tutti gli algoritmi di energy management è capire preventivamente di quanto si rallenterà l’applicazione riducendo le performance (frequency scaling o throttlingo o power capping RAPL). Questo perché non sempre è conveniente andare piano.

@@ -40,7 +40,7 @@ Sono stati svolti diversi test al fine di trovare un modello ottimale di utilizz
 Al fine di condurli nel modo più trasparente e corretto possibile sono stati resi pubblici \cite{mygit} tutti i codici utilizzati durante lo svolgimento di questi test. %TODO5O: riordinare & documentare git
 
 \subsection{Struttura dei test}
-Ognuno dei test effettuati, con il fine di coprire e reperire il maggior numero di informazioni possibili, ha dovuto monitorare e catalogare 4 tipi di informazioni diversi:
+Sono stati prodotti dei test ad hoc, composti in parte da script bash, e in parte da programmi c++ con lo scopo di sfruttare al massimo le infrastruttura utilizzata \ref{table:hpc}. Ognuno di questi, con il fine di coprire e reperire il maggior numero di informazioni possibili, ha dovuto monitorare e catalogare 4 tipi di informazioni diversi:
 
 \begin{itemize}
     \item Tempo solo invio
@@ -97,7 +97,7 @@ Questo può portare una singola publish a impiegare più cicli e più tempo dell
 
 In tutti i test successivi, ove non specificato diversamente sono stati usati 1 publisher e 48 subscriber su diversi nodi. Questo è stato fatto per provare la scalabilità, visto che nel testbed che è stato utilizzato, erano presenti 48 core (1 core per ogni subscriber).
 
-\subsection{Test1}
+\subsection{Test-1}
 In DDS ed in particolare nel layer sottostante di RTPS, per scambiare messaggi anche tramite rete, e non solo nello stesso nodo, è possibile scegliere come mezzo diversi tipi di protocolli:
 
 \begin{itemize}
@@ -115,7 +115,7 @@ Nel primo test si è valutata la differenza di queste implementazioni utilizzand
         \label{fig:test3_different_protocols}
 \end{figure}
 
-\subsection{Test2}
+\subsection{Test-2}
 Un concetto fondamentale nelle comunicazioni tra attori con gerarchie diverse, in sistemi con diverse centinaia di migliaia di entita, come cluster, nodi, processori, workflow, job (etc.), sono le possibilità di instradare, segmentare e rendere gerarchiche le comunicazioni. Come spiegatolo nel capitolo \ref{Chapter:dds} in DDS ci sono diversi strumenti disponibili per farlo. Tra di loro differiscono per alcuni aspetti, come flessibilità, costo (in performance) e livello di segmentazione.
 
 In questo test si è valutata la differenza in termini di performance dei diversi strumenti, con un particolare focus sulle partizioni e le wildcards rese disponibili in esso.
@@ -134,8 +134,16 @@ Inoltre il topic non permette gerarchie ed è difficilmente modificabile a run-t
 Questo strumento risulta molto interessante, in quanto all'interno di un topic permette di definire gerarchie (è possibile sottoscriversi a più partizioni contemporaneamente), definisce wildcards e crea una segmentazione virtuale. Inoltre è facilmente modificabile a run-time.
 
 \subsubsection{Wildcards}
-Le wildcards sono un costrutto appartenente alla partizione che permette di definire dei pattern testuali sulla base del quale vengono instradati i messaggi. Un esempio può essere \textit{Node*} che va a corrisponde a tutti i messaggi sotto il topic precedentemente definito, a tutte le partizioni che iniziano con Node.
-\subsection{Test3}
+Le wildcards sono un costrutto appartenente alle partizioni, che permette di definire dei pattern testuali sulla base del quale vengono instradati i messaggi. Un esempio può essere \textit{Node*} che va a corrisponde a tutti i messaggi sotto il topic precedentemente definito, a tutte le partizioni che iniziano con Node.
+
+\begin{figure}[H]
+    \centering
+    %TODO DA INSERIRE WILDCARDS costi
+    %\includegraphics[width=\textwidth]{./results/}
+\end{figure}
+
+
+\subsection{Test-3}
 
 \section{Risultati}
 

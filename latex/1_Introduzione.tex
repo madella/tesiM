@@ -16,7 +16,8 @@ La gestione energetica di sistemi HPC è diventata per questo motivo, una delle 
 Questi ultimi hanno portato a delle difficoltà sempre più grandi nel ridimensionamento dei transistor, conseguito nella progressiva fine delle leggi di Denard e Moore\cite{TODO}. Tali leggi, che avevano guidato l'industria informatica per decenni, prevedevano un consumo energetico costante al crescere della velocità e capacità computazionale. Quando questi sono venuti a mancare, il mantenimento e ancora di più lo sviluppo di nuove generazioni di sistemi è diventato un compito tutt'altro che banale, e con questi si sono resi necessari sempre più software in grado di automatizzarne la gestione. 
 Infatti utilizzare efficientemente l'energia disponibile e ottimizzare le prestazioni delle applicazioni sotto un limite di potenza è diventata una sfida, che ha richiesto soluzioni specifiche. %da sistemare
 % Power management ================================================================
-Il concetto di Power Management è nato sotto questo contesto, definendo un modello software che ha il compito di gestire tutto ciò che riguarda potenza, energia e temperatura di sistemi di HPC. Per farlo sono stati definiti diversi attori ognuno con un compito specifico, e cercando di standardizzare le interazioni che questi componenti dovevano avere.
+Il concetto di Power Management è nato sotto questo contesto, definendo un modello software che ha il compito di gestire tutto ciò che riguarda potenza %, energia e temperatura NO! (o sbaglio?)
+di sistemi di HPC. Per farlo sono stati definiti diversi attori ognuno con un compito specifico, e cercando di standardizzare le interazioni che questi componenti dovevano avere.
 
 Questo Power-Stack ha però la necessità di avere una visione globale per la gestione energetica, al fine di permettere dove necessario di definire degli obbiettivi e limiti di prestazioni e consumi. Inoltre deve essere definita un'interfaccia standard per poter interagire con i controlli hardware e software di sistemi HPC di diversi produttori.
 %Una limitazione primaria della maggior parte, se non di tutti, di questi sforzi è che la ricerca sull'ottimizzazione è stata limitata esclusivamente ai singoli livelli del PowerStack. Le opportunità di ottenere ulteriori miglioramenti nell'efficienza energetica dalla messa a punto collettiva di due o più livelli del PowerStack sono rimaste in gran parte inesplorate.
@@ -24,7 +25,7 @@ Questo Power-Stack ha però la necessità di avere una visione globale per la ge
 Mentre sono state proposte diverse tecniche per colmare questo bisogno, %o mancanza?
 %gestione della potenza e dell'energia, 
 la maggior parte di esse si è rivelata essere una soluzione per soddisfare singoli obiettivi di ottimizzazione o per un singolo sistema di HPC. Infatti molti dei prodotti attualmente disponibili svolgono compiti a granularità diverse e spesso in conflitto gli uni con gli altri. Peraltro non sono neanche mai state definite o modellizzate interfacce di comunicazione tra i vari software, lasciando ai gestori dei sistemi di HPC, l'onere di farlo.
-%TODO: Trovare queste cit:
+%TODOV: Trovare queste cit: M. Maiterth et al., Energy and power aware job scheduling and resource management: global survey initial analysis, in 2018 IEEE International Parallel and Distributed Processing Symposium Workshops (IPDPSW), Vancouver, BC, 2018, pp. 685–693, doi: 10.1109/IPDPSW.2018.00111.
 %Un recente studio [22] condotto dal gruppo di lavoro EEHPC [9] ha concluso che la maggior parte di tali tecniche manca di una consapevolezza globale necessaria per ottenere le migliori prestazioni di sistema e throughput. Inoltre, ciascuna tecnica tende a migliorare la gestione di potenza ed energia per un sottoinsieme diverso dell'hardware del sito o del sistema e a diverse granularità (spesso in conflitto). Sfortunatamente, le tecniche esistenti non sono state progettate per coesistere simultaneamente su un unico sito e cooperare nella gestione in modo efficiente. %Traduzione GPT di paper PS, da cambiare
 % Per affrontare queste lacune, la comunità HPC ha bisogno di uno stack completo per la gestione di energia e potenza. 
 % DDS =======================================================================
@@ -35,19 +36,39 @@ nonché quello di Real-Time Publish-Subscribe (RTPS).
 \section{Contributi}
 I contributi di questa tesi sono stati lo studio e caratterizzazione di una specifica implementazione di DDS all'interno di sistemi HPC al fine di fornire una visione più completa della possibilità di integrare questo strumento come base delle comunicazioni di un middlware per i componenti del power management. Successivamente sono stati valutati dei modelli basati su questi risultati come modo d'uso. Infine sono stati creati per completare il quadro due di questi attori, mancanti nelle implementazioni attualmente prodotte, utilizzando la libreria REGALE.
 
-- Definire le interfacce tra questi livelli per tradurre gli obiettivi a ciascun livello in azioni al livello inferiore adiacente.
-- Promuovere l'ottimizzazione end-to-end attraverso diversi livelli del PowerStack.
-% Negli ultimi anni, la rapida crescita dei sistemi di supercalcolo ha portato a una crescente domanda di strategie efficienti per il power management. Poiché il panorama delle capacità omputazionali continua la sua rapida espansione, l'imperativo di soluzioni  sostenibili di gestione dell'energia diventa ancora più evidente. La formidabile potenza computazionale esercitata dai moderni supercomputer è spesso contrastata dal considerevole consumo di energia necessario per alimentare le loro operazioni. Questo fenomeno è evidente anche nell'interesse crescente per il calcolo ecologico, anziché il puro e semplice consumo di energia\cite{Green}\cite{Green2}\cite{hardvard}. In questo contesto, la ricerca di innovative strategie di gestione dell'energia diventa non solo una considerazione economica, ma soprattutto uno sforzo fondamentale per ridurre le conseguenze ecologiche dell'incremento del consumo di energia. Inoltre, le prestazioni degli elementi di calcolo sono intrinsecamente limitate dal consumo di energia, il che implica che migliorare l'efficienza energetica si traduce in una maggiore performance massima.
+% - Definire le interfacce tra questi livelli per tradurre gli obiettivi a ciascun livello in azioni al livello inferiore adiacente.
+% - Promuovere l'ottimizzazione end-to-end attraverso diversi livelli del PowerStack.
 
-% Le architetture moderne implementano un controllore termico e energetico integrato nel dado, il cui scopo è fornire prestazioni massime entro limiti fisici ed esternamente imposti. Oltre a ciò, sono stati aggiunti anche altri compiti al controllo energetico e termico, tra cui:
-% (i) scambio di messaggi con diversi agenti (come Node-manager, Board Management Controller (BMC) e sistemi operativi) modificando la sua azione di controllo per soddisfare tutti i vincoli dati da questi agenti;
-% (ii) essere consapevoli delle implicazioni sulla sicurezza delle sue azioni di controllo, evitando punti operativi fatali a livello di sistema e rilevando e prevenendo attacchi basati sulla sicurezza legati a errori\cite{fbv} o a rumori elettrici virus\cite{pnv}.
+% ==============================================================  obbiettivi di power management.
+% Formalmente energy management, power management e thermal management hanno significati diversi.
 
-% Inoltre, c'è la mancanza di software completi, interoperabili e open-source in grado di gestire e monitorare contemporaneamente il consumo senza influire sull'aspetto più cruciale dei supercomputer: le prestazioni. Attualmente, ci sono diverse utility [\ref{SSEC:runtimes}] capaci di risolvere un dominio di problemi, ma senza la capacità di interagire tra loro in modo diretto.
+% Power management -> gestione della Potenza. Qui l’obbiettivo è controllare la potenza assorbita. Indirettamente legata al raffreddamento (qui di parla di TDP - thermal design power – si fa l’assunzione di essere a regime, quindi a transitori termici esaurit), ma anche legata alla massima corrente erogabile da un alimentatore o dai pad del chip. In questo caso si parla di TDC, Thermal design current ma anche di peak current.
 
-% L'obiettivo finale sarebbe infatti quello di collegare gli strumenti diversi disponibili utilizzando un approccio distribuito, sfruttando il potenziale del Data Distribution Service (DDS) e del Real-Time Publish-Subscribe (RTPS).% [\ref{SEC:dds}].
+% Quando si parla di TDP o TDC di norma quello che si vuole ottenere è fare power capping ovvero limitare la max power ad un certo valore. 
+% Se si parla invece di power management si può in modo erraneo anche includere energy management 
 
-% \subsection{DDS \& RTPS} \label{SEC:dds}
-% DDS (Data Distribution Service)\cite{DDS} e RTPS (Real-Time Publish-Subscribe)\cite{RTPS} costituiscono due tecnologie fondamentali nel campo delle comunicazioni distribuite e in tempo reale. Queste tecnologie svolgono un ruolo critico nel consentire una trasmissione efficiente e affidabile dei dati tra dispositivi e applicazioni interconnesse, con particolare rilevanza in scenari complessi come i sistemi embedded, l'Internet delle cose e applicazioni ad alte prestazioni come l'HPC.
+% Thermal management -> gestione temperatura dinamica o statica. 
+% Energy management -> gestione dell’energia e quindi anche di quello che si paga, e sostenibilità. Qui bisogna stare attenti in quanto l’estremo dell’energy management e riduzione del costo energetico è quello di spegnere tutto e andare al mare. Ovvero se non si fa compute o se si va molto piano si paga una penalità in performance molto elevata. Essendo un problema di trade off tra performance e riduzione dei consumi spesso si deve darsi una definizione di quella che è una performance accettabile o una riduzione di performance accettabile dentro la quale si cerca di ridurre l’energia. 
+%Fissata la riduzione di performance, minimizzare l’energia coincide con minimizzare la potenza. Da qui la confusione tra energy management e power management.
 
-% In particolare, DDS funge da framework di comunicazione distribuita che facilita lo scambio di dati tra componenti software distribuiti su reti eterogenee e consente di definire la politica di qualità del servizio (QoS). D'altra parte, RTPS funge da protocollo sottostante utilizzato da DDS per realizzare il paradigma di pubblicazione-sottoscrizione all'interno delle reti in tempo reale. RTPS si concentra sulla consegna affidabile di messaggi in tempo reale, garantendo che i dati raggiungano i destinatari appropriati nel modo più efficiente possibile. Questo protocollo gestisce anche aspetti critici come il controllo del flusso dei dati e la sincronizzazione dei nodi.
+% E’ doveroso differenziare tra energia e potenza in quanto ridurre la potenza non vuol dire per forza ridurre l’energia, e viceversa. Sono infatti famose due politiche, run fast and stop e go slow and low power. Ma qui ci arrivo dopo.
+% A volte si usa power management per includere tutti i tre, thermal, power e energy. In modo erraneo giusto?
+
+% Meccanismi e componenti HW per il power management, ma anche thermal ed energy.
+
+% DFS: Dynamic Frequency scaling. Questo vuol dire che da qualche parte nell’archietettura c’è un registro che permette di cambiare la frequenza del PLL o FLL che eroga il clock alla CPU. Riducendo la frequenza di clock si ha un effetto lineare sulla riduzione della potenza dinamica.
+% Clock gating: da qualche parte nell’albero di clock c’è l’equivalente di un AND che può essere comandato tramite registro (throttling) o in modo automatico per silenziare il segnale di clock. Questo azzera la potenza dinamica.
+% Throttling – anche T state in terminologia ACPI. Questo vuol dire che è possibile salare dei cicli di clock in modo percentuale. Equivalente a DFS ma non proprio.
+% DVFS: Dynamic voltage e frequency scaling. In questo caso si varia anche il voltaggio insieme alla frequenza. Facendo ciò si riduce fino al cubo la potenza dinamica, si riduce in modo esponenziale il leakage. Aumenta il costo di design in quanto deve essere fatto il sign-off del core a diverse coppie di frequenza e tensione.  E’ necessario poter variare la tensione per delle zone del chip.  Servono o voltage regulator che permettono di variare la tensione, oppure degli LDO che sfruttano transistor per controllare un drop di tensione. A seconda dell’implementazione può essere il core a settare la nuova tensione e frequenza oppure un controllore di potenza. Vedi i P-state.
+% Power gating, o anche C-state. In questo caso viene rimossa l’aliomentazione ai core. A seconda dell’implementazione serve salvare il contesto o meno.
+% Power capping (RAPL) in questo caso esiste un registro che permette di fissare un consumo massimo per alcune sotto parti del chip. In realtà è realizzato da un controllore di potenza che tramite firmware controlla le manopole di sopra.
+% PVT sensors, process, voltage e temperature sensor. Servono per misurare la velocità del silicio, la tensione e la temperatura in zone del silicio.
+ 
+
+% Algoritmi: % Come sfrutti le manopole di sopra per realizzare i goal di ancora più sopra.
+% Esempi sono Countdown, EAR, linux governors, ecc ecc.
+ 
+
+% Una parte fondamentale di tutti gli algoritmi di energy management è capire preventivamente di quanto si rallenterà l’applicazione riducendo le performance (frequency scaling o throttlingo o power capping RAPL). Questo perché non sempre è conveniente andare piano. Il motivo è il leakage e la potenza statica.
+
+ 

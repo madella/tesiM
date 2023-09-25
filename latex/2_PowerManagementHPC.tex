@@ -1,42 +1,55 @@
 \chapter{Power management}
-% Intro, cos'è il PM?
-Power Management può essere visto come un attore che svolge tre compiti:
-%TODO come è fatto un sistema HPC, def di nodo, etc.
 
-Per svolgere al meglio il suo compito, un PowerStack deve interfacciarsi ad una serie di componenti HW e SW come: (i) sensori fisici, (ii) attuatori, (iii) sistema operativo e (iiii)applicazioni dell'utente. Successivamente, grazie a queste interfacce, viene monitorato lo stato di Processore, Temperatura e Tensione, impostando di conseguenza, (secondo delle politiche definite), il target di funzionamento. 
-
-Oltre a queste metriche, il Power Management deve monitorare il consumo energetico delle tensioni dei binari dal Resource Manager (RM) e riceve dall'OS le richieste in termini di livello di prestazioni (Frequenza Obiettivo), budget energetico e caratteristiche del carico di lavoro da eseguire. La politica di gestione della potenza determina, in base a questi parametri, il miglior target di funzionamento in cui eseguire gli elementi di elaborazione, garantendo al contempo la stabilità termica, il budget energetico e i vincoli dell'applicazione. La gestione della potenza consente all'applicazione e al modello di programmazione in esecuzione di richiedere modifiche al target di funzionamento in modo asincrono per seguire le fasi dell'applicazione ed entrare in punti di funzionamento a basso consumo energetico durante le fasi limitate dall'I/O, dalla memoria e dalla comunicazione per aumentare l'efficienza energetica.
-
+I sistemi di HPC sono composti da decine di centinaia di nodi computazionali interconnessi tra di loro da reti a bassa latenza e alta banda. 
+%Ogni volta che deve essere eseguito un compito, l'utente richiede che vengano allocate delle risorse, sopra il quale far eseguire gli applicativi. Queste richieste, vengono inserite in delle code, gestite dallo scheduler di sistema %TODO:da controllare 
+% che poi vanno a frammentare virtualmente e condividere il nodo in sub-clusters tra i vari utenti. %Alla fine dei vari compiti da eseguire il partizionamento delle risorse del nodo viene annullato, riportando il nodo al suo stato iniziale. L'unica parte non partizionabile del nodo sono le CPU, memorie e acceleratori.
+% HPC applications typically use the Single Program Multiple Data
+% (SPMD) execution model, where the same application executable
+% is instanced multiple time on different nodes of the cluster; each
+% instance works on a partition of the global workload and communicates with other instances to orchestrate subsequent computational steps. For this reason, a HPC application can be seen as the composition of several tasks executed in a distributed environment which exchanges messages among all the instances. Achieving high-performance communication on distributed applications in large clusters is not an easy task. The Message-Passing Interface (MPI) runtime responds to these demands by abstracting the level of network infrastructure using a simple but high-performance interface for communication that can scale up on thousands of nodes.
+% Intro, cos'è il PM? 
+Tutti questi nodi uniti insieme, grazie alla grande quantità di processori e agli acceleratori che hanno montato al loro interno offrono capacità computazioni che nei giorni nostri hanno raggiunto ordini del ExaFlops ($10^{18}$ operazioni di  Floating Point per secondo).
+Visto l'aumento della densità energetica e alle magnifiche prestazioni raggiunte, la potenza necessaria per alimentare questi sistemi sta superando i 20MWatt. Se poi si considera che la maggior parte della potenza fornita, viene convertita in calore, si deve prendere in considerazione anche i consumi necessaria per tenere raffreddati questi sistemi. Infatti se non adeguati, le difficili condizioni in cui lavorano comportano grandi inefficienze in termini di energia, che si traducono anche in degradazioni di prestazioni computazionali. 
+Considerando tutto, ai centri che ospitano queste macchine si devono fornire decine di MWatt di potenza per ogni exa-supercomputer che hanno installato. 
+Ordini di grandezza di questo tipo non sono facilmente ottenibili e hanno costi estremamente elevati. 
+%Inoltre i prezzi per garantire questi valori di Watt aumenta in modo non lineare.
+Al fine di definire dei power budget, e utilizzare efficientemente la potenza richiesta si sono resi necessari strumenti situati su diversi livelli di astrazione. 
+Sono nati così i primi concetti di Power Management, componenti per controllare l'utilizzo di energia utilizzando diverse strategie al fine di ridurre gli sprechi energetici e, allo stesso tempo, garantire un temperatura di funzionamento sicura.
+Power Management può essere visto come un sistema composto sia da parti software che Hardware. L'insieme di questi componenti va a formare un power-stack in grado di gestire la potenza assorbita di macchine HPC.
 
 \section{Stato dell'arte}
+Per riuscire nel suo scopo, il Power-Stack deve riuscire a gestire la potenza dei sistemi anche a granularità più basse, come singoli nodi, e singoli elementi all'interno dei nodi fornendo servizi a diversi livelli di astrazione.
+Tra questi vediamo:
+\begin{itemize}    
+    \item servizi in-band, 
+    \item servizi out-of-band
+    \item applicazioni utente, e componenti di alto livello%, per definire le politiche
+\end{itemize}
+% I servizi in-band vengono forniti alle applicazioni e ai sistemi operativi in esecuzione negli elementi di elaborazione del chip e sono composti da: (i) governor dedicati alla potenza e telemetria correlata alla potenza a livello di sistema operativo; (ii) un'interfaccia dedicata per consentire alle applicazioni e ai tempi di esecuzione del modello di programmazione di specificare suggerimenti e prescrizioni per la gestione della potenza; (iii) un'interfaccia dedicata al Sistema e alla Gestione delle Risorse per supportare il capping della potenza a livello di CPU e nodo, nonché per gestire il compromesso tra Throughput ed Efficienza Energetica. I servizi out-of-band vengono forniti all'amministratore di sistema e agli strumenti di gestione del sistema tramite il Controller di Gestione della Scheda (BMC). Questi servizi consistono nella telemetria di potenza out-of-band, nel capping di potenza a livello di sistema e nella affidabilità e assistenza.
 
-% Come mostrato nella {Figura 1},
-Il Power Management è collegato: (i) on-chip ai Power Management (gestendo il consumo energetico e le prestazioni degli elementi di elaborazione principali) e ai sensori (monitorando il processo, la temperatura e la tensione degli elementi di elaborazione principali); (ii) off-chip ai Moduli Regolatori di Tensione (VRM) che alimentano il chip, gli altri componenti a bordo e il Controller di Gestione della Scheda (BMC).
+% (ii) off-chip ai Moduli Regolatori di Tensione (VRM) che alimentano il chip, gli altri componenti a bordo e il Controller di Gestione della Scheda (BMC).
 
-Questi componenti hardware vengono utilizzati per offrire un insieme di servizi in-band e out-of-band.
+\subsection{interfacce in-band}
+Le interfacce in-band sono rese possibili tramite componenti hardware sul chip, come i power knob (manopole per la gestione della potenza) che controlla il consumo e le prestazioni di ogni processore, e sensori che permettono di monitorare temperature e tensioni. Queste interfacce sono spesso utilizzate dai power governors (SO) e anche da alcune interfacce del System Management per permettere di limitare ad un massimo di potenza a livello di processore ee a livello di nodo. Un esempio di questi componenti è il power controller che risiede all'interno dei processori, ed esponendo lo spazio di memoria interno a degli indirizzi di I/O riesce a fornire a chi lo necessita tutti i controlli. Grazie a questi componenti, sia il sistema operativo, che il System Manager riesce ad accede a delle strutture date contenenti gli stati, statistiche e consumi dei diversi componenti all'interno del chip.
+%TODO: schema power governors e power controller
 
-I servizi in-band vengono forniti alle applicazioni e ai sistemi operativi in esecuzione negli elementi di elaborazione del chip e sono composti da: (i) governor dedicati alla potenza e telemetria correlata alla potenza a livello di sistema operativo; (ii) un'interfaccia dedicata per consentire alle applicazioni e ai tempi di esecuzione del modello di programmazione di specificare suggerimenti e prescrizioni per la gestione della potenza; (iii) un'interfaccia dedicata al Sistema e alla Gestione delle Risorse per supportare il capping della potenza a livello di CPU e nodo, nonché per gestire il compromesso tra Throughput ed Efficienza Energetica. I servizi out-of-band vengono forniti all'amministratore di sistema e agli strumenti di gestione del sistema tramite il Controller di Gestione della Scheda (BMC). Questi servizi consistono nella telemetria di potenza out-of-band, nel capping di potenza a livello di sistema e nella affidabilità e assistenza.
-
-\subsection{Servizi In-Band}
-%\subsection{Interfacce SO}
-Il Power Management condivide una regione di memoria interna con lo spazio degli indirizzi I/O degli elementi di elaborazione. Questa interfaccia consente all'OS di accedere periodicamente a un insieme di strutture dati di stato contenenti lo stato del Power Management, le statistiche e il consumo energetico dei diversi binari di tensione e componenti. Queste informazioni possono essere utilizzate e accessibili dalle applicazioni e dagli utenti per monitorare in modo dettagliato l'energia consumata dalle applicazioni, consentendo la consapevolezza energetica.
-
-\subsection{Servizi Out-of-Band}
-%\subsection{Board Management COntroller}
-Oltre alla politica di gestione della potenza e ai servizi In-Band, il Power Management si interfaccia con il BMC per supportare servizi Out-of-Band. Questi includono la telemetria dettagliata sullo stato di potenza e prestazioni del chip, il Power Management a livello di chip e a livello di sistema e la segnalazione di errori e guasti nel chip e nei processi principali.
+\subsection{interfacce out-of-band}
+Sono interfacce che diversamente da quelle di prima, risiedono al di fuori dei songoli processori, ma comunque all'interno della scheda madre. Tra questi il più importante è il Board Management Controller, solitamente un microcontrollore out-of-band che esegue in modo indipendente dal processore. Il suo principale scopo è quello di monitorare in modo dettagliato lo stato di tensioni, temperature, ventole e prestazioni dei processori e fornire contemporaneamente servizi di power capping sia a livello di sistema che di singoli processori. Infine essendo alimentato in modo indipendente riesce monitorare errori ed eccezioni che si manifestano sui processori, fornendo dettagli di elevata importanza.
+%TODO: se vuoi spiegare come sono fatti entrambi BMC e Power governors
 
 \subsection{Interfacce di alto livello}
 %TODO
+Tra le principali interfacce di alto livello, a livello di sistema operativo troviamo i \emph{power governors}, software in grado di gestire e controllare il consumo energetico dei componenti hardware sottostanti, ed in particolare quello dei processori. Svolgono principalmente due azioni: (i) monitoraggio del sistema in termini di carico di lavoro, temperatura e tensione e (ii) scelta della modalità di funzionamento in modo dinamico. In particolare questa ultima opzione prevede di adattarsi dinamicamente alle variazioni del carico di lavoro per fornire più o meno potenza ai processori.
 
+Nel corso degli anni sono state sviluppati diversi software con compiti e meccanismi differenti. Tra questi rivediamo  \emph{Variorum} (LLNL), \emph{GEOPM} (Intel)\cite{GEOPM}, and \emph{HDEEM} (Atos)\cite{HDEEM}. 
 
-%Magari nella sezione dei problemi
-Nel corso degli anni sono state sviluppati diversi software come parti di Power Management come \emph{Variorum} (LLNL), \emph{GEOPM} (Intel)\cite{GEOPM}, and \emph{HDEEM} (Atos)\cite{HDEEM}. Tutti questi strumenti rappresentano un tentativo di risolvere un problema specifico di Power Management e non un software globale di gestione dell'energia di sistemi HPC.
+Tutti questi strumenti rappresentano un tentativo di risolvere un problema specifico di Power Management e non un software globale di gestione dell'energia di sistemi HPC.
 % Additionally, have been introduced predictive analysis and machine learning\cite{MLEC} algorithms. Predictive algorithms can predict load spikes and implement precautionary measures to lower consumption, while machine learning can fine-tune energy management strategies using historical and real-time data. Moreover, predictive algorithms often based on ML models are essential for estimating the workload sensitivity to a given power reduction or operating point selection. Indeed, it is essential for energy management and power management algorithm to reason on an implicit or explicit performance model.
 
 % All these solutions represent attempts to tackle power management challenges, yet they display differing levels of compatibility. This lack highlights the urgent need for a comprehensive interoperability framework. These tools, though efficacious for specific use cases, often fail to cohesively integrate and cooperate due to varying interfaces and implementations.
 
-\section{Componenti PowerStack}
-Un power stack completo e interoperabile, deve essere composto da  attori che svolgono ruoli ben precisi. Tra questi i più importanti sono:
+\section{Modello di power stack} %Componenti power stack
+Per utilizzare in modo controllato tutte le interfacce precedentemente spiegate, è stato necessario definire un modello di interazione e responsabilità dei vari componenti. Infatti un power stack completo e interoperabile, deve essere composto da attori che svolgono ruoli ben precisi e definiti. Tra questi i più importanti sono:
 \begin{itemize}
     \item Workflow engine
     \item System Manager
@@ -55,16 +68,27 @@ Di seguito viene riportato uno schema\ref{fig:powerstackscheme} che mostra le in
 Il workflow engine analizza le dipendenze e le richieste di risorse di ogni workflow e decide dinamicamente come dividerlo negli specifici jobs che verranno assegnati al system-manager.
 
 \subsection{Job schedulers}
-Il job scheduler ha il compito di assegnare e condividere le risorse computazionali e fisice del sistema HPC, ai vari utenti che lo utilizzano. In particolare la serie di compiti che si trova a svolgere è il seguente L'utente schedula i jobs da svolgere in una o più code, definite dallo scheduler. Il Job scheduler esamina tutte le code e i job in esse contenute, e decide dinamicamente, quale sarà l'ordine di esecuzione, e il tempo massimo in cui viene assegnata una risorsa. Generalmente si cerca di ottimizzare alcune caratteristiche come il tempo di utilizzo del sistema oppure l'accesso veloce alle risorse per alcuni sottoinsiemi di jobs. Inoltre le code definite, possono avere diverse priorità o può essere ristretto l'accesso a soli alcuni utenti. 
+Il job scheduler ha il compito di assegnare e condividere le risorse computazionali e fisice del sistema HPC, ai vari utenti che lo utilizzano. In particolare la serie di compiti che si trova a svolgere è il seguente L'utente schedula i jobs da svolgere in una o più code, definite dallo scheduler. Il Job scheduler esamina tutte le code e i job in esse contenute, e decide dinamicamente, quale sarà l'ordine di esecuzione, e il tempo massimo in cui viene assegnata una risorsa. Generalmente si cerca di ottimizzare alcune caratteristiche come il tempo di utilizzo del sistema oppure l'accesso veloce alle risorse per alcuni sottoinsiemi di jobs. Inoltre le code definite, possono avere diverse priorità o può essere ristretto l'accesso a soli alcuni utenti. I job scheduler possono condividere un nodo anche con più utenti contemporaneamente, in base all'utilizzo che devono farne. Per farlo il nodo viene allocato e diviso in partizioni virtuali, che vengo sciolte una volta finiti i job in esecuzione. Questo permette di utilizzare al massimo i componenti messi a disposizione dal sistema HPC.
 
+\subsection{Resource Manager}
+Per riuscire a svolgere questo lavoro il Job Scheduler interagisce con uno o più \textbf{Resource Manager}. Questi sono software che hanno il privilegio di gestire le risorse di un centro di calcolo. Queste risorse includono diversi componenti:
+\begin{itemize}
+    \item Nodi
+    \item Processori
+    \item Memorie
+    \item Dischi
+    \item Canali di comunicazione (compresi quelli di I/O)
+    \item Interfacce di rete 
+\end{itemize}
+Per esempio quando un Job Scheduler deve eseguire un job, richiede al RM di allocare core, memorie, dischi e risorse di rete in linea con quanto il job ha necessita di essere eseguito.
+
+Infine in alcuni casi il RM è anche responsabile di gestire elettricità e raffreddamento dei centri di calcolo.
 
 \subsection{System Manager}
-Riceve come input un insieme di jobs che devono essere schedulati all'interno del sistema, e in modo indicativo decide quando schedulare ogni job, su quale nodo, e con quale power budget. Successivamente vengono monitorati i dati relativi a potenza ed energia, e controlla di conseguenza i budget di potenza, e la \emph{user-fairness}
-
-%To carry out its work, a job scheduler typically interacts with one or more resource managers. A resource manager is a piece of system software that has privileged ability to control various resources within a datacenter. These resources can include things such as the physical nodes that make up a highperformance computer's computational resources; disks, disk channels, or burst buffer hardware that comprise I/O resources; or network interfaces, network channels, or switches that comprise interconnect resources. For example, a job scheduler might use resource management software to configure the processing cores, memory, disk, and networking resources within one or more computational nodes in accordance with the requested resources for a specific batch job prior to launching that job onto the allocated computational nodes. Finally, in some cases, resource management software might have the ability to actuate pieces of the physical plant that are responsible for delivering electricity to the datacenter or cooling the datacenter
+Il System Manager è un componente che riceve come input un insieme di jobs che devono essere schedulati all'interno del sistema, e in modo indicativo decide quando schedulare ogni job, su quale nodo, e con quale power budget. Successivamente vengono monitorati i dati relativi a potenza ed energia, e controlla di conseguenza i budget di potenza, e la \emph{user-fairness}
 
 \subsection{Job Manager}
-Il job manager decide i target delle manopole del Power Management, come (i) CPU power cap, (ii) CPU clock frequency oltre ad eseguire ottimizzazione del codice.
+Lo scopo del job manager è quello di effettuare ottimizzazioni job-centriche considerando le prestazioni di ogni applicazioni, il suo utilizzo di risorse, la sua fase e qualsiasi interazione dettata da ogni workflow in cui è presente. In breve il job manager decide i target delle manopole del Power Management, come (i) CPU power cap, (ii) CPU clock frequency oltre ad eseguire ottimizzazione del codice.
 
 \subsection{Node Manager}
 Il node manager fornisce accesso ai controlli e monitoraggio hardware a livello del nodo. Volendo permette anche di definire delle policy di power management. Ha infine lo scopo di preservare integrità, sicurezza del nodo sia in termini informatici che fisici.
@@ -72,15 +96,13 @@ Il node manager fornisce accesso ai controlli e monitoraggio hardware a livello 
 
 \subsection{Monitor}
 
-Il monitor è responsabile di collezionare tutte le metriche in-band e out-of-band che riguardando:
+Il monitor è responsabile di collezionare tutte le metriche in-band e out-of-band che riguardando prestazioni, utilizzo e stato delle risorse, potenza ed energia.
+Tutto questo deve essere fatto con il minor impatto possibile sul sistema dove sta agendo, collezionando, aggregando e analizzando le metriche e dove necessario, scambiandole ad altri attori. A sua volta il \emph{Monitor} è scomponibile in tre sotto-moduli:
 \begin{itemize}
-    \item prestazioni
-    \item Utilizzo di risorse
-    \item Stato delle risorse
-    \item Potenza
-    \item Energia
+    \item Gestione Firma che genera una firma che identifica univocamente il job; 
+    \item Estimatore che valuta le proprità dei job o dello stato del sistema usando la firma generata precedentemente;
+    \item Dashboard che fornisce le funzionalità da mostrare agli sviluppatori.
 \end{itemize}
-Tutto questo deve essere fatto con il minor impatto possibile sul sistema dove sta agendo, collezionando, aggregando e analizzando le metriche e dove necessario, scambiandole ad altri attori.
 
 
 % TODO:
