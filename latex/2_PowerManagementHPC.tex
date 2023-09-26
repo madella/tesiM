@@ -1,6 +1,20 @@
 \chapter{Power management}
+Il termine power management è stato usato nel corso degli anni per raggruppare problemi di diversa tipologia, ma che ruotano tutti attorno al concetto di energia.
+Tra questi infatti si può includere:
+\begin{itemize}
+    \item Power management legata alla gestione della potenza assorbita,che si può a sua volta suddivisa in:
+    \begin{itemize}
+        \item Thermal Design Power, potenza termica massima che un componente può dissipare;
+        \item Therm Design Current o Peak Current, legata alla massima corrente erogabile da alimentatori o dai pad dei chip; %todo: change
+    \end{itemize}
+    \item Thermal management, gestione temperatura dinamica o statica;
+    \item Energy management, gestione della sostenibilità e del consumo di energia;
+\end{itemize}
 
-I sistemi di HPC sono composti da decine di centinaia di nodi computazionali interconnessi tra di loro da reti a bassa latenza e alta banda. 
+Nel contesto di questa ricerca, si farà riferimento a questa parola per abbracciare tutti e tre i concetti che essa può rappresentare, riflettendo così una visione olistica per la comprensione del problema.   
+
+\subsection{High-Performance Computing}
+Il contesto nel quale viene definito solitamente un Power Management è un sistema di computazione ad alte prestazioni, detto anche sistema HPC. Questi ultimi sono macchine computazionali composte da decine di centinaia di nodi interconnessi tra di loro da reti a bassa latenza e alta banda. 
 %Ogni volta che deve essere eseguito un compito, l'utente richiede che vengano allocate delle risorse, sopra il quale far eseguire gli applicativi. Queste richieste, vengono inserite in delle code, gestite dallo scheduler di sistema %TODO:da controllare 
 % che poi vanno a frammentare virtualmente e condividere il nodo in sub-clusters tra i vari utenti. %Alla fine dei vari compiti da eseguire il partizionamento delle risorse del nodo viene annullato, riportando il nodo al suo stato iniziale. L'unica parte non partizionabile del nodo sono le CPU, memorie e acceleratori.
 % HPC applications typically use the Single Program Multiple Data
@@ -8,7 +22,7 @@ I sistemi di HPC sono composti da decine di centinaia di nodi computazionali int
 % is instanced multiple time on different nodes of the cluster; each
 % instance works on a partition of the global workload and communicates with other instances to orchestrate subsequent computational steps. For this reason, a HPC application can be seen as the composition of several tasks executed in a distributed environment which exchanges messages among all the instances. Achieving high-performance communication on distributed applications in large clusters is not an easy task. The Message-Passing Interface (MPI) runtime responds to these demands by abstracting the level of network infrastructure using a simple but high-performance interface for communication that can scale up on thousands of nodes.
 % Intro, cos'è il PM? 
-Tutti questi nodi uniti insieme, grazie alla grande quantità di processori e agli acceleratori che hanno montato al loro interno offrono capacità computazioni che nei giorni nostri hanno raggiunto ordini del ExaFlops ($10^{18}$ operazioni di  Floating Point per secondo).
+Tutti i nodi uniti insieme, visto l'elevato numero di processori e agli acceleratori che hanno montato al loro interno offrono capacità computazioni che nei giorni nostri hanno raggiunto ordini del ExaFlops ($10^{18}$ operazioni di  Floating Point per secondo).
 Visto l'aumento della densità energetica e alle magnifiche prestazioni raggiunte, la potenza necessaria per alimentare questi sistemi sta superando i 20MWatt. Se poi si considera che la maggior parte della potenza fornita, viene convertita in calore, si deve prendere in considerazione anche i consumi necessaria per tenere raffreddati questi sistemi. Infatti se non adeguati, le difficili condizioni in cui lavorano comportano grandi inefficienze in termini di energia, che si traducono anche in degradazioni di prestazioni computazionali. 
 Considerando tutto, ai centri che ospitano queste macchine si devono fornire decine di MWatt di potenza per ogni exa-supercomputer che hanno installato. 
 Ordini di grandezza di questo tipo non sono facilmente ottenibili e hanno costi estremamente elevati. 
@@ -18,50 +32,50 @@ Sono nati così i primi concetti di Power Management, componenti per controllare
 Power Management può essere visto come un sistema composto sia da parti software che Hardware. L'insieme di questi componenti va a formare un power-stack in grado di gestire la potenza assorbita di macchine HPC.
 
 \section{Stato dell'arte}
-Per riuscire nel suo scopo, il Power-Stack deve riuscire a gestire la potenza dei sistemi anche a granularità più basse, come singoli nodi, e singoli elementi all'interno dei nodi fornendo servizi a diversi livelli di astrazione.
-Tra questi vediamo:
-\begin{itemize}    
-    \item servizi in-band, 
-    \item servizi out-of-band
-    \item applicazioni utente, e componenti di alto livello%, per definire le politiche
-\end{itemize}
+Per riuscire nel suo scopo, il Power-Stack deve gestire la potenza dei sistemi a diversi livelli di granularità come sistemi, singoli nodi, e singoli elementi all'interno dei nodi. Per poterlo fare, è necessario utilizzare componenti hardware accessibili principalmente tramite servizi in-band e out-of-band.
 % I servizi in-band vengono forniti alle applicazioni e ai sistemi operativi in esecuzione negli elementi di elaborazione del chip e sono composti da: (i) governor dedicati alla potenza e telemetria correlata alla potenza a livello di sistema operativo; (ii) un'interfaccia dedicata per consentire alle applicazioni e ai tempi di esecuzione del modello di programmazione di specificare suggerimenti e prescrizioni per la gestione della potenza; (iii) un'interfaccia dedicata al Sistema e alla Gestione delle Risorse per supportare il capping della potenza a livello di CPU e nodo, nonché per gestire il compromesso tra Throughput ed Efficienza Energetica. I servizi out-of-band vengono forniti all'amministratore di sistema e agli strumenti di gestione del sistema tramite il Controller di Gestione della Scheda (BMC). Questi servizi consistono nella telemetria di potenza out-of-band, nel capping di potenza a livello di sistema e nella affidabilità e assistenza.
 
 % (ii) off-chip ai Moduli Regolatori di Tensione (VRM) che alimentano il chip, gli altri componenti a bordo e il Controller di Gestione della Scheda (BMC).
 
-\subsection{interfacce in-band}
-Le interfacce in-band sono rese possibili tramite componenti hardware sul chip, come i power knob (manopole per la gestione della potenza) che controlla il consumo e le prestazioni di ogni processore, e sensori che permettono di monitorare temperature e tensioni. Queste interfacce sono spesso utilizzate dai power governors (SO) e anche da alcune interfacce del System Management per permettere di limitare ad un massimo di potenza a livello di processore ee a livello di nodo. Un esempio di questi componenti è il power controller che risiede all'interno dei processori, ed esponendo lo spazio di memoria interno a degli indirizzi di I/O riesce a fornire a chi lo necessita tutti i controlli. Grazie a questi componenti, sia il sistema operativo, che il System Manager riesce ad accede a delle strutture date contenenti gli stati, statistiche e consumi dei diversi componenti all'interno del chip.
+\subsection{Servizi in-band} %TODO da sistemare
+I servizi in-band accedono alle risorse hardware utilizzando i medesimi canali attraverso cui transitano altre forme di informazioni e comandi. In questa specifica situazione, si tratta di interfacce che richiedono al processori stessi le informazioni necessarie. Ognuno di essi è sviluppato su più livelli tra cui i cosiddetti \emph{Governors} (o governatori), i \emph{Driver} che servono a veicolare queste informazioni ed infine componenti Hardware presenti all'interno dei chip. Fondamentalmente i governors permettono monitorare e in alcuni casi di gestire alcune metriche dei processori. Tra i più famosi Governors troviamo CPUfreq\cite{TODO} (Linux)e \emph{Intel Power Governors}\cite{TODO}. \textbf{CPUFreq} è un insieme di strumenti del kernel Linux che regola e monitora la frequenza dei processori \cite{TODO}
+% [https://www.kernel.org/doc/html/v4.14/admin-guide/pm/cpufreq.html]
+. Può  effettuarlo sia in autonomia, in risposta al carico di sistema, sia adattarsi in risposta agli eventi ACPI oppure essere modificata manualmente dai programmi nello spazio utente. E' reso possibili tramite degli specifici driver (intel\_pstate) che comunicano con i componenti hardware sul chip. Diversamente \textbf{Intel Power Governors} utilizza le interfacce proprietarie (RAPL) con cui monitora potenza ed energia a livello di sistema.
+Entrambi questi strumenti hanno necessità di componenti Hardware dedicati come i power knob (manopole per la gestione della potenza) e sensori che permettono di monitorare temperature e tensioni.
+Usare i servizi in-band sono molto flessibili e permetto di operare in real-time ed in modo dinamico. Infatti interagendo con l' Hardware e passando tramite il sistema operativo, sono necessari semplici chiamate e comandi per controllare questi strumenti.
+
+
 %TODO: schema power governors e power controller
 
-\subsection{interfacce out-of-band}
-Sono interfacce che diversamente da quelle di prima, risiedono al di fuori dei songoli processori, ma comunque all'interno della scheda madre. Tra questi il più importante è il Board Management Controller, solitamente un microcontrollore out-of-band che esegue in modo indipendente dal processore. Il suo principale scopo è quello di monitorare in modo dettagliato lo stato di tensioni, temperature, ventole e prestazioni dei processori e fornire contemporaneamente servizi di power capping sia a livello di sistema che di singoli processori. Infine essendo alimentato in modo indipendente riesce monitorare errori ed eccezioni che si manifestano sui processori, fornendo dettagli di elevata importanza.
-%TODO: se vuoi spiegare come sono fatti entrambi BMC e Power governors
 
-\subsection{Interfacce di alto livello}
-%TODO
-Tra le principali interfacce di alto livello, a livello di sistema operativo troviamo i \emph{power governors}, software in grado di gestire e controllare il consumo energetico dei componenti hardware sottostanti, ed in particolare quello dei processori. Svolgono principalmente due azioni: (i) monitoraggio del sistema in termini di carico di lavoro, temperatura e tensione e (ii) scelta della modalità di funzionamento in modo dinamico. In particolare questa ultima opzione prevede di adattarsi dinamicamente alle variazioni del carico di lavoro per fornire più o meno potenza ai processori.
+\subsection{Servizi out-of-band}
+Contrariamente alle interfacce in-band, le out-of-band fanno utlizzo di \emph{sidechannels} ovvero canali di accesso alternativi per ottenere le informazioni richieste. Questi oltre a non andare ad influenzare il consumo e l'utilizzo del sistema, permettono di monitorare i componenti anche quando ci sono errori ed eccezioni. Un componente tra i più famosi nell'ambito del power management è il Board Management Controller, solitamente un microcontrollore animato da sistemi embedded linux, e accessibile tramite ssh con un canale separato (solitamente provvisto di una propria interfaccia di rete e/o bus specifici). Il suo principale scopo è quello di monitorare in modo dettagliato lo stato di tensioni, temperature, ventole e prestazioni dei processori e fornire contemporaneamente servizi di power capping sia a livello di sistema che di singoli processori. 
+%TODO: se vuoi spiegare esempi di bmc come opencms e aspeed astd2600
+% HDEEM Estende bmc con FPGA che legge le potenze HFrequency
 
-Nel corso degli anni sono state sviluppati diversi software con compiti e meccanismi differenti. Tra questi rivediamo  \emph{Variorum} (LLNL), \emph{GEOPM} (Intel)\cite{GEOPM}, and \emph{HDEEM} (Atos)\cite{HDEEM}. 
-
-Tutti questi strumenti rappresentano un tentativo di risolvere un problema specifico di Power Management e non un software globale di gestione dell'energia di sistemi HPC.
+\section{Interfacce di alto livello}
+Nel corso degli anni con l'obbiettivo di ottimizzare e automatizzare l' \emph{ottenimento} di queste informazioni sono stati sviluppati diversi software di più alto livello che utilizzano sia strumenti in band che out of band per gestire il power management. Tra questi rivediamo i punto famosi: \emph{Variorum} (LLNL), \emph{GEOPM} (Intel)\cite{GEOPM}, e \emph{HDEEM} (Atos)\cite{HDEEM}. Tutti questi vogliono fornire una soluzione ad un sottoinsieme di problemi gestione dell'energia piuttosto che ad un software globale di Power Management di sistemi di calcolo ad alte prestazioni.
 % Additionally, have been introduced predictive analysis and machine learning\cite{MLEC} algorithms. Predictive algorithms can predict load spikes and implement precautionary measures to lower consumption, while machine learning can fine-tune energy management strategies using historical and real-time data. Moreover, predictive algorithms often based on ML models are essential for estimating the workload sensitivity to a given power reduction or operating point selection. Indeed, it is essential for energy management and power management algorithm to reason on an implicit or explicit performance model.
 
 % All these solutions represent attempts to tackle power management challenges, yet they display differing levels of compatibility. This lack highlights the urgent need for a comprehensive interoperability framework. These tools, though efficacious for specific use cases, often fail to cohesively integrate and cooperate due to varying interfaces and implementations.
 
 \section{Modello di power stack} %Componenti power stack
-Per utilizzare in modo controllato tutte le interfacce precedentemente spiegate, è stato necessario definire un modello di interazione e responsabilità dei vari componenti. Infatti un power stack completo e interoperabile, deve essere composto da attori che svolgono ruoli ben precisi e definiti. Tra questi i più importanti sono:
+Con Power-Stack si intende un insieme di applicazioni software che cooperando riescono a fornire ad applicazioni, utenti e amministratori gli strumenti per un servizio di Power Management. Una volta definito il problema, e i componenti che possono essere utilizzati, è possibile definire un modello di interazione e responsabilità dei vari attori. Di seguito vengono riportati quelli che sono i ruoli necessari al fine di coordinare un sistema ad HPC dall'esecuzione di un applicativo, fino alla gestione delle tensioni. 
 \begin{itemize}
     \item Workflow engine
     \item System Manager
     \item Job Manager
+    \item Resource Manager
     \item Node Manager
     \item Monitor
 \end{itemize}
+%TODO add an example of each component
 
 Di seguito viene riportato uno schema\ref{fig:powerstackscheme} che mostra le interazioni tra i vari attori.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{img/REGALE-Architecture-1536x1421.png} 
+    \includegraphics[width=\textwidth]{img/REGALE-Architecture-1536x1421.png}
+    \caption{Modello di power stack} 
     \label{fig:powerstackscheme}
 \end{figure}
 \subsection{Workflow engine}

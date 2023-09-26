@@ -16,7 +16,7 @@ La gestione energetica di sistemi HPC è diventata per questo motivo, una delle 
 Questi ultimi hanno portato a delle difficoltà sempre più grandi nel ridimensionamento dei transistor, conseguito nella progressiva fine delle leggi di Denard e Moore\cite{TODO}. Tali leggi, che avevano guidato l'industria informatica per decenni, prevedevano un consumo energetico costante al crescere della velocità e capacità computazionale. Quando questi sono venuti a mancare, il mantenimento e ancora di più lo sviluppo di nuove generazioni di sistemi è diventato un compito tutt'altro che banale, e con questi si sono resi necessari sempre più software in grado di automatizzarne la gestione. 
 Infatti utilizzare efficientemente l'energia disponibile e ottimizzare le prestazioni delle applicazioni sotto un limite di potenza è diventata una sfida, che ha richiesto soluzioni specifiche. %da sistemare
 % Power management ================================================================
-Il concetto di Power Management è nato sotto questo contesto, definendo un modello software che ha il compito di gestire tutto ciò che riguarda potenza %, energia e temperatura NO! (o sbaglio?)
+Il concetto di Power Management è nato sotto questo contesto, definendo un modello software che ha il compito di gestire la potenza %, energia e temperatura NO! (o sbaglio?)
 di sistemi di HPC. Per farlo sono stati definiti diversi attori ognuno con un compito specifico, e cercando di standardizzare le interazioni che questi componenti dovevano avere.
 
 Questo Power-Stack ha però la necessità di avere una visione globale per la gestione energetica, al fine di permettere dove necessario di definire degli obbiettivi e limiti di prestazioni e consumi. Inoltre deve essere definita un'interfaccia standard per poter interagire con i controlli hardware e software di sistemi HPC di diversi produttori.
@@ -29,8 +29,8 @@ la maggior parte di esse si è rivelata essere una soluzione per soddisfare sing
 %Un recente studio [22] condotto dal gruppo di lavoro EEHPC [9] ha concluso che la maggior parte di tali tecniche manca di una consapevolezza globale necessaria per ottenere le migliori prestazioni di sistema e throughput. Inoltre, ciascuna tecnica tende a migliorare la gestione di potenza ed energia per un sottoinsieme diverso dell'hardware del sito o del sistema e a diverse granularità (spesso in conflitto). Sfortunatamente, le tecniche esistenti non sono state progettate per coesistere simultaneamente su un unico sito e cooperare nella gestione in modo efficiente. %Traduzione GPT di paper PS, da cambiare
 % Per affrontare queste lacune, la comunità HPC ha bisogno di uno stack completo per la gestione di energia e potenza. 
 % DDS =======================================================================
-L'obiettivo finale sarebbe infatti quello di fornire un middleware documentato e facilmente integrabile, nei vari strumenti ad oggi presenti, per collegarli tra loro utilizzando un approccio distribuito e sfruttando il potenziale del Data Distribution Service (DDS)%[\ref{SEC:dds}]
-nonché quello di Real-Time Publish-Subscribe (RTPS).
+L'obiettivo finale sarebbe infatti quello di fornire un middleware documentato e facilmente integrabile, nei vari strumenti ad oggi presenti, per collegarli tra loro utilizzando un approccio distribuito e sfruttando il potenziale del Data Distribution Service (DDS) %[\ref{SEC:dds}] 
+nonché quello di \gls{Real-Time} Publish-Subscribe (RTPS).
 
 
 \section{Contributi}

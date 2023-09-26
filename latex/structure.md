@@ -15,7 +15,7 @@ abstract
     - Interfacce Alto lvello
       - ( vari attori )  
 - DDS-RTPS & ROS
-  - REGALE (scheletro BSC)
+- REGALE (scheletro BSC)
 - Lavoro svolto (REGALE library)
   - Caratterizzazione DDS HPC
   - Modello per utilizzo di DDS per REGALE

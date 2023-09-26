@@ -61,7 +61,20 @@ In particolare la sequenza di scambio è:
 
 %TODO: ROS
 
-% \subsection{DDS \& ROS}\label{SSEC:rosiface}
+\section{ROS}\label{SSEC:rosiface}
+
+
+Questo approccio distribuito per la distribuzione dei dati tra vari attori utilizzando un middlware basato su DDS non è idea inedita.Infatti dalla sua seconda versione il software open-source \textbf{Robot Operating System} meglio conosciuto come ROS
+\begin{wrapfigure}{r}{0.4\textwidth}
+  \includegraphics[width=0.4\textwidth]{img/ROS_MW.png}
+  \caption{Ros Middleware per DDS} 
+  \label{fig:rmw_dds_common}
+\end{wrapfigure}
+ha deciso di usare questi strumenti introducendo un ulteriore livello che permette di cambiare varie implementazioni di DDS. Questa idea è stata e sarà di grande ispirazione per il completamento di questo progetto.
+Nello specifico, è stata creata una libreria chiama rmw\_dds\_common(ros middleware) come mostrato nella \ref{fig:rmw_dds_common}\footnote{L'implementazione di FastDDS vuole essere un esempio tra le diverse implementazioni disponibili per ROS2} sopra il quale la community ha creato le implementazioni di DDS desiderate, andando a creare così diverse possibilità di implementazione dello stesso servizio di distribuzione dati.
+Inoltre per cambiare tra le diverse versioni di DDS si deve semplicemente impostare una variabile di ambiente, rendendo estremamente facile per tutti i possibili fruitori di ROS. 
+
+
 % Ros Middleware interface\cite{ros2iface}, developed within the context of the Robot Operating System (ROS), stands as a pinnacle of innovation in the realm of creating middleware for Distributed Data Systems. The middleware leverages advanced data serialization techniques, optimized for real-time performance and efficient data exchange. Its incorporation of Quality of Service parameters and support for both publish-subscribe and request-response communication patterns underscores its sophistication, making it a state-of-the-art choice for building DDS middleware in distributed environments.
 
 % In fact ROS capitalizes on the Data Distribution Service as a foundational communication middleware protocol\cite{ros2iron}, which plays a pivotal role in enabling seamless and efficient data exchange and interaction between the myriad components that constitute a robotic ecosystem.

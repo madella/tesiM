@@ -1,15 +1,18 @@
 \chapter{Casi di studio e valutazioni}
-In questa sezione verranno riportati i casi studio e i test effettuati sul framework. Tutti questi sono stati eseguiti su un sistema HPC Galielo-100 Cineca con le specifiche riportate nella tabella seguente
+Il tema principale di questa tesi, è stata quelli di generare un modello, analizzare e alla fine implementare quello che potrebbe essere l'infrastruttura sulla quale tutti gli attori di un Power-Stack 
+possano comunicare in modo completamente distribuito tramite DDS. Per poter creare e testare questa infrastruttura sono stati necessari veri sistemi di High-Performance Computing sui quali andare a provare quello che sequenzialmente è stato prodotto. Infatti per questo lavoro sono stati resi disponibili due supercomputer diversi nel tentativo di ottenere risultati altamente affidabili.
 
-\vspace{.7cm}
+In questo capitolo verranno riportati i casi studio e i test effettuati sul framework. Tutti questi sono stati eseguiti su un sistema HPC Galielo-100 Cineca con le specifiche riportate nella tabella seguente
+
+\vspace{.5cm}
 \begin{center}
-\begin{tabular}{l|l}
+\begin{tabular}{l|l|l}
     \hline
-    \textbf{Parameter} & \textbf{Value} \\
+    \textbf{Parameter} & \textbf{Cineca} & \textbf{E4} \\
     \hline
-    Number of nodes used & 3 \\
+    Number of nodes used & 3 & 3\\
     \hline
-    Processor & Intel CascadeLake 8260 \\
+    Processor & Intel CascadeLake 8260 & Intel CascadeLake 8260  \\
     \hline
     Number of sockets per node & 2 \\
     \hline
@@ -24,42 +27,56 @@ In questa sezione verranno riportati i casi studio e i test effettuati sul frame
     MPI & Open MPI  4.1.1 \\
     \hline
 \end{tabular}
-\label{table:hpc}
+\label{table:hpc-cineca}
 \end{center}
 
-\section{Test}
-Sono stati svolti diversi test al fine di trovare un modello ottimale di utilizzo e per la caratterizzazione di DDS, all'interno di sitemi HPC, nel contesto del Power Management. Nello specifico i test sono stati utili a capire il peso che avesse una singola configurazione o modello di utilizzo al fine di trovare quello più adeguato per una futura implementazione. I test effettuati sono:
-
-\begin{itemize}
-    \item test-1: protocollo di comunicazione
-    \item test-2: partizioni e wildcards
-    \item test-3: throughput
-\end{itemize}
-
-
-Al fine di condurli nel modo più trasparente e corretto possibile sono stati resi pubblici \cite{mygit} tutti i codici utilizzati durante lo svolgimento di questi test. %TODO5O: riordinare & documentare git
-
-\subsection{Struttura dei test}
-Sono stati prodotti dei test ad hoc, composti in parte da script bash, e in parte da programmi c++ con lo scopo di sfruttare al massimo le infrastruttura utilizzata \ref{table:hpc}. Ognuno di questi, con il fine di coprire e reperire il maggior numero di informazioni possibili, ha dovuto monitorare e catalogare 4 tipi di informazioni diversi:
-
-\begin{itemize}
-    \item Tempo solo invio
-    \item Istruzioni Perf-Event
-    \item Cicli TSC (read\_tsc)
-    \item Tempo invio-ricezione
-\end{itemize}
-%TODO: se serve approfondire TSC, e metriche eseguite prima e dopo
-
-In particolare nel Publisher \ref{actor:publisher} prima e dopo la chiamata a funzione di write() %TODO: inserire nella tesi?
-si sono presi i valori tempo-invio, istruzioni, e TSC, mentre al lato ricevente, di Subscriber \ref{actor:subscriber} è stato preso il tempo al momento dell'arrivo del messaggio. Segue uno schema uml della base di ognuno dei test.
+\section{Struttura dei test}
+I test effettuati in questa sezione sono composti da tre componenti ognuno di essi fondamentale all'ottenimento dei risultati nel modo più veloce e preciso possibile.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{./img/umel-send-receive.png}
-    \caption{Schema UML} %TODO: add readtsc, istr
+    \includegraphics[width=\textwidth]{./img/schema_test_globale.drawio.png}
+    \caption{Struttura test} %TODO: add readtsc, istr
     \label{fig:uml}
 \end{figure}
 
+\subsection{Shell}\label[Sezione]{sec:Shell}
+Vista la necessità di lanciare diversi publisher e diversi subscriber ogni volta con dei parametri variabili è stato conveniente usare programmi di scripting come Bash. Infatti questi gestivano i parametri variabili da passare agli attori, inizializzavano le variabili d'ambiente, decidevano quali core dovevano essere utilizzati da ogni partecipante (task-setaffinity) e mantenevano sincronizzati i test per evitare che alcuni attori fossero inizializzati troppo presto. Infine ripulivano e ordinavano i dati una volta terminato i test ed andavano ad eseguire gli script python che processavano i dati, nelle cartelle corrette.
+\subsection{C++}
+E' stato scelto di utilizzare direttamente l'implementazione DDS invece che il già citato \emph{Ros middlware} [\ref{SSEC:rosiface}] per i seguenti motivi:
+\begin{itemize}
+    \item Potenzialità: ROS mette a disposizione solo alcuni degli strumenti resi disponibili dallo strato DDS, andando a limitare la possibilità di sfruttamento di tutte le impostazioni e QoS di FastDDS;
+    \item Flessibilità: Per andare a definire delle strutture dati di ROS, al fine di scambiare messaggi DDS usando il middleware offerto, era necessario creare diverse strutture dati che combaciassero con le interfacce ROS;
+    \item Comodità: Implementare completamente \emph{rmw\_dds\_common} richiedeva un impegno e uno studio non indifferente della architettura sottostante a ROS, che seppur ben documentata, sarebbe costata molto tempo in più. 
+\end{itemize}
+E' stato scelto di realizzare una unica implementazione publisher e subscriber dove i valore delle funzionalità che si volevano testare dovevano essere passati come parametro lato bash (\ref{sec:Shell}) in modo da poter avviare tutti i test con gli stessi codici, rendendo più semplice la gestione dei diversi test, e più robusto ad errori dovuti a diverse configurazioni.
+\subsubsection*{Struttura}
+
+Per scambiarsi dei messaggi all'interno di infrastruttura basata su DDS, sono necessari: (i) un topic, (ii)un publisher ed (iii) un subscriber. Inoltre nel topic è necessario definire il tipo dato o struttura di dati che si va a scambiare. La struttura che si è scelta di utilizzare per i test è stata la seguente:
+\begin{verbatim}
+    struct DDSTest
+    {
+        unsigned long index;
+        std::string message;
+    };
+\end{verbatim}
+Dove index era necessario per definire una corrispondenza stretta tra i messaggi inviati e quelli ricevuti, mentre la stringa era comoda per definire un oggetto di dimensione molto variabile (anche dinamicamente durante i test).
+
+Una volta studiata la documentazione ufficiale di eProsima FastDDS, è stato sviluppato un codice in grado di integrare tutte le funzionalità di DDS ed alcuni strumenti per l'ottenimento di metriche precedentemente concordate con Cineca\cite{TODO}. Nello specifico sono state scelte:
+\begin{itemize}
+    \item Tempo di invio
+    \item Istruzioni Perf-Event per invio
+    \item Cicli TSC (read\_tsc) per invio
+    \item Tempo di invio e ricezione
+\end{itemize}
+\subsection{Calcolo TSC}
+\subsection{Conteggio istruzioni}
+
+\subsection{Ottenimento dei tempi}
+Per ottenere le differenze di tempi su sistemi Linux, è ricorrente utilizzare una funzione chiamata \textbf{clock\_gettime()} che restituisce il tempo istantaneo alla chiamata. Se si esegue la differenza tra due diverse clock\_gettime(), si dovrebbe ottenere il tempo trascorso tra queste due.
+
+
 \subsubsection{Sincronizzazione orologi su nodi diversi}
+
 Per ottenere risultati attendibili sulla metrica del tempo è stato necessario sincronizzare i nodi utilizzati prima di poter far partire i test. Per farlo è stato usata una funzione \emph{CLOCK\_MONOTONIC} che rappresenta un \textit{un orologio non impostabile a livello di sistema che rappresenta il tempo monotono da un punto non specificato nel passato. Su Linux, quel punto corrisponde al numero di secondi di esecuzione del sistema da quando è stato avviato. L'orologio CLOCK\_MONOTONIC non è influenzato da salti discontinui nell'ora del sistema, ma è influenzato dalle regolazioni incrementali eseguite da  NTP.} Il problema che si è presentato, è che avendo nodi diversi su cui far eseguire i test, per provare ad esempio nel modo più affidabile i protocolli di trasporto, è stato necessario implementare delle MPI\_Barrier prima di diverse esecuzioni di \emph{clock\_gettime(CLOCK\_MONOTONIC)}. Di seguito sono stati riportati i grafici del risultato ottenuto.
 \begin{figure}[H]
     \centering
@@ -75,6 +92,48 @@ Per ottenere risultati attendibili sulla metrica del tempo è stato necessario s
 \end{figure}
 
 Come possibile vedere nella figura \ref{fig:sync_time_shift} nonostante le mpi\_barrier, sono presenti degli scostamenti di tempo tra 2 nodi durante diversi test effettuati (in particolare 1000), e si è scelto di utilizzare il valore modale di questa differenza,sulla base del quale, si sono elaborati tutti i dati successivi.
+
+Nonostante fosse idealmente il metodo più preciso per ottenere i tempi di send-receiving, essendo l'ordine di grandezza dell'errore dello stesso ordine di grandezza dei tempi di ricezione, si è preferito procedere con un approccio di ottenimento dei tempi basato sul \textbf{RTT}.
+
+
+\subsubsection{UML}
+Lo schema UML di funzionamento degli attori DDS è riassunto e schematizzato dalla figura \ref{fig:uml}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{./img/umel-send-receive.png}
+    \caption{Schema UML} %TODO: add readtsc, istr
+    \label{fig:uml}
+\end{figure}
+
+In particolare nel Publisher \ref{actor:publisher} prima e dopo la chiamata a funzione di write() %TODO: inserire nella tesi?
+si sono presi i valori tempo-invio, istruzioni, e TSC, mentre al lato ricevente, di Subscriber \ref{actor:subscriber} è stato preso il tempo al momento dell'arrivo del messaggio. Segue uno schema uml della base di ognuno dei test.
+
+
+
+%TODO: se serve approfondire TSC, e metriche eseguite prima e dopo
+
+
+
+
+
+\section{DataMiners}
+Considerando che ogni publisher generasse 10K messaggi da inviare a 48 subscriber, per ogni protocollo di trasporto, e in alcuni casi in partizioni differenti si è arrivato ad avere per ogni test fino a $1'960'000$ messaggi scambiati e le relative metriche per ogni messaggio da processare. 
+Gli script python sono stati utili a organizzare e processare tutti i dati prodotti dai vari test. Inoltre sono stati fondamentali per poter generare tutti i grafici che sono stati in questa tesi.
+
+
+
+\section{Test}
+Sono stati svolti diversi test al fine di trovare un modello ottimale di utilizzo e per la caratterizzazione di DDS, all'interno di sitemi HPC, nel contesto del Power Management. Nello specifico i test sono stati utili a capire il peso che avesse una singola configurazione o modello di utilizzo al fine di trovare quello più adeguato per una futura implementazione. I test effettuati sono:
+
+\begin{itemize}
+    \item test-1: protocollo di comunicazione
+    \item test-2: partizioni e wildcards
+    \item test-3: throughput
+\end{itemize}
+
+
+Al fine di condurli nel modo più trasparente e corretto possibile sono stati resi pubblici \cite{mygit} tutti i codici utilizzati durante lo svolgimento di questi test. %TODO5O: riordinare & documentare git
+
 
 \subsection{Impatto del numero di sub in un dominio}
 Visto lo schema \ref{fig:uml} risulta facile capire, che il numero di subscriber presenti in un dominio comporta un overhead di comunicazione che va ad influenzare sia i tempi, che i cicli, che le istruzioni impiegate nella singola \emph{publish} su un topic che viene facilmente dimostrato nella figura\ref{fig:test3_overhead}.
@@ -144,15 +203,26 @@ Le wildcards sono un costrutto appartenente alle partizioni, che permette di def
 
 
 \subsection{Test-3}
+Nel test-3 si è voluto vedere il throughput posssibile per ciascun protocollo, utilizzando un payload di X.
 
 \section{Risultati}
-
+Visti i diversi risultati si può dire che è meglio usare i topic per* le partizioni per *
+etc etc
 \section{Modello}
 
+
+
+
 \section{Scheletro componenti}
-Nel seguente capitolo viene stilato uno scheletro dei componenti con i relativi topic usati al fine di dare una visione completa e aggiuntiva rispetto al modello precedentemente stilato  
+Nel corso di questa tesi con la collaborazione di alcuni membri del progetto REGALE, come Cineca\cite{TODO} e BSC\cite{TODO} sono stati sviluppati dei prototipi di componenti del modello di Power-Stack per HPC.
+Questi ultimi oltre a fornire una prova delle potenzialità del middleware di DDS, sono utili anche come esempio per una effettiva implementazione del middleware DDS all'interno di componenti già sviluppati nell'ambito del PM che vogliono essere introdotti nello stack.
+
+
+seguente capitolo viene stilato uno scheletro dei componenti con i relativi topic usati al fine di dare una visione completa e aggiuntiva rispetto al modello precedentemente stilato  
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{./img/dummies_skeleton.png}
     \includegraphics[width=\textwidth]{./img/server_skeleton.png}
 \end{figure}
+
+\subsection{MQTT Bridge}
