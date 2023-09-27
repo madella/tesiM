@@ -242,7 +242,7 @@ public:
             struct perf_event_attr pe;
             memset(&pe, 0, sizeof(struct perf_event_attr));
             pe.type = PERF_TYPE_HARDWARE;
-            pe.config = PERF_COUNT_HW_REF_CPU_CYCLES; // TSC rdTSC ;TIME_STAMP_COUNTER? (CYCLE); REFERENCE CYCLE;  instruction; ABS time with  time.time()// Or any other desired event
+            pe.config = config; // TSC rdTSC ;TIME_STAMP_COUNTER? (CYCLE); REFERENCE CYCLE;  instruction; ABS time with  time.time()// Or any other desired event
             pe.size = sizeof(struct perf_event_attr);
             pe.disabled = 1;
             pe.exclude_kernel = 1;
@@ -262,7 +262,6 @@ public:
     {
         if (listener_.matched_ > 0)
         {
-            std::cout << "size of message: %u" << sizeof(hello_); 
 
             uint64_t tsc_start(0),tsc_end(0);
             // Get PE syscall

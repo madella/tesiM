@@ -37,7 +37,10 @@ data/
 wrap_rwm/
 build/
 *.data
-
+*.acn 
+*.glo 
+*.ist 
+*.glsdefs
 data/
 
 windows_utils.txt

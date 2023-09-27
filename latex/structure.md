@@ -24,6 +24,18 @@ abstract
     - monitor 
 
 
+
+
+
+STATO DELL?ARTE
+- Sensori e attuatori per fare pm
+  - Questi sensori e attuatori sono possibi
+    - OUT of band
+      - BMC 
+    - in band
+      - Power governors  
+- 
+
 # Meccanismi per la gestione dei consumi, servizi di power management, algoritmi di power management.
 
 - Power management: gestione della Potenza. Qui l’obbiettivo è controllare la potenza assorbita. Indirettamente legata al raffreddamento (qui di parla di TDP - thermal design power – si fa l’assunzione di essere a regime, quindi a transitori termici esauriti), ma anche legata alla massima corrente erogabile da un alimentatore o dai pad del chip. In questo caso si parla di TDC, Thermal design current ma anche di peak current.

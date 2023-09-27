@@ -32,35 +32,39 @@ Sono nati così i primi concetti di Power Management, componenti per controllare
 Power Management può essere visto come un sistema composto sia da parti software che Hardware. L'insieme di questi componenti va a formare un power-stack in grado di gestire la potenza assorbita di macchine HPC.
 
 \section{Stato dell'arte}
-Per riuscire nel suo scopo, il Power-Stack deve gestire la potenza dei sistemi a diversi livelli di granularità come sistemi, singoli nodi, e singoli elementi all'interno dei nodi. Per poterlo fare, è necessario utilizzare componenti hardware accessibili principalmente tramite servizi in-band e out-of-band.
+Per riuscire nel suo scopo, il Power-Stack deve gestire la potenza dei sistemi a diversi livelli di granularità come sistemi, singoli nodi, e singoli elementi all'interno dei nodi. Per poterlo fare, è necessario usare gli attuatori ed i sensori presenti all'interno del core, accessibili in uno dei seguenti modi:
+\begin{itemize}
+    \item in-band
+    \item out-of-band
+\end{itemize}
 % I servizi in-band vengono forniti alle applicazioni e ai sistemi operativi in esecuzione negli elementi di elaborazione del chip e sono composti da: (i) governor dedicati alla potenza e telemetria correlata alla potenza a livello di sistema operativo; (ii) un'interfaccia dedicata per consentire alle applicazioni e ai tempi di esecuzione del modello di programmazione di specificare suggerimenti e prescrizioni per la gestione della potenza; (iii) un'interfaccia dedicata al Sistema e alla Gestione delle Risorse per supportare il capping della potenza a livello di CPU e nodo, nonché per gestire il compromesso tra Throughput ed Efficienza Energetica. I servizi out-of-band vengono forniti all'amministratore di sistema e agli strumenti di gestione del sistema tramite il Controller di Gestione della Scheda (BMC). Questi servizi consistono nella telemetria di potenza out-of-band, nel capping di potenza a livello di sistema e nella affidabilità e assistenza.
 
 % (ii) off-chip ai Moduli Regolatori di Tensione (VRM) che alimentano il chip, gli altri componenti a bordo e il Controller di Gestione della Scheda (BMC).
 
 \subsection{Servizi in-band} %TODO da sistemare
-I servizi in-band accedono alle risorse hardware utilizzando i medesimi canali attraverso cui transitano altre forme di informazioni e comandi. In questa specifica situazione, si tratta di interfacce che richiedono al processori stessi le informazioni necessarie. Ognuno di essi è sviluppato su più livelli tra cui i cosiddetti \emph{Governors} (o governatori), i \emph{Driver} che servono a veicolare queste informazioni ed infine componenti Hardware presenti all'interno dei chip. Fondamentalmente i governors permettono monitorare e in alcuni casi di gestire alcune metriche dei processori. Tra i più famosi Governors troviamo CPUfreq\cite{TODO} (Linux)e \emph{Intel Power Governors}\cite{TODO}. \textbf{CPUFreq} è un insieme di strumenti del kernel Linux che regola e monitora la frequenza dei processori \cite{TODO}
-% [https://www.kernel.org/doc/html/v4.14/admin-guide/pm/cpufreq.html]
-. Può  effettuarlo sia in autonomia, in risposta al carico di sistema, sia adattarsi in risposta agli eventi ACPI oppure essere modificata manualmente dai programmi nello spazio utente. E' reso possibili tramite degli specifici driver (intel\_pstate) che comunicano con i componenti hardware sul chip. Diversamente \textbf{Intel Power Governors} utilizza le interfacce proprietarie (RAPL) con cui monitora potenza ed energia a livello di sistema.
-Entrambi questi strumenti hanno necessità di componenti Hardware dedicati come i power knob (manopole per la gestione della potenza) e sensori che permettono di monitorare temperature e tensioni.
-Usare i servizi in-band sono molto flessibili e permetto di operare in real-time ed in modo dinamico. Infatti interagendo con l' Hardware e passando tramite il sistema operativo, sono necessari semplici chiamate e comandi per controllare questi strumenti.
+I servizi in-band accedono alle risorse hardware tramite codice che esegue sul processore stesso. Questi servizi vengono poi esposti agli utenti tramite i cosiddetti \emph{Governors} (o governatori), entità software a livello del sistema operativo che tramite dei \emph{Driver}, riescono ad accedere ai componenti Hardware presenti all'interno dei chip. Questo meccanismo è resa possibile da driver come intel\_pstate che comunicano direttamente con i power controller.
 
+
+Tra i più famosi Governors troviamo Powersave\cite{TODO}, Userspace \cite{TODO}, ondemand e cpufreq. Questi possono essere eseguiti come servizi demon che in risposta al carico di sistema applicano in risposta agli eventi ACPI applicano delle policy predefinite. Altrimenti possono richiamate manualmente dai programmi o tramite comandi nello spazio utente. Infine usare interfacce in-band permette di operare in real-time garantendo un servizio molto flessibile e dinamico.
+
+% E' reso possibili tramite degli specifici driver (intel\_pstate) che comunicano con i componenti hardware sul chip. Diversamente \textbf{Intel Power Governors} utilizza le interfacce proprietarie (RAPL) con cui monitora potenza ed energia a livello di sistema.
+% Entrambi questi strumenti hanno necessità di componenti Hardware dedicati come i power knob (manopole per la gestione della potenza) e sensori che permettono di monitorare temperature e tensioni.
+% I servizi in-band sono molto flessibili e permetto di operare in real-time ed in modo dinamico. Infatti interagendo con l' Hardware e passando tramite il sistema operativo, sono necessari semplici chiamate e comandi per controllare questi strumenti.
 
 %TODO: schema power governors e power controller
 
-
 \subsection{Servizi out-of-band}
-Contrariamente alle interfacce in-band, le out-of-band fanno utlizzo di \emph{sidechannels} ovvero canali di accesso alternativi per ottenere le informazioni richieste. Questi oltre a non andare ad influenzare il consumo e l'utilizzo del sistema, permettono di monitorare i componenti anche quando ci sono errori ed eccezioni. Un componente tra i più famosi nell'ambito del power management è il Board Management Controller, solitamente un microcontrollore animato da sistemi embedded linux, e accessibile tramite ssh con un canale separato (solitamente provvisto di una propria interfaccia di rete e/o bus specifici). Il suo principale scopo è quello di monitorare in modo dettagliato lo stato di tensioni, temperature, ventole e prestazioni dei processori e fornire contemporaneamente servizi di power capping sia a livello di sistema che di singoli processori. 
+Contrariamente alle interfacce in-band, le out-of-band fanno utlizzo di \emph{sidechannels} ovvero canali di accesso alternativi per ottenere le informazioni richieste. Questo meccanismo permette di accedere ad informazioni da processi esterni dal processore del quale si vuole impostare o reperire dei dati. Per di più questo permette di monitorare i componenti anche quando ci sono errori ed eccezioni che normalmente bloccherebbe il workflow. Un componente tra i più famosi che svolge questa funzione è il Board Management Controller, solitamente un microcontrollore animato da sistemi embedded linux, e accessibile tramite ssh con un canale separato (solitamente provvisto di una propria interfaccia di rete e/o bus specifici). Il suo principale scopo è quello di monitorare in modo dettagliato lo stato di tensioni, temperature, ventole e prestazioni dei processori e fornire contemporaneamente servizi di power capping sia a livello di sistema che di singoli processori. 
 %TODO: se vuoi spiegare esempi di bmc come opencms e aspeed astd2600
 % HDEEM Estende bmc con FPGA che legge le potenze HFrequency
 
 \section{Interfacce di alto livello}
-Nel corso degli anni con l'obbiettivo di ottimizzare e automatizzare l' \emph{ottenimento} di queste informazioni sono stati sviluppati diversi software di più alto livello che utilizzano sia strumenti in band che out of band per gestire il power management. Tra questi rivediamo i punto famosi: \emph{Variorum} (LLNL), \emph{GEOPM} (Intel)\cite{GEOPM}, e \emph{HDEEM} (Atos)\cite{HDEEM}. Tutti questi vogliono fornire una soluzione ad un sottoinsieme di problemi gestione dell'energia piuttosto che ad un software globale di Power Management di sistemi di calcolo ad alte prestazioni.
-% Additionally, have been introduced predictive analysis and machine learning\cite{MLEC} algorithms. Predictive algorithms can predict load spikes and implement precautionary measures to lower consumption, while machine learning can fine-tune energy management strategies using historical and real-time data. Moreover, predictive algorithms often based on ML models are essential for estimating the workload sensitivity to a given power reduction or operating point selection. Indeed, it is essential for energy management and power management algorithm to reason on an implicit or explicit performance model.
+Nel corso degli anni con l'obbiettivo di ottimizzare e automatizzare l'interazione con questi meccanismi hardware sono stati sviluppati diversi software di più alto livello che utilizzano sia interfacce in band che interfacce out of band. Si possono ricordare i più famosi: \emph{Variorum} (LLNL), \emph{GEOPM} (Intel)\cite{GEOPM}, e \emph{HDEEM} (Atos)\cite{HDEEM}. Tutti questi rappresentano però un tentativo di fornire una soluzione ad un sottoinsieme di problemi per la gestione dell'energia, piuttosto che ad un software con visione globale di Power Management per sistemi di calcolo ad alte prestazioni. %MANCANZA DI VISIONE GLOBALE!!!
 
 % All these solutions represent attempts to tackle power management challenges, yet they display differing levels of compatibility. This lack highlights the urgent need for a comprehensive interoperability framework. These tools, though efficacious for specific use cases, often fail to cohesively integrate and cooperate due to varying interfaces and implementations.
 
 \section{Modello di power stack} %Componenti power stack
-Con Power-Stack si intende un insieme di applicazioni software che cooperando riescono a fornire ad applicazioni, utenti e amministratori gli strumenti per un servizio di Power Management. Una volta definito il problema, e i componenti che possono essere utilizzati, è possibile definire un modello di interazione e responsabilità dei vari attori. Di seguito vengono riportati quelli che sono i ruoli necessari al fine di coordinare un sistema ad HPC dall'esecuzione di un applicativo, fino alla gestione delle tensioni. 
+Con Power-Stack si intende un insieme di applicazioni software che cooperando riescono a fornire ad applicazioni, utenti e amministratori gli strumenti per un servizio di Power Management. Una volta definito il problema, e i componenti che possono essere utilizzati, è possibile definire un modello di interazione e responsabilità dei vari attori. Di seguito vengono riportati quelli che sono i ruoli necessari al fine di coordinare un sistema HPC dall'allocazione di un applicativo, fino alla gestione delle tensioni. 
 \begin{itemize}
     \item Workflow engine
     \item System Manager
@@ -70,7 +74,7 @@ Con Power-Stack si intende un insieme di applicazioni software che cooperando ri
     \item Monitor
 \end{itemize}
 %TODO add an example of each component
-
+%TODO aggiungi i tipi di informazioni che si scambiano, per facilitare nel modello la realizzaizone
 Di seguito viene riportato uno schema\ref{fig:powerstackscheme} che mostra le interazioni tra i vari attori.
 \begin{figure}[H]
     \centering
@@ -106,7 +110,6 @@ Lo scopo del job manager è quello di effettuare ottimizzazioni job-centriche co
 
 \subsection{Node Manager}
 Il node manager fornisce accesso ai controlli e monitoraggio hardware a livello del nodo. Volendo permette anche di definire delle policy di power management. Ha infine lo scopo di preservare integrità, sicurezza del nodo sia in termini informatici che fisici.
-
 
 \subsection{Monitor}
 

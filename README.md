@@ -2,7 +2,7 @@
 Expected to be **14/10/2023 - 21/10/2023**
 Deadlines:
   - [ ] domanda:            **01/09/2023**
-  - [x] scadenza requisiti: 29/09/2023
+  - [ ] scadenza requisiti: 29/09/2023
   - [ ] upload tesi:        **05/10/2023**
   - [ ] approvazione tesi:  09/10/2023
 
