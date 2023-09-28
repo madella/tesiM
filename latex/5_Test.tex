@@ -1,6 +1,6 @@
-\chapter{Casi di studio e valutazioni}
+\chapter{Test}
 Il tema principale di questa tesi, è stata quelli di generare un modello, analizzare e alla fine implementare quello che potrebbe essere l'infrastruttura sulla quale tutti gli attori di un Power-Stack 
-possano comunicare in modo completamente distribuito tramite DDS. Per poter creare e testare questa infrastruttura sono stati necessari veri sistemi di High-Performance Computing sui quali andare a provare quello che sequenzialmente è stato prodotto. Infatti per questo lavoro sono stati resi disponibili due supercomputer diversi nel tentativo di ottenere risultati altamente affidabili. Di seguito le specifiche dei sistemi utilizzati:
+possano comunicare in modo completamente distribuito tramite DDS. Per poter creare l'infrastruttura necessaria, sono stati utilizzati sistemi di High-Performance Computing sui quali andare a provare empiricamente i vari esperimenti. Per supportare questo lavoro, sono stati resi disponibili due supercomputer uno da Cineca\cite{TODO} e uno da E4\cite{TODO} nel tentativo di ottenere risultati affidabili. Di seguito le specifiche dei sistemi utilizzati:
 %In questo capitolo verranno riportati i casi studio e i test effettuati sul framework. %Tutti questi sono stati eseguiti su un sistema HPC Galielo-100 Cineca con le specifiche riportate nella tabella seguente
 
 \begin{table}[H]
@@ -30,6 +30,8 @@ possano comunicare in modo completamente distribuito tramite DDS. Per poter crea
 \end{center}
 \caption{Tabella hardware dei sistemi utilizzati}\label{table:hpc-cineca}
 \end{table}
+
+% In tutti i test successivi, ove non specificato diversamente sono stati usati 1 publisher e 48 subscriber su diversi nodi. Questo è stato fatto per provare la scalabilità, visto che nel testbed che è stato utilizzato, erano presenti 48 core (1 core per ogni subscriber).
 
 \section{Strumenti utilizzati}%Struttura dei test
 I test effettuati in questa sezione sono stati generati da diversi tipi di componenti ognuno di essi con uno o più compiti specifici, in modo da avere un discreto controllo sull'avanzamento e la gestione dei dati. Nella figura \ref{fig:schema_global} viene riportato uno schema riassuntivo di tutte le tecnologie utilizzate.
@@ -108,7 +110,7 @@ Lo schema UML di funzionamento degli attori DDS è riassunto e schematizzato dal
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{./img/umel-send-receive.png}
-    \caption{Schema UML} %TODO: add readtsc, istr
+    \caption{Schema UML} %TODO: typo on receiving time = recIVE
     \label{fig:uml}
 \end{figure}
 
@@ -118,7 +120,7 @@ si sono presi i valori tempo-invio, istruzioni, e TSC, mentre al lato ricevente,
 %TODO: se serve approfondire TSC, e metriche eseguite prima e dopo
 
 \section{DataMiners}
-Considerando che ogni publisher generasse 10K messaggi da inviare a 48 subscriber, per ogni protocollo di trasporto, e in alcuni casi in partizioni differenti si è arrivato ad avere per ogni test fino a $1'960'000$ messaggi scambiati e le relative metriche per ogni messaggio da processare. 
+Considerando che ogni publisher genera 10K messaggi da inviare a 48 subscriber, per ogni protocollo di trasporto, e in alcuni casi in partizioni differenti si è arrivato ad avere per ogni test fino a $1'960'000$ messaggi scambiati e le relative metriche per ogni messaggio da processare. 
 Gli script python sono stati utili a organizzare e processare tutti i dati prodotti dai vari test. Inoltre sono stati fondamentali per poter generare tutti i grafici che sono stati in questa tesi.
 
 \section{Sincronizzazione}\label{sec:timesync}
@@ -160,7 +162,7 @@ Per semplificarne la comprensione viene riportato lo schema modificato:
 
 Ovviamente questo metodo può comportare qualche ritardo intrinseco di dover gestire due entità per ogni attore, ma sono tempi infinitesimali in confronto al tempo necessario per inviare il messaggio su rete (dove è stato usato questo approccio).
 
-\section{Test}
+\section{Schema}
 Sono stati svolti diversi test al fine di trovare un modello ottimale di utilizzo e per la caratterizzazione di DDS, all'interno di sitemi HPC, nel contesto del Power Management. Nello specifico i test sono stati utili a capire il peso che avesse una singola configurazione o modello di utilizzo al fine di trovare quello più adeguato per una futura implementazione. I test effettuati sono:
 
 \begin{itemize}
@@ -172,27 +174,6 @@ Sono stati svolti diversi test al fine di trovare un modello ottimale di utilizz
 
 Al fine di condurli nel modo più trasparente e corretto possibile sono stati resi pubblici \cite{mygit} tutti i codici utilizzati durante lo svolgimento di questi test. %TODO5O: riordinare & documentare git
 
-
-\subsection{Impatto del numero di sub in un dominio}
-Visto lo schema \ref{fig:uml} risulta facile capire, che il numero di subscriber presenti in un dominio comporta un overhead di comunicazione che va ad influenzare sia i tempi, che i cicli, che le istruzioni impiegate nella singola \emph{publish} su un topic che viene facilmente dimostrato nella figura\ref{fig:test3_overhead}.
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{./results/test3_sending_multiplesub.png} %TODO, sqeunce is an error
-    \caption{overhead sulla publish all'aumentare dei subscriber}
-    \label{fig:test3_overhead}
-\end{figure}
-Ovviamente l'impatto è poco significativo in quei protocolli che applicano strutture di \gls{multicasting} come udp-Multicast e Shared-Memory. 
-
-\begin{figure}[H]
-    \includegraphics[width=\textwidth]{./results/test3_udpvsudpM.png} 
-        \caption{} %TODO: caption
-        \label{}
-\end{figure}
-
-Questo può portare una singola publish a impiegare più cicli e più tempo della singola ricezione dei messaggi, come si vede nella figura\ref{fig:test3_different_protocols}
-
-In tutti i test successivi, ove non specificato diversamente sono stati usati 1 publisher e 48 subscriber su diversi nodi. Questo è stato fatto per provare la scalabilità, visto che nel testbed che è stato utilizzato, erano presenti 48 core (1 core per ogni subscriber).
-
 \subsection{Test-1}
 In DDS ed in particolare nel layer sottostante di RTPS, per scambiare messaggi anche tramite rete, e non solo nello stesso nodo, è possibile scegliere come mezzo diversi tipi di protocolli:
 
@@ -203,27 +184,12 @@ In DDS ed in particolare nel layer sottostante di RTPS, per scambiare messaggi a
     \item shared-memory: analogo al metodo precedentemente, ma invece di utilizzare un indirizzo IP, viene utilizzato un indirizzo di memoria. E' possibile solo quando i due processi che comunicano sono sullo stesso nodo, con memoria condivisa.
 \end{itemize}
 
-Nel primo test si è valutata la differenza di queste implementazioni utilizzando la rete infiniband \ref{table:hpc} su diversi nodi di un supercalcolatore. I risultati che sono stati trovati forniscono importanti informazioni, %TODO: to finish
-
-\begin{figure}[H]
-    \includegraphics[width=\textwidth]{./results/test3_different_protocol_send_receive.png} 
-        \caption{differenza tra solo publish e publish-subscribe per ogni protocollo}
-        \label{fig:test3_different_protocols}
-\end{figure}
-
-\begin{figure}[H]
-    \includegraphics[width=\textwidth]{./results/test1_cyclinstr.png} 
-        \caption{cicli e istruzioni per ogni protocollo}
-        \label{fig:test3_different_protocols}
-\end{figure}
+Nel primo test si è valutata la differenza di queste implementazioni utilizzando la rete infiniband \ref{table:hpc} su diversi nodi di un supercalcolatore. 
 
 \subsection{Test-2}
 Un concetto fondamentale nelle comunicazioni tra attori con gerarchie diverse, in sistemi con diverse centinaia di migliaia di entita, come cluster, nodi, processori, workflow, job (etc.), sono le possibilità di instradare, segmentare e rendere gerarchiche le comunicazioni. Come spiegatolo nel capitolo \ref{Chapter:dds} in DDS ci sono diversi strumenti disponibili per farlo. Tra di loro differiscono per alcuni aspetti, come flessibilità, costo (in performance) e livello di segmentazione.
 
 In questo test si è valutata la differenza in termini di performance dei diversi strumenti, con un particolare focus sulle partizioni e le wildcards rese disponibili in esso.
-
-\subsubsection{Comparazione strumenti}
-Nei test effettuati con domini, topic e partizioni, non sono state notate differenze degne di nota in termini di performance (cicli e istruzioni) nell'usare uno strumento piuttosto che un altro. 
 
 \subsubsection*{Dominio} 
 Il dominio è la segmentazione di più "forte" e di più alto livello. Va a partizionare gli attori presenti in un dominio in modo del tutto fisico (cambiando per ogni dominio porte e indirizzi di comunicazione) e per nulla flessibile. Per cambiare il dominio è necessario distruggere e creare di nuovo il partecipante. Inoltre il dominio non permette nessun tipo di gerarchia.
@@ -237,6 +203,7 @@ Questo strumento risulta molto interessante, in quanto all'interno di un topic p
 
 \subsubsection{Wildcards}
 Le wildcards sono un costrutto appartenente alle partizioni, che permette di definire dei pattern testuali sulla base del quale vengono instradati i messaggi. Un esempio può essere \textit{Node*} che va a corrisponde a tutti i messaggi sotto il topic precedentemente definito, a tutte le partizioni che iniziano con Node.
+%TODO: Schema test 2
 
 \begin{figure}[H]
     \centering
@@ -246,7 +213,7 @@ Le wildcards sono un costrutto appartenente alle partizioni, che permette di def
 
 
 \subsection{Test-3}
-Nel test-3 si è voluto misurare il throughput massimo possibile per ciascun protocollo. Per calcolarlo sono stati usati i seguenti dati:
+Nel test-3 si è voluto misurare il throughput e la bandwidth massima per ciascun protocollo. Per calcolarlo sono stati usati i seguenti dati:
 
 \begin{table}[H]
     \begin{center}
@@ -264,41 +231,6 @@ Nel test-3 si è voluto misurare il throughput massimo possibile per ciascun pro
         \hline
     \end{tabular}
     \end{center}
-    \caption{Valori usati per calcolare il throughput}\label{table:hpc-cineca}
+    \caption{Valori usati per il test 3}\label{table:hpc-cineca}
     \end{table}
     
-
-\begin{figure}[H]
-    \includegraphics[width=\textwidth]{./results/test3_throughput.png} 
-        \caption{} %TODO: caption
-        \label{}
-\end{figure}
-
-
-\begin{figure}[H]
-    \includegraphics[width=\textwidth]{./results/test3_graph_throughput.png} 
-    \caption{} %TODO: caption
-    \label{}
-\end{figure}
-
-\section{Caratterizzazione DDS su HPC}
-Visti i diversi risultati si può dire che è meglio usare i topic per* le partizioni per *
-etc etc
-\section{Modello}
-
-
-
-
-\section{Scheletro componenti}
-Nel corso di questa tesi con la collaborazione di alcuni membri del progetto REGALE, come Cineca\cite{TODO} e BSC\cite{TODO} sono stati sviluppati dei prototipi di componenti del modello di Power-Stack per HPC.
-Questi ultimi oltre a fornire una prova delle potenzialità del middleware di DDS, sono utili anche come esempio per una effettiva implementazione del middleware DDS all'interno di componenti già sviluppati nell'ambito del PM che vogliono essere introdotti nello stack.
-
-
-seguente capitolo viene stilato uno scheletro dei componenti con i relativi topic usati al fine di dare una visione completa e aggiuntiva rispetto al modello precedentemente stilato  
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{./img/dummies_skeleton.png}
-    \includegraphics[width=\textwidth]{./img/server_skeleton.png}
-\end{figure}
-\subsection{Job Manager}
-\subsection{MQTT Bridge}

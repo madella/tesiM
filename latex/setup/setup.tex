@@ -74,11 +74,11 @@
 % Configurazioni personalizzate
 % Esempio: Cambia il formato dei titoli dei capitoli
 %\titleformat{\chapter}[display]{\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
-%\usepackage{afterpage}
+\usepackage{afterpage}
 \newcommand\blankpage{%
     \null
     \thispagestyle{empty}%
-    \addtocounter{page}{-1}%
+    %\addtocounter{page}{-1}%
     \newpage}
 
 \usepackage[sorting=none]{biblatex}

@@ -11,24 +11,29 @@
 \input{glossario.tex}
 
 \begin{document}  
-\thispagestyle{empty}
+
 %\setmarginsrb{3 cm}{2 cm}{3 cm}{0 cm}{-1 cm}{1 cm}{0 cm}{1.5 cm}
+\thispagestyle{empty}%
 \input{setup/frontpage.tex}
-\blankpage
-\pagestyle{empty}
+\afterpage{\blankpage}
+
+\thispagestyle{empty}%
 \input{0_Abstract.tex}
-\thispagestyle{empty}
+
 \tableofcontents
-\thispagestyle{empty}
-%TODO: Glossario outliers0 publisher e subscriber
+\afterpage{\blankpage}
+
+
 \titleformat{\chapter}[display]
   {\normalfont\bfseries}{}{0pt}{\Huge}
-\input{1_Introduzione.tex}
-\input{2_PowerManagementHPC.tex}
-\input{3_Regale.tex}
-\input{4_DdsRtpsRps.tex}
-\input{5_CaseStudies&Evaluation.tex}
-\input{6_Conclusione.tex}
+\input{1_Introduction.tex}
+\input{2_StateoftheArt.tex}
+\input{3_DdsRtpsRps.tex}
+\input{4_Regale.tex}
+\input{5_Test.tex}
+\input{6_Results.tex}
+\input{7_Model&Dummy.tex}
+\input{8_Conclusione.tex}
 
 \printnoidxglossaries
 \printbibliography
