@@ -1,11 +1,11 @@
 \chapter{Test}
 Il tema principale di questa tesi, è stata quelli di generare un modello, analizzare e alla fine implementare quello che potrebbe essere l'infrastruttura sulla quale tutti gli attori di un Power-Stack 
-possano comunicare in modo completamente distribuito tramite DDS. Per poter creare l'infrastruttura necessaria, sono stati utilizzati sistemi di High-Performance Computing sui quali andare a provare empiricamente i vari esperimenti. Per supportare questo lavoro, sono stati resi disponibili due supercomputer uno da Cineca\cite{TODO} e uno da E4\cite{TODO} nel tentativo di ottenere risultati affidabili. Di seguito le specifiche dei sistemi utilizzati:
+possano comunicare in modo completamente distribuito tramite DDS. Per poter creare l'infrastruttura necessaria, sono stati utilizzati sistemi di High-Performance Computing sui quali andare a provare empiricamente i vari esperimenti. Per supportare questo lavoro, sono stati resi disponibili due supercomputer uno da Cineca\cite{Cineca} e uno da E4\cite{E4} nel tentativo di ottenere risultati affidabili. Di seguito le specifiche dei sistemi utilizzati:
 %In questo capitolo verranno riportati i casi studio e i test effettuati sul framework. %Tutti questi sono stati eseguiti su un sistema HPC Galielo-100 Cineca con le specifiche riportate nella tabella seguente
 
 \begin{table}[H]
 \begin{center}
-    %TODO: Da riscrivere in italianoNumer
+    %TODO: Da riscrivere in italiano
 \begin{tabular}{l|l|l}
     \hline
     \textbf{Parameter} & \textbf{Cineca} & \textbf{E4} \\
@@ -28,7 +28,8 @@ possano comunicare in modo completamente distribuito tramite DDS. Per poter crea
     \hline
 \end{tabular}
 \end{center}
-\caption{Tabella hardware dei sistemi utilizzati}\label{table:hpc-cineca}
+\caption{Tabella hardware dei sistemi utilizzati}
+\label{table:hpc-cineca}
 \end{table}
 
 % In tutti i test successivi, ove non specificato diversamente sono stati usati 1 publisher e 48 subscriber su diversi nodi. Questo è stato fatto per provare la scalabilità, visto che nel testbed che è stato utilizzato, erano presenti 48 core (1 core per ogni subscriber).
@@ -43,14 +44,9 @@ I test effettuati in questa sezione sono stati generati da diversi tipi di compo
 \end{figure}
 
 \subsection{Bash}\label[Sezione]{sec:Shell}
-Vista la necessità di lanciare diversi publisher e diversi subscriber ogni volta con dei parametri variabili è stato conveniente usare programmi di scripting come \gls{Bash}. Infatti questi gestivano i parametri variabili da passare agli attori, inizializzavano le variabili d'ambiente, decidevano quali core dovevano essere utilizzati da ogni partecipante (task-setaffinity) e mantenevano sincronizzati i test per evitare che alcuni attori fossero inizializzati troppo presto. Infine ripulivano e ordinavano i dati una volta terminato i test ed andavano ad eseguire gli script python che processavano i dati, nelle cartelle corrette.
+Vista la necessità di lanciare diversi publisher e diversi subscriber ogni volta con dei parametri variabili è stato conveniente usare programmi di scripting come \gls{Bash}. Infatti questi gestivano i diversi parametri da passare agli attori, inizializzavano le variabili d'ambiente, decidevano quali core dovevano essere utilizzati da ogni partecipante (task-setaffinity) e mantenevano sincronizzati i test per evitare che alcuni attori fossero inizializzati troppo presto. Infine ripulivano e ordinavano i dati una volta terminato i test ed andavano ad eseguire gli script python che processavano i dati, nelle cartelle corrette.
 \subsection{C++}
-E' stato scelto di utilizzare direttamente l'implementazione DDS invece che il già citato \emph{Ros middlware} [\ref{SSEC:rosiface}] per i seguenti motivi:
-\begin{itemize}
-    \item Potenzialità: ROS mette a disposizione solo alcuni degli strumenti resi disponibili dallo strato DDS, andando a limitare la possibilità di sfruttamento di tutte le impostazioni e QoS di FastDDS;
-    \item Flessibilità: Per andare a definire delle strutture dati di ROS, al fine di scambiare messaggi DDS usando il middleware offerto, era necessario creare diverse strutture dati che combaciassero con le interfacce ROS;
-    \item Comodità: Implementare completamente \emph{rmw\_dds\_common} richiedeva un impegno e uno studio non indifferente della architettura sottostante a ROS, che seppur ben documentata, sarebbe costata molto tempo in più. 
-\end{itemize}
+
 E' stato scelto di realizzare una unica implementazione publisher e subscriber dove i valore delle funzionalità che si volevano testare dovevano essere passati come parametro lato bash (\ref{sec:Shell}) in modo da poter avviare tutti i test con gli stessi codici, rendendo più semplice la gestione dei diversi test, e più robusto ad errori dovuti a diverse configurazioni.
 \subsubsection*{Struttura}
 
@@ -64,7 +60,7 @@ Per scambiarsi dei messaggi all'interno di infrastruttura basata su DDS, sono ne
 \end{verbatim}
 Dove index era necessario per definire una corrispondenza stretta tra i messaggi inviati e quelli ricevuti, mentre la stringa era comoda per definire un oggetto di dimensione molto variabile (anche dinamicamente durante i test).
 
-Una volta studiata la documentazione ufficiale di eProsima FastDDS, è stato sviluppato un codice in grado di integrare tutte le funzionalità di DDS ed alcuni strumenti per l'ottenimento di metriche precedentemente concordate con Cineca\cite{TODO}. Nello specifico sono state scelte:
+Una volta studiata la documentazione ufficiale di eProsima FastDDS, è stato sviluppato un codice in grado di integrare tutte le funzionalità di DDS ed alcuni strumenti per l'ottenimento di metriche precedentemente concordate con Cineca\cite{Cineca}. Nello specifico sono state scelte:
 \begin{itemize}
     \item Tempo di invio
     \item Istruzioni Perf-Event per invio
@@ -84,7 +80,7 @@ Il Time Stamp Counter, è un registro a 64 bit, presente nella maggior parte dei
 Per le istruzioni invece è stato usato lo strumento \textbf{Perf}, un software offerto da Linux ed incluso anche nel suo \gls{Kernel}, per la profilazione delle performance tramite i \emph{performance\_counter}. Questa suite è estremamente avanzata e permette di ottenere delle metriche specifiche senza troppa difficolta. In questo caso è stata usata una chiamata alla libreria \textbf{perf\_event} nel codice per il valore \emph{PERF\_COUNT\_HW\_INSTRUCTIONS}.
 
 \subsection{Ottenimento dei tempi}
-In sistemi molto complessi come può essere considerato un supercalcolatore, la gestione degli orologi è tutt'altro che banale. Infatti dopo aver deciso una tra le tante politiche di sincronizzazione disponibile come centralizzata, distribuita, GPS e tante altre, è necessario applicarle e continuare a tenere questi orologi sullo stesso tempo assoluto. Nei sistemi utilizzati in questo progetto, ed in particolare nei sistemi \ref{table:hpc-cineca}, lo strumento adottato è Network Time Protocol (fornito da \gls{ntpd}). Quest'utlimo ogni intervallo di tempo impostato, va a rendere disponibile ai vari nodi ed ai rispettivi orologi locali un tempo di riferimento che ha la funzione di punto fisso. Questo intervallo è normalmente fissato ogni 1024s, ma non disponendo dei diritti necessari ad utilizzarlo, non mi è stato possibile recuperare l'informazione.
+In sistemi molto complessi come può essere considerato un supercalcolatore, la gestione degli orologi è tutt'altro che banale. Infatti dopo aver deciso una tra le tante politiche di sincronizzazione disponibile come centralizzata, distribuita, GPS e tante altre, è necessario applicarle e continuare a tenere questi orologi sullo stesso tempo assoluto. Nei sistemi utilizzati in questo progetto, ed in particolare nei sistemi \ref{table:hpc-cineca}, lo strumento adottato è Network Time Protocol (fornito da \gls{Ntpd}). Quest'utlimo ogni intervallo di tempo impostato, va a rendere disponibile ai vari nodi ed ai rispettivi orologi locali un tempo di riferimento che ha la funzione di punto fisso. Questo intervallo è normalmente fissato ogni 1024s, ma non disponendo dei diritti necessari ad utilizzarlo, non mi è stato possibile recuperare l'informazione.
 
 Detto questo, per ottenere le differenze di tempi su sistemi Linux, è ricorrente utilizzare una funzione chiamata \textbf{clock\_gettime()} che restituisce il tempo istantaneo alla chiamata. Se si esegue la differenza tra due diverse clock\_gettime(), si ottiene il tempo trascorso tra queste due.
 Per questa funzione è possibile ottenere diverse metriche tra cui:
@@ -120,7 +116,7 @@ si sono presi i valori tempo-invio, istruzioni, e TSC, mentre al lato ricevente,
 %TODO: se serve approfondire TSC, e metriche eseguite prima e dopo
 
 \section{DataMiners}
-Considerando che ogni publisher genera 10K messaggi da inviare a 48 subscriber, per ogni protocollo di trasporto, e in alcuni casi in partizioni differenti si è arrivato ad avere per ogni test fino a $1'960'000$ messaggi scambiati e le relative metriche per ogni messaggio da processare. 
+Considerando che ogni publisher genera 10 mila messaggi da inviare a tutti e 48 i subscriber, per ogni protocollo di trasporto, e in alcuni casi in partizioni differenti si è arrivato ad avere per ogni test fino a $1'960'000$ messaggi scambiati e le relative metriche per ogni messaggio da processare. 
 Gli script python sono stati utili a organizzare e processare tutti i dati prodotti dai vari test. Inoltre sono stati fondamentali per poter generare tutti i grafici che sono stati in questa tesi.
 
 \section{Sincronizzazione}\label{sec:timesync}
@@ -166,6 +162,7 @@ Ovviamente questo metodo può comportare qualche ritardo intrinseco di dover ges
 Sono stati svolti diversi test al fine di trovare un modello ottimale di utilizzo e per la caratterizzazione di DDS, all'interno di sitemi HPC, nel contesto del Power Management. Nello specifico i test sono stati utili a capire il peso che avesse una singola configurazione o modello di utilizzo al fine di trovare quello più adeguato per una futura implementazione. I test effettuati sono:
 
 \begin{itemize}
+    \item test-0: discovery
     \item test-1: protocollo di comunicazione
     \item test-2: partizioni e wildcards
     \item test-3: throughput
@@ -173,6 +170,12 @@ Sono stati svolti diversi test al fine di trovare un modello ottimale di utilizz
 
 
 Al fine di condurli nel modo più trasparente e corretto possibile sono stati resi pubblici \cite{mygit} tutti i codici utilizzati durante lo svolgimento di questi test. %TODO5O: riordinare & documentare git
+
+
+\subsection{Test-0}
+La prima fase di DDS consiste nel riconoscere altri \emph{dds-partecipant} appartenenti allo stesso dominio. Questa viene chiamata \textbf{fase di Discovery}. Essa ha un ruolo estremamente importante siccome senza non sarebbe possibile far comunicare nessun attore all'interno della stessa rete e nemmeno nello stesso nodo. Una delle peculiarità di DDS è che permette di eseguire tutto in modo completamente distribuito, e anche questa fase non viene fatta diversamente (se non esplicitamente configurato). Il problema è che durante la discovery, quando si hanno diverse migliaia di componenti, si genera un overhead di pacchetti scambiati e di conseguenza anche le computazioni necessarie che crescono esponenzialmente. %Ovviamente la natura effimera di alcuni di questi componenti potrebbe aggravare il problema. 
+Sono disponibili in DDS, anche per questo motivo, meccanismi di discovery centralizzati al fine di evitare questo problema. In questo esperimento si andranno a comparare le due diverse implementazioni e per farlo si userà \textbf{perf}.
+%CONTROLLA CHE SI POSSA FARE TCPDUMP SU CINECA
 
 \subsection{Test-1}
 In DDS ed in particolare nel layer sottostante di RTPS, per scambiare messaggi anche tramite rete, e non solo nello stesso nodo, è possibile scegliere come mezzo diversi tipi di protocolli:
@@ -203,17 +206,20 @@ Questo strumento risulta molto interessante, in quanto all'interno di un topic p
 
 \subsubsection{Wildcards}
 Le wildcards sono un costrutto appartenente alle partizioni, che permette di definire dei pattern testuali sulla base del quale vengono instradati i messaggi. Un esempio può essere \textit{Node*} che va a corrisponde a tutti i messaggi sotto il topic precedentemente definito, a tutte le partizioni che iniziano con Node.
-%TODO: Schema test 2
 
 \begin{figure}[H]
-    \centering
-    %TODO DA INSERIRE WILDCARDS costi
-    %\includegraphics[width=\textwidth]{./results/}
-\end{figure}
+    \includegraphics[width=\textwidth]{./img/wildcards.png}
+    \caption{Schema test wildcards}
+    \label{fig:test_UML_wildcards}
+\end{figure} 
+
+
+Definiti questi concetti è stato pensato un test rappresentato dalla figura \ref{fig:test_UML_wildcards} per valutare se utilizzare la partizioni, e quindi sfruttare le gerarchie negli instradamenti avesse un prezzo in termini di performance da pagare.  
 
 
 \subsection{Test-3}
-Nel test-3 si è voluto misurare il throughput e la bandwidth massima per ciascun protocollo. Per calcolarlo sono stati usati i seguenti dati:
+Nel l'ultimo test si è è voluto ottenere dei valori rappresentativi della teconologia studiata. In particolare si sono visti valori come il throughput e la bandwidth massima per ciascun protocollo.
+Per calcolarlo sono stati scelte configurazioni che potessero simulare un carico di comunicazioni elevato tra attori di HPC. Nella tabella \ref{table:test3} vengono riportate i parametri scelti.
 
 \begin{table}[H]
     \begin{center}
@@ -231,6 +237,6 @@ Nel test-3 si è voluto misurare il throughput e la bandwidth massima per ciascu
         \hline
     \end{tabular}
     \end{center}
-    \caption{Valori usati per il test 3}\label{table:hpc-cineca}
+    \caption{Valori usati per il test 3}\label{table:test3}
     \end{table}
     

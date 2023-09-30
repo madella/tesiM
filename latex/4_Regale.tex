@@ -1,13 +1,13 @@
 \chapter{REGALE}
 %COSA
-REGALE\cite{REGALE} è un progetto Europeo nato ad Aprile 2021 che opera nell'ambito del Power Management in sistemi ad High-Performance Computing ed in particolare si è focalizzato su sistemi Exascale\footnote{Exascale: capace di eseguire operazioni nell'ordine di ExaFlops ($10^{18}$)}.
+REGALE\cite{REGALE} è un progetto finanziato dall'UE\cite{ue_REGALE} nato ad Aprile 2021 che opera nell'ambito del Power Management in sistemi ad High-Performance Computing ed in particolare si è focalizzato su sistemi Exascale\footnote{Exascale: capace di eseguire operazioni nell'ordine di ExaFlops ($10^{18}$)}.
 
 
 % sono: institute of Communication and Computer Systems, Andritz, Atos, Barcelona Supercomputing Center, Cineca, E4 Computer Engineering, Électricité de France, Leibniz Supercomputing Centre, National Technical University of Athens, Ryax Technologies, Scio, Technical University of Munich, TWT, Ubitech, University of Bologna e University of Grenoble Alpes.
 %PERCHé
 
 \section{Obbiettivi}
-Il loro principale obbiettivo è quello di progettare ed implementare uno stack software open-source di Power Management olistico in grado di operare in sistemi ad alte prestazioni. Per farlo sono state definite delle parole chiave che si è imposto di rispettare durante lo sviluppo di tutto il progetto:
+Il loro principale obbiettivo è aprire la strada alla prossima generazione di applicazioni dell'HPC, riunendo importanti parti interessate, accademici e centri europei di supercalcolo. Il progetto si pone di definire un'architettura open-source con l'intenzione di costruire un prototipo in grado di dotare i sistemi di HPC dei meccanismi e delle politiche necessari per garantire un utilizzo delle risorse efficace\cite{ue_REGALE}. Per farlo sono state definite delle parole chiave che si è imposto di rispettare durante lo sviluppo di tutto il progetto:
 \begin{itemize}
     \item Effettivo utilizzo delle risorse disponibili, ottenibile tramite miglioramenti delle performance delle applicazioni, aumento del throughput del sistema, e la minimizzazione della \emph{Performance Degradation} sotto vincoli di potenza;
     \item Ampia applicabilità ottenibile attraverso l'inseguimento di concetti come scalabilità, indipendenza dalle piattaforme ed estensibilità;
@@ -16,7 +16,7 @@ Il loro principale obbiettivo è quello di progettare ed implementare uno stack 
 
 
 \section{Power Stack}
-L'intero progetto, durante il suo sviluppo si è basato su strumenti come MPI library, SLURM, or DCDB. Ulteriormente, Regale, ha deciso di considerare l'introduzione di molti software open-source che potessero soddisfare le esigenze modello di Power Stack \ref{fig:powerstackscheme}. Infatti sono stati valutati e selezionati i software (molti dei quali prodotti dai partner) con i seguenti ruoli mostrati in tabella \ref{table:REGALE}.
+L'intero progetto, durante il suo sviluppo si è basato su strumenti come MPI library\cite{mpi}, SLURM\cite{slurm}, o DCDB\cite{dcdb}. Inoltre, ha deciso di considerare l'introduzione di molti software open-source che potessero soddisfare le esigenze modello di Power Stack \ref{fig:powerstackscheme}. Infatti sono stati valutati e selezionati diversi applicativi (molti dei quali prodotti dai partner, come mostrati in tabella \ref{table:REGALE}) anche con ruoli analoghi, per soddisfare a diverse esigenze.
 \begin{table}[ht]
     \centering
     \begin{tabular}{l|l|l}
@@ -48,16 +48,25 @@ L'intero progetto, durante il suo sviluppo si è basato su strumenti come MPI li
     BeBiDa & RYAX & System Manager \\
     \hline
 \end{tabular}
-\caption{Ruoli dei partner all'interno di REGALE e architettura di base}\label{table:REGALE}
+\caption{Software introdotti all'interno di REGALE con il partner che li ha prodotti e il loro ruolo}\label{table:REGALE}
 \end{table}
-A questi mancano solo il \emph{Workflow engine}.
-\begin{figure}[H]
+
+\begin{figure}[htbp][H]
     \centering
-    \includegraphics[width=\textwidth]{./img/REGALE_USE.png}
-    \caption{Copertura componenti REGALE}
+    \begin{subfigure}[b]{0.7\textwidth}
+    \includegraphics[width=\textwidth]{img/REGALE-Architecture-1536x1421.png}
+    \caption{Modello di Power Stack Regale}
+    \label{fig:powerstackscheme}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.7\textwidth}
+    \includegraphics[width=\textwidth]{img/REGALE_USE.png}
+    \caption{Copertura componenti}
     \label{fig:regale_cover}
+    \end{subfigure}
+    \caption{Descrizione delle immagini}
 \end{figure}
 
 \section{Integrazione}
-Vista la natura dei software introdotti nel progetto, non era previsto che questi potessero comunicare tra di loro, in quanto nati per essere isolati. Serviva perciò uno strumento che fosse in grado di far comunicare due a due ogni attore del power stack da loro introdotto. 
-tto questo pretesto si è scelto di testare varie soluzioni, tra cui anche quella di un \textbf{middlware DDS}. Questa tesi è nata in collaborazione con REGALE, ed è stata stilata anche per riportare test utili alla finalità di REGALE.
+Vista la natura dei software introdotti nel progetto, non era previsto che questi potessero comunicare tra di loro, in quanto nati per essere usati singolarmente. Serviva perciò uno strumento che fosse in grado di far comunicare due a due ogni attore del power stack da loro introdotto. 
+tto questo pretesto si è scelto di testare varie soluzioni, tra cui anche quella di un \textbf{middlware DDS}. %Questa tesi è nata in collaborazione con REGALE, ed è stata stilata anche per riportare test utili alla finalità di REGALE.

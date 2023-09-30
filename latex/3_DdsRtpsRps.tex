@@ -1,5 +1,5 @@
 \chapter{DDS \& RTPS}\label{Chapter:dds}
-DDS (Data Distribution Service)\cite{DDS} e RTPS (Real-Time Publish-Subscribe)\cite{RTPS} costituiscono due soluzioni fondamentali nel campo delle comunicazioni distribuite e real-time. Queste tecnologie svolgono un ruolo importante nella la trasmissione di dati tra dispositivi e applicazioni interconnesse, rivestendo particolare importanza in scenari complessi come i sistemi embedded, in IoT e applicazioni ad alte prestazioni come l'HPC (High-Performance Computing). 
+DDS (Data Distribution Service)\cite{DDS} e RTPS (Real-Time Publish-Subscribe)\cite{RTPS} costituiscono due soluzioni fondamentali nel campo delle comunicazioni distribuite e real-time. Queste tecnologie svolgono un ruolo importante nella la trasmissione di dati tra dispositivi e applicazioni interconnesse, rivestendo particolare importanza in scenari complessi come i sistemi embedded, e ad alte prestazioni come HPC. 
 
 
 \section{Implementazione usasta}
@@ -11,10 +11,10 @@ DDS e RTPS sono dei protocolli di comunicazione per specifici casi di utilizzo. 
   \item GurumDDS
 \end{itemize}
 
-e tante altre. In tutti i successivi capitoli verrà preso come riferimento FastDDS ed in particolare la sua versione 2.11.2 \cite{FastDDS}. E' stato scelto di utilizzare questa implementazione  dato il supporto per le comunicazione Real-Time, e le impostazioni delle Qualità del servizio(QoS) che la rendevano perfetta per un utilizzo su sistemi di HPC. %TODO: Da migliorare
+e tante altre. In tutti i successivi capitoli verrà preso come riferimento FastDDS ed in particolare la sua versione 2.11.2 \cite{FastDDS}. E' stato scelto di utilizzare questa implementazione  dato il supporto per le comunicazione Real-Time, e le impostazioni delle Qualità del servizio(QoS) che la rendevano adeguatamente configurabile per un utilizzo su sistemi di HPC. %TODO: Da migliorare
 
 \section{DDS}
-Data Distribution Service è un protocollo di comunicazione incentrato sullo scambio di dati per sistemi distribuiti. Questo si basa su modello chiamato Data-Centric Publish Subscribe (DCPS) I principali attori che vengono coinvolti sono:
+Data Distribution Service è un protocollo di comunicazione incentrato sullo scambio di dati per sistemi distribuiti. Questo si basa su modello chiamato Data-Centric Publish Subscribe (DCPS). I principali attori che vengono coinvolti sono:
 \begin{itemize}
     \item Publisher: responsabile della creazione e configurazione dei DataWriter. Il DataWriter è l'entità responsabile della pubblicazione effettiva dei messaggi. Ciascuno avrà un Topic assegnato sotto il quale vengono pubblicati i messaggi;\label{actor:publisher}
 
@@ -31,7 +31,7 @@ Inoltre DDS definisce le cosidette Qualità di Servizio (QoS policy) che servono
 
 
 \section{RTPS}
-Real-Time Publisher Subscribe protocol è un protocollo-middleware utilizzato da DDS per gestire la comunicazione su diversi protocolli di rete come UDP/TCP e Shared Memory. Il suo principale scopo è quello di inviare messaggi real-time, con un approccio best-effort e cercando di massimizzare l'efficienza. E' inoltre progettato per fornire strumenti per la comunicazione unicast e multicast. Le principali entità descritte da RTPS sono:
+Real-Time Publisher Subscribe è un middleware\footnote{Formalmente è un protocollo a se stante, utilizzato da DDS come middlware} utilizzato da DDS per gestire la comunicazione su diversi protocolli di rete come UDP/TCP e Shared Memory. Il suo principale scopo è quello di inviare messaggi real-time, con un approccio best-effort e cercando di massimizzare l'efficienza. E' inoltre progettato per fornire strumenti per la comunicazione unicast e multicast. Le principali entità descritte da RTPS sono:
 \begin{itemize}
     \item RTPSWriter: endpoint capace di inviare dati;
     \item RTPSReader: endpoint abilitato alla ricezione dei dati;
@@ -64,15 +64,27 @@ In particolare la sequenza di scambio è:
 \section{ROS}\label{SSEC:rosiface}
 
 
-Questo approccio distribuito per la distribuzione dei dati tra vari attori utilizzando un middlware basato su DDS non è idea inedita.Infatti dalla sua seconda versione il software open-source \textbf{Robot Operating System} meglio conosciuto come ROS
-\begin{wrapfigure}{r}{0.4\textwidth}
-  \includegraphics[width=0.4\textwidth]{img/ROS_MW.png}
+Questo approccio distribuito per la distribuzione dei dati tra vari attori utilizzando un middlware basato su DDS non è idea inedita. Infatti dalla sua seconda versione il software open-source \textbf{Robot Operating System} meglio conosciuto come ROS
+\begin{wrapfigure}{r}{0.5\textwidth}
+  \includegraphics[width=0.5\textwidth]{img/ROS_MW.png}
   \caption{Ros Middleware per DDS} 
   \label{fig:rmw_dds_common}
 \end{wrapfigure}
-ha deciso di usare questi strumenti introducendo un ulteriore livello che permette di cambiare varie implementazioni di DDS. Questa idea è stata e sarà di grande ispirazione per il completamento di questo progetto.
-Nello specifico, è stata creata una libreria chiama rmw\_dds\_common(ros middleware) come mostrato nella \ref{fig:rmw_dds_common}\footnote{L'implementazione di FastDDS vuole essere un esempio tra le diverse implementazioni disponibili per ROS2} sopra il quale la community ha creato le implementazioni di DDS desiderate, andando a creare così diverse possibilità di implementazione dello stesso servizio di distribuzione dati.
-Inoltre per cambiare tra le diverse versioni di DDS si deve semplicemente impostare una variabile di ambiente, rendendo estremamente facile per tutti i possibili fruitori di ROS. 
+ha deciso di usare questi strumenti introducendo un ulteriore livello che permette di usare diverse implementazioni di DDS. Questa idea è stata e sarà di grande ispirazione per il completamento di questo progetto.
+Nello specifico, è stata creata una libreria chiama rmw\_dds\_common(ros middleware) come mostrato nella \ref{fig:rmw_dds_common}\footnote{L'implementazione di FastDDS vuole essere un esempio tra le diverse soluzioni disponibili per ROS2} sopra il quale la community ha creato le implementazioni di DDS desiderate, andando a creare così diverse possibilità di configurazione dello stesso servizio di distribuzione dati.
+Inoltre per cambiare tra le diverse versioni di DDS si deve semplicemente impostare una variabile di ambiente, rendendo il procedimento facile per tutti i possibili fruitori di ROS2. 
+
+Tuttavia è stato scelto di utilizzare direttamente l'implementazione DDS invece che \emph{Ros middlware} per i seguenti motivi:
+\begin{itemize}
+    \item Potenzialità: ROS mette a disposizione solo alcuni degli strumenti resi disponibili dallo strato DDS, andando a limitare la possibilità di sfruttamento di tutte le impostazioni e QoS di FastDDS;
+    \item Granularità: oltre alla mancanza di alcune funzionalità, in ros sono predisposti dei pacchetti preconfigurati di entità. Per andare a studiare più approfonditamente gli strumenti su architetture diverse, è più pratico avere la possibilità di cambiare ogni piccola configurazione.
+    \item Flessibilità: Per andare a definire delle strutture dati di ROS, al fine di scambiare messaggi DDS usando il middleware offerto, era necessario creare diverse strutture dati che combaciassero con le interfacce ROS;
+    \item Diversa natura: In ROS, la maggior parte delle comunicazioni fatte sono intra-processo e raramente viene utilizzata una infrastruttura di rete, per andare a collegare tutti i nodi. Per questo sono maggiormente ottimizzate quel tipo di comunicazioni, piuttosto che quelle su rete, come in questo caso.
+    \item Facilità di implementazione: Implementare completamente \emph{rmw\_dds\_common} richiedeva un impegno e uno studio non indifferente della architettura sottostante a ROS, che seppur ben documentata, sarebbe costata diverso tempo. 
+\end{itemize}
+
+
+% in ROS, la maggior parte delle comunicazioni fatte sono intra-processo e raramente viene utilizzata una infrastruttura di rete, per andare a scambiare dei messaggi. Per questo sono maggiormente ottimizzate quel tipo di comunicazioni, piuttosto che quelle su rete, come nel caso di HPC
 
 
 % Ros Middleware interface\cite{ros2iface}, developed within the context of the Robot Operating System (ROS), stands as a pinnacle of innovation in the realm of creating middleware for Distributed Data Systems. The middleware leverages advanced data serialization techniques, optimized for real-time performance and efficient data exchange. Its incorporation of Quality of Service parameters and support for both publish-subscribe and request-response communication patterns underscores its sophistication, making it a state-of-the-art choice for building DDS middleware in distributed environments.

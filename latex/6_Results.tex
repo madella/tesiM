@@ -2,10 +2,11 @@
 % Visti i diversi risultati si può dire che è meglio usare i topic per* le partizioni per *
 % etc etc
 
-Nella sezione corrente, si riportano tutti i risultati rilevanti ottenuti durante la fase di testing e verrà stilato un modello di use-case utile alle finalità di Power Management.
+Nella sezione corrente, si riportano tutti i risultati rilevanti ottenuti durante la fase di testing e verrà stilando un possibile modello di use-case utile alle finalità di Power Management.
+\section{Discovery centralizzata contro distribuita}
 
-\section{Impatto del numero di sub in un dominio}
-Visto lo schema \ref{fig:uml} risulta facile capire, che il numero di subscriber presenti in un dominio comporta un overhead di comunicazione che va ad influenzare sia i tempi, che i cicli, che le istruzioni impiegate nella singola \emph{publish} su un topic come viene facilmente dimostrato nella figura\ref{fig:test3_overhead}.
+\section{Impatto del numero di sub iscritti ad un topic}
+Visto lo schema \ref{fig:uml} risulta facile capire, che il numero di subscriber presenti in un dominio ed iscritti ad un topic, comporta un overhead di comunicazione che va ad influenzare sia i tempi, che cicli e istruzioni impiegate nella singola \emph{publish} come viene facilmente dimostrato nella figura \ref{fig:test3_overhead} e \ref{fig:test3_latenza}.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{./results/test3_sending_multiplesub.png} %TODO, sqeunce is an error
@@ -16,7 +17,7 @@ Visto lo schema \ref{fig:uml} risulta facile capire, che il numero di subscriber
     \centering
     \includegraphics[width=\textwidth]{./results/test3_sendingreceiving_multiplesub.png} 
     \caption{latenza di ricezione all'aumentare dei subscriber}
-    \label{fig:test3_overhead}
+    \label{fig:test3_latenza}
 \end{figure}
 
 Ovviamente l'impatto è poco significativo in quei protocolli che applicano strutture di \gls{multicasting} come udp-Multicast e Shared-Memory. 
@@ -27,11 +28,10 @@ Ovviamente l'impatto è poco significativo in quei protocolli che applicano stru
         \label{}
 \end{figure}
 
-Da questo si può concludere che sia il publisher che subscriber risentono della presenza di molteplici ascoltatori su un topic. Questo problema è facilmente risolvibile lato publisher utilizzando protocolli che si basano su multicast. 
-
+Da questo si può concludere che sia il publisher che subscriber risentono della presenza di molteplici \emph{dds-partecipant} in ascolto su un topic. Questo problema è migliorato nel caso vengano utilizzati protocolli che si basano su multicast. 
 
 \section{Primo messaggio}
-E' stato notato in tutte le comunicazioni effettuate un ritardo, di un ordine di grandezza superiore, che riguarda esclusivamente il primo messaggio. Tuttavia, non è stato chiarito il motivo di questo \gls{overhead}, presente anche in comunicazioni locali\footnote{comunicazioni effettuati in localhost o in shared memory}. Anche se non dimostrato una delle possibili motivazioni potrebbe essere la necessità di allocare memoria durante la prima fase di comunicazione, da entrambi gli attori (potenzialmente amplificato nel caso \ref{fig:rtt_uml}). 
+E' stato notato con tutti i protocolli utilizzati un ritardo, di un ordine di grandezza superiore, che riguarda esclusivamente il primo messaggio. Tuttavia, non è stato chiarito il motivo di questo \gls{overhead}, presente anche in comunicazioni locali\footnote{comunicazioni effettuati in localhost o in shared memory}. Anche se non dimostrato una delle possibili motivazioni potrebbe essere la necessità di allocare memoria durante la prima fase di comunicazione, da entrambi gli attori (potenzialmente amplificato nel caso \ref{fig:rtt_uml}). 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/errortest.png} 
     \caption{} %TODO: caption
@@ -39,8 +39,9 @@ E' stato notato in tutte le comunicazioni effettuate un ritardo, di un ordine di
 \end{figure}
 Data la complessità necessaria per andare così a fondo nel problema, non è stato approfondito ulteriormente.
 
-\section{test-1}
-I risultati che sono stati trovati forniscono importanti informazioni, %TODO: to finish
+\section{Protocolli di comunicazione}
+Visti gli schemi %TODO: schema attori fatto da me
+le comunicazioni che dovrebbero essere maggiormente usate sono quelle non locali. In merito a ciò, nonostante ci siano di mezzo molti più livelli per comunicare con udp e tcp, i risultati trovati sono stati decisamente interessanti.
 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/test3_different_protocol_send_receive.png} 
@@ -60,34 +61,44 @@ I risultati che sono stati trovati forniscono importanti informazioni, %TODO: to
         \label{fig:test3_different_protocols}
 \end{figure}
 
-\section{test-2}
-
-Nei test effettuati con domini, topic e partizioni, non sono state notate differenze degne di nota in termini di performance (cicli e istruzioni) nell'usare uno strumento piuttosto che un altro. %TODO ADD GRAPH
-
-\section{test-3}
+\section{Domini, Partizioni e Wildcards}
+Nei test effettuati con topic e partizioni, non sono state notate differenze degne di nota in termini di performance nell'usare uno strumento piuttosto che un altro (\ref{fig:test2parttopicdomain}). Lo sono stati invece tra questi ultimi e i Domini. Tuttavia i domini non offrono alcun tipo di flessibilità e richiede il riavvio dei \emph{dds-partecipant} nel caso si necessiti di un qualsiasi cambiamento. Per questo è consigliato utilizzo di domini diversi, solo tra entità che non hanno necessità di comunicare, e che anzi, magari anche per motivi di sicurezza devono stare isolati. 
 
 \begin{figure}[H]
+    \includegraphics[width=\textwidth]{./results/test2_cicli_partvstopicvsdomaain.png} 
+        \caption{Peso in termini di cicli nell'usare partizioni topic e domini}
+        \label{fig:test2parttopicdomain}
+\end{figure}
+
+Per quanto riguarda entità che necessitano di gerarchie, è conveniente usare le partizioni con le Wildcards visto che non hanno un peso significativo \ref{fig:test2wildcards}. Infine lasciando i topic come mezzo di partizionamento, per il tipo di dati, e il tipo di istruzioni da utilizzare.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{./results/test2_wildcards.png}
+    \caption{La differenza tra dummy, 1 partizione o 16 partizioni non ha particolari costi in termini di invio con utilizzo di wildcards}
+        \label{fig:test2wildcards}
+\end{figure}
+
+
+
+\section{Throughput}
+L'ultimo test è stato utile a comprendere tutte le potenzialità di questo strumento più che creare un modello di utilizzo. Infatti come si può vedere dai seguenti grafici, i numeri di KByte (\ref{fig:throughput_Byte}) che è possibile inviare ogni secondo da un publisher ad un subscriber supera il MB/s, e permettendo comunicazione di diverse decine di Hz (\ref{fig:throughput_msg}). Inoltre questo valore raggiunge numeri ancora più elevati qualora si usassero comunicazioni multicast, come notabile in figura \ref{fig:throughput_increasing}
+\begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/test3_throughput.png} 
-        \caption{} %TODO: caption
-        \label{}
+        \caption{throughput di invio da parte di un singolo attore in Kilo-Bytes} %TODO: change protocol"
+        \label{fig:throughput_Byte}
 \end{figure}
 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/test3_throughput_m.png} 
-        \caption{} %TODO: caption
-        \label{}
+        \caption{throughput di invio da parte di un singolo attore in messaggi} %TODO: caption
+        \label{fig:throughput_msg}
 \end{figure}
 
 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/test3_graph_throughput.png} 
-    \caption{} %TODO: caption
-    \label{}
+    \caption{throughput a crescenti numeri di subscribers} 
+    \label{fig:throughput_increasing}
 \end{figure}
 
-
-
-
-
-
-\section{Modello}
