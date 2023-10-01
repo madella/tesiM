@@ -192,8 +192,6 @@ Nel primo test si è valutata la differenza di queste implementazioni utilizzand
 \subsection{Test-2}
 Un concetto fondamentale nelle comunicazioni tra attori con gerarchie diverse, in sistemi con diverse centinaia di migliaia di entita, come cluster, nodi, processori, workflow, job (etc.), sono le possibilità di instradare, segmentare e rendere gerarchiche le comunicazioni. Come spiegatolo nel capitolo \ref{Chapter:dds} in DDS ci sono diversi strumenti disponibili per farlo. Tra di loro differiscono per alcuni aspetti, come flessibilità, costo (in performance) e livello di segmentazione.
 
-In questo test si è valutata la differenza in termini di performance dei diversi strumenti, con un particolare focus sulle partizioni e le wildcards rese disponibili in esso.
-
 \subsubsection*{Dominio} 
 Il dominio è la segmentazione di più "forte" e di più alto livello. Va a partizionare gli attori presenti in un dominio in modo del tutto fisico (cambiando per ogni dominio porte e indirizzi di comunicazione) e per nulla flessibile. Per cambiare il dominio è necessario distruggere e creare di nuovo il partecipante. Inoltre il dominio non permette nessun tipo di gerarchia.
     
@@ -214,6 +212,7 @@ Le wildcards sono un costrutto appartenente alle partizioni, che permette di def
 \end{figure} 
 
 
+%In questo test si è valutata la differenza in termini di performance dei diversi strumenti, con un particolare focus sulle partizioni e le wildcards rese disponibili in esso.
 Definiti questi concetti è stato pensato un test rappresentato dalla figura \ref{fig:test_UML_wildcards} per valutare se utilizzare la partizioni, e quindi sfruttare le gerarchie negli instradamenti avesse un prezzo in termini di performance da pagare.  
 
 
