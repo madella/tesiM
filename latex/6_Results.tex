@@ -103,13 +103,13 @@ Per quanto riguarda entità che necessitano di gerarchie, è conveniente usare l
 
 
 \section{Throughput}
-L'ultimo test è stato utile a comprendere tutte le potenzialità di questo strumento più che creare un modello di utilizzo. Infatti come si può vedere dai seguenti grafici, i numeri di KByte (\ref{fig:throughput_Byte}) che è possibile inviare ogni secondo da un publisher ad un subscriber supera il MB/s, e permettendo comunicazione di diverse decine di Hz (\ref{fig:throughput_msg}). Inoltre questo valore raggiunge numeri ancora più elevati qualora si usassero comunicazioni multicast, come notabile in figura \ref{fig:throughput_increasing}
+L'ultimo test è stato utile a comprendere tutte le potenzialità di questo strumento più che creare un modello di utilizzo. Infatti come si può vedere dai seguenti grafici, i numeri di KByte (\ref{fig:throughput_combined}) che è possibile inviare ogni secondo da un publisher ad un subscriber supera il MB/s, e permettendo comunicazione di diverse decine di Hz (\ref{fig:throughput_combined}). Inoltre questo valore raggiunge numeri ancora più elevati qualora si usassero comunicazioni multicast, come notabile in figura \ref{fig:throughput_increasing}.
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/test3_throughput_combined.png} 
-        \caption{throughput di invio da parte di un singolo attore} %TODO: change protocol"
-
-        \label{fig:throughput_Byte}
+        \caption{throughput di invio da parte di un singolo attore}
+        \label{fig:throughput_combined}
 \end{figure}
+Sull'asse delle Y, a sinistra, vengono mostrati in verde i il valore di KMessaggi/s\footnote{1000 Messaggi al secondo} raggiungibili dai vari protocolli di comunicazione, mentre in grigio, a sinistra i KByte/s.
 
 % \begin{figure}[H]
 %     \includegraphics[width=\textwidth]{./results/test3_throughput_m.png} 

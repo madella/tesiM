@@ -10,9 +10,9 @@ possano comunicare in modo completamente distribuito tramite DDS. Per poter crea
     \hline
     \textbf{Parameter} & \textbf{Cineca} & \textbf{E4} \\
     \hline
-    Number of nodes used & 3 & 3\\
+    Number of nodes used & 3 \\
     \hline
-    Processor & Intel CascadeLake 8260 & Intel CascadeLake 8260  \\
+    Processor & Intel CascadeLake 8260 S \\
     \hline
     Number of sockets per node & 2 \\
     \hline
@@ -127,7 +127,7 @@ ma essendo ntpd un servizio di amministrazioni non è stato possibile interagirc
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{./results/time_sync_node.png}
-    \caption{Scostamento del tempo su nodi diversi}
+    \caption{Scostamento del tempo su nodi diversi} %TODO Da rifare i grafici
     \label{fig:sync_time_shift1}
 \end{figure}
 \begin{figure}[H]
@@ -135,11 +135,11 @@ ma essendo ntpd un servizio di amministrazioni non è stato possibile interagirc
     \caption{Scostamento senza outliers}
     \label{fig:sync_diff_distr2}
 \end{figure}
-\begin{figure}[H]
-    \includegraphics[width=\textwidth]{./results/time_sync_distribution.png}
-    \caption{Distribuzione delle differenze}
-    \label{fig:sync_diff_distr3}
-\end{figure}
+% \begin{figure}[H]
+%     \includegraphics[width=\textwidth]{./results/time_sync_distribution.png}
+%     \caption{Distribuzione delle differenze}
+%     \label{fig:sync_diff_distr3}
+% \end{figure}
 
 Come possibile notare nella figura \ref{fig:sync_time_shift1} nonostante le mpi\_barrier, gli scostamenti di tempo tra 2 nodi durante i diversi tentativi effettuati (1000), cambia notevolmente, arrivando a differenze fino ad un massimo di 290 microsecondi. Questo rende il metodo appena mostrato utilizzabile solo nel caso in cui non sia necessario sapere il tempo assoluto di qualche azione, ma le varianze, che rimarrebbero costanti se si utilizzano sempre gli stessi nodi.
 
@@ -174,7 +174,7 @@ Al fine di condurli nel modo più trasparente e corretto possibile sono stati re
 
 \subsection{Test-0}
 La prima fase di DDS consiste nel riconoscere altri \emph{dds-partecipant} appartenenti allo stesso dominio. Questa viene chiamata \textbf{fase di Discovery}. Essa ha un ruolo estremamente importante siccome senza non sarebbe possibile far comunicare nessun attore all'interno della stessa rete e nemmeno nello stesso nodo. Una delle peculiarità di DDS è che permette di eseguire tutto in modo completamente distribuito, e anche questa fase non viene fatta diversamente (se non esplicitamente configurato). Il problema è che durante la discovery, quando si hanno diverse migliaia di componenti, si genera un overhead di pacchetti scambiati e di conseguenza anche le computazioni necessarie che crescono esponenzialmente. %Ovviamente la natura effimera di alcuni di questi componenti potrebbe aggravare il problema. 
-Sono disponibili in DDS, anche per questo motivo, meccanismi di discovery centralizzati al fine di evitare questo problema. In questo esperimento si andranno a comparare le due diverse implementazioni e per farlo si userà \textbf{perf}.
+Sono disponibili in DDS, anche per questo motivo, meccanismi di discovery centralizzati al fine di evitare questo problema. In questo esperimento si andranno a comparare le due diverse implementazioni e per farlo si useranno gli strumenti \textbf{perf} e \textbf{TCPdump}.
 %CONTROLLA CHE SI POSSA FARE TCPDUMP SU CINECA
 
 \subsection{Test-1}
@@ -187,7 +187,7 @@ In DDS ed in particolare nel layer sottostante di RTPS, per scambiare messaggi a
     \item shared-memory: analogo al metodo precedentemente, ma invece di utilizzare un indirizzo IP, viene utilizzato un indirizzo di memoria. E' possibile solo quando i due processi che comunicano sono sullo stesso nodo, con memoria condivisa.
 \end{itemize}
 
-Nel primo test si è valutata la differenza di queste implementazioni utilizzando la rete infiniband \ref{table:hpc} su diversi nodi di un supercalcolatore. 
+Nel primo test si è valutata la differenza di queste implementazioni utilizzando la rete infiniband \ref{table:hpc-cineca} su diversi nodi di un supercalcolatore. 
 
 \subsection{Test-2}
 Un concetto fondamentale nelle comunicazioni tra attori con gerarchie diverse, in sistemi con diverse centinaia di migliaia di entita, come cluster, nodi, processori, workflow, job (etc.), sono le possibilità di instradare, segmentare e rendere gerarchiche le comunicazioni. Come spiegatolo nel capitolo \ref{Chapter:dds} in DDS ci sono diversi strumenti disponibili per farlo. Tra di loro differiscono per alcuni aspetti, come flessibilità, costo (in performance) e livello di segmentazione.
@@ -217,8 +217,7 @@ Definiti questi concetti è stato pensato un test rappresentato dalla figura \re
 
 
 \subsection{Test-3}
-Nel l'ultimo test si è è voluto ottenere dei valori rappresentativi della teconologia studiata. In particolare si sono visti valori come il throughput e la bandwidth massima per ciascun protocollo.
-Per calcolarlo sono stati scelte configurazioni che potessero simulare un carico di comunicazioni elevato tra attori di HPC. Nella tabella \ref{table:test3} vengono riportate i parametri scelti.
+Nel l'ultimo test ci si è focalizzati sui risultati numerici dell'utilizzo di questo middleware. Ci si è focalizzati principalmente sul throughput, un valore particolarmente importante quando si parla di sistemi con volumi di scambio estremamente elevati. Sono stati eseguiti i test su tutti e 4 i protocolli messi a disposizione, al fine di fornire una panoramica completa, con risultati chiari. Inoltre per calcolarlo sono state cambiate le configurazioni in modo che potessero simulare un carico di comunicazioni elevato tra attori di HPC. Nella tabella \ref{table:test3} vengono riportate i parametri scelti.
 
 \begin{table}[H]
     \begin{center}
