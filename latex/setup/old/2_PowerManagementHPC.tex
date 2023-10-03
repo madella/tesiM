@@ -20,10 +20,10 @@ Ordini di grandezza di questo tipo non sono facilmente raggiungibili e anche qua
 %Inoltre i prezzi per garantire questi valori di Watt aumenta in modo non lineare.
 Al fine di definire dei power budget, e utilizzare efficientemente la potenza richiesta si sono resi necessari strumenti situati su diversi livelli di astrazione. 
 Sono nati così i primi concetti di Power Management, componenti per controllare l'utilizzo di energia utilizzando diverse strategie al fine di ridurre gli sprechi energetici e, allo stesso tempo, garantire un temperatura di funzionamento sicura.%Power Management può essere visto come un sistema composto sia da parti software che Hardware.
-L'insieme dei componenti software e hardware che svolgono il compito di Power Management vanno a formare un power-stack in grado di gestire la potenza assorbita di macchine HPC.
+L'insieme dei componenti software e hardware che svolgono il compito di Power Management vanno a formare un Power Stack in grado di gestire la potenza assorbita di macchine HPC.
 
 \section{Stato dell'arte}
-Un Power-Stack deve gestire e monitorare la potenza assorbita, le frequenze e le temperature di processori all'interno dei sistemi. Questo deve poter essere fatto anche a diversi livelli come intero sistema,
+Un Power Stack deve gestire e monitorare la potenza assorbita, le frequenze e le temperature di processori all'interno dei sistemi. Questo deve poter essere fatto anche a diversi livelli come intero sistema,
 \setlength{\intextsep}{1pt} % Adjust the vertical space here (5pt in this example)
 \begin{wrapfigure}{r}{0.4\textwidth}
     \includegraphics[width=0.4\textwidth]{img/SoA.png}
@@ -32,12 +32,12 @@ Un Power-Stack deve gestire e monitorare la potenza assorbita, le frequenze e le
     \label{fig:SoAinoutband}
 \end{wrapfigure}
 singoli nodi e singoli elementi all'interno dei nodi. E' quindi necessario poter accedere agli attuatori e sensori presenti nei core sia in modo diretto che da "remoto". Normalmente sono rese disponibili due tipi di interfacce:
-Nella figura \ref{fig:SoAinoutband} viene schematizzata la differenza tra le due interfacce disponibili. 
+Nella figura~\ref{fig:SoAinoutband} viene schematizzata la differenza tra le due interfacce disponibili. 
 \begin{itemize}
     \item in-band
     \item out-of-band
 \end{itemize}
-Nella figura \ref{fig:SoAinoutband} viene schematizzato l'accesso ai dispositivi hardware che si occupano della gestione del power management su sistemi HPC. Sarebbe in realtà possibile accedere a questi componenti anche tramite altri meccanismi specifici, ad esempio la mappatura in memoria condivisa, tuttavia a causa della loro natura altamente specializzata, tali approcci non saranno inclusi nell'ambito di questa tesi.
+Nella figura~\ref{fig:SoAinoutband} viene schematizzato l'accesso ai dispositivi hardware che si occupano della gestione del power management su sistemi HPC. Sarebbe in realtà possibile accedere a questi componenti anche tramite altri meccanismi specifici, ad esempio la mappatura in memoria condivisa, tuttavia a causa della loro natura altamente specializzata, tali approcci non saranno inclusi nell'ambito di questa tesi.
 
 % I servizi in-band vengono forniti alle applicazioni e ai sistemi operativi in esecuzione negli elementi di elaborazione del chip e sono composti da: (i) governor dedicati alla potenza e telemetria correlata alla potenza a livello di sistema operativo; (ii) un'interfaccia dedicata per consentire alle applicazioni e ai tempi di esecuzione del modello di programmazione di specificare suggerimenti e prescrizioni per la gestione della potenza; (iii) un'interfaccia dedicata al Sistema e alla Gestione delle Risorse per supportare il capping della potenza a livello di CPU e nodo, nonché per gestire il compromesso tra Throughput ed Efficienza Energetica. I servizi out-of-band vengono forniti all'amministratore di sistema e agli strumenti di gestione del sistema tramite il Controller di Gestione della Scheda (BMC). Questi servizi consistono nella telemetria di potenza out-of-band, nel capping di potenza a livello di sistema e nella affidabilità e assistenza.
 
@@ -62,7 +62,7 @@ Per esempio in \emph{CPUfreq} fornisce diversi governors per soddisfare diversi 
     \label{fig:inband}
 \end{figure}
 
-Il vantaggio di usare queste interfacce è che permettono di operare in \gls{Real-Time} ed in modo dinamico. I lati negativi invece risiedono nelle stesse peculiarità di questi strumenti, ovvero che possono ottenere solo le informazioni dei core sui quali i richiedenti vengono eseguiti. 
+Il vantaggio di usare queste interfacce è che permettono di operare in Real-Time ed in modo dinamico. I lati negativi invece risiedono nelle stesse peculiarità di questi strumenti, ovvero che possono ottenere solo le informazioni dei core sui quali i richiedenti vengono eseguiti. 
 
 % E' reso possibili tramite degli specifici driver (intel\_pstate) che comunicano con i componenti hardware sul chip. Diversamente \textbf{Intel Power Governors} utilizza le interfacce proprietarie (RAPL) con cui monitora potenza ed energia a livello di sistema.
 % Entrambi questi strumenti hanno necessità di componenti Hardware dedicati come i power knob (manopole per la gestione della potenza) e sensori che permettono di monitorare temperature e tensioni.
@@ -89,7 +89,7 @@ Nel corso degli anni con l'obbiettivo di ottimizzare e automatizzare l'interazio
 
 
 \section{Modello di power stack} %Componenti power stack
-Con Power-Stack si intende un insieme di applicazioni software che cooperando riescono a fornire ad applicazioni, utenti e amministratori gli strumenti per un servizio di Power Management. Una volta definito il problema, e i componenti che possono essere utilizzati, è possibile definire un modello di interazione e responsabilità dei vari attori. Di seguito vengono riportati quelli che sono i ruoli necessari al fine di coordinare un sistema HPC dall'allocazione di un applicativo, fino alla gestione delle tensioni. 
+Con Power Stack si intende un insieme di applicazioni software che cooperando riescono a fornire ad applicazioni, utenti e amministratori gli strumenti per un servizio di Power Management. Una volta definito il problema, e i componenti che possono essere utilizzati, è possibile definire un modello di interazione e responsabilità dei vari attori. Di seguito vengono riportati quelli che sono i ruoli necessari al fine di coordinare un sistema HPC dall'allocazione di un applicativo, fino alla gestione delle tensioni. 
 \begin{itemize}
     \item Workflow engine (WE)
     \item System Manager (SM)
@@ -148,7 +148,7 @@ Tutto questo deve essere fatto con il minor impatto possibile sul sistema dove s
 \end{itemize}
 
 
-Per concludere viene mostrato uno schema in figura \ref{fig:powerstackscheme} che vuole mostrare la gerarchia e le possibili interazioni tra i vari attori.
+Per concludere viene mostrato uno schema in figura~\ref{fig:powerstackscheme} che vuole mostrare la gerarchia e le possibili interazioni tra i vari attori.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{img/REGALE-Architecture-1536x1421.png}

@@ -1,42 +1,44 @@
 \chapter{Introduzione}
 Il termine power management è stato usato nel corso degli anni per raggruppare problemi di diversa tipologia, ma che ruotano tutti attorno al concetto di energia.
 Tra questi infatti si può includere:
-\begin{itemize}
-    \item Power management legata alla gestione della potenza assorbita, a sua volta suddivisibile in:
+\begin{enumerate}
+    \item Power Management per la potenza assorbita, a sua volta suddivisibile in:
     \begin{itemize}
         \item Thermal Design Power, potenza termica massima che un componente può dissipare;
-        \item Therm Design Current o Peak Current, legata alla massima corrente erogabile da alimentatori o dai processori;
+        \item Therm Design Current o Peak Current, massima corrente erogabile da alimentatori o dai processori;
     \end{itemize}
     \item Thermal management, gestione temperatura dinamica o statica;
     \item Energy management, gestione della sostenibilità e del consumo di energia;
-\end{itemize}
+\end{enumerate}
 
 \noindent In questa tesi, si farà riferimento a questa parola per abbracciare tutti e tre i concetti che essa può rappresentare, offrendo così una visione olistica e completa del problema.
 
-Il contesto nel quale viene definito un Power Management è spesso un sistema di \emph{High-Performance Computing}, detto anche sistema ad alte prestazioni. Questi ultimi sono macchine computazionali composte da cluster di decine o a volte centinaia di nodi interconnessi tra di loro da reti a bassa latenza. Ogni nodo è composto a sua volta da decine di processori, ed acceleratori come CPU, GPU e TPU. %todo gls
+Il contesto nel quale viene definito un Power Management è spesso un sistema di \emph{High-Performance Computing}, detto anche sistema ad alte prestazioni. Questi ultimi sono macchine computazionali composte da cluster di decine o a volte centinaia di nodi interconnessi tra di loro da reti a bassa latenza. Ogni nodo è composto a sua volta da decine di processori, ed acceleratori come CPU, GPU e TPU.
 Inoltre ogni nodo mette a disposizione memorie di diverso tipo, con capienze elevate e ad alta banda, condivisibile tra i processori al suo interno. Andando a considerare tutti i cluster nel loro insieme, si ottengo capacità computazioni che nei giorni nostri hanno raggiunto ordini del ExaFlops ($10^{18}$ operazioni di Floating Point per secondo). 
 
-In contrasto a ciò, dagli anni '70 ad oggi si sono manifestate difficolta sempre più grandi nel ridimensionamento dei transistor, che ha portato ad una progressiva fine delle leggi di Denard e Moore\cite{Dennardsscaling}\cite{Dennardsscaling2}. Tali leggi, che avevano guidato l'industria informatica per decenni, prevedevano un consumo energetico costante al crescere della velocità e capacità computazionale. Quando la loro efficacia è venuta a mancare, il mantenimento e ancora di più lo sviluppo di nuove generazioni di sistemi sono diventati compiti tutt'altro che banali\cite{growth}, rendendo sempre più di vitale importanza i software in grado di automatizzarne la gestione.
-Dall'arrivo degli exa-computer\footnote{Supercomputer in grado che raggiunge prestazioni di ExaFlops}, la potenza necessaria per alimentare questi sistemi ha superato la precedente soglia dei 20MWatt\cite{TOP500}. Se poi si considera che la maggior parte della potenza fornita, viene convertita in calore, si deve prendere in considerazione anche i consumi necessari per tenere raffreddati i sistemi. Infatti, se non adeguati comporterebbero grandi inefficienze in termini di energia, che si traducono anche in degradazioni di prestazioni computazionali. Prendendo in considerazione ogni aspetto, i centri che ospitano queste macchine necessitano di decine di MWatt di potenza per ogni exa-computer che hanno in funzionamento. Ordini di grandezza di questo tipo non sono facilmente raggiungibili e anche quando lo sono, hanno costi estremamente elevati. 
+In contrasto a ciò, dagli anni '70 ad oggi si sono manifestate difficolta crescenti nel riduzione della dimensione dei transistor, che ha portato al progressivo termine delle leggi di Dennard e Moore\cite{Dennardsscaling}\cite{Dennardsscaling2}. Tali leggi, che hanno guidato l'industria informatica per decenni, prevedevano un consumo energetico costante al crescere della velocità e capacità computazionale. Quando la loro efficacia è venuta a mancare, il mantenimento e ancora di più lo sviluppo di nuove generazioni di sistemi sono diventati compiti tutt'altro che banali\cite{growth}, rendendo sempre più di vitale importanza la realizzazione di software in grado di automatizzarne la gestione.
+Dall'arrivo degli exa-computer\footnote{Supercalcolatore in grado che raggiunge prestazioni di ExaFlops}, la potenza necessaria per alimentare questi sistemi ha superato la precedente soglia dei 20MWatt\cite{TOP500}. Se poi si considera che la maggior parte della potenza fornita, viene convertita in calore, diventano rilevanti anche i consumi necessari per tenere raffreddati i sistemi. Infatti, un raffreddamento inadeguati può portare inefficienze energetica, che si traduce anche in degradazioni di prestazioni computazionali. %Prendendo in considerazione ogni aspetto, i centri che ospitano queste macchine necessitano di decine di MWatt di potenza per ogni exa-computer che hanno in funzionamento. 
+Questa soglia di potenza rende la gestione della potenza dei Data Center più complessa %\cite{Cesarini}
+
+%Ordini di grandezza di questo tipo non sono facilmente raggiungibili e anche quando lo sono, hanno costi estremamente elevati. 
 %Inoltre i prezzi per garantire questi valori di Watt aumenta in modo non lineare.
-Al fine di definire dei power budget, e utilizzare efficientemente la potenza richiesta si sono resi necessari strumenti in grado di operare su diversi livelli di astrazione. 
-Sono nati così i primi concetti di Power Management, componenti per controllare l'utilizzo di energia utilizzando diverse strategie, al fine di ridurre gli sprechi energetici e, allo stesso tempo, garantire un temperatura di funzionamento sicura. %Power Management può essere visto come un sistema composto sia da parti software che Hardware.
-L'insieme dei componenti software e hardware che svolgono il compito di Power Management vanno a formare un Power Stack(PS) in grado di gestire la potenza assorbita di macchine HPC.
+Al fine di ridurre il consumo di potenza di esercizio, si cerca un approccio in grado di imporre vincoli di potenza, 
+a diverse granularità: intero data-center, cluster di calcolo, nodo, job. 
+% e utilizzare efficientemente la potenza richiesta si sono resi necessari strumenti in grado di operare su diversi livelli di astrazione. 
+Sono nati così i primi strumenti di Power Management, per controllare l'utilizzo dell'energia tramite la riconfigurazione dinamica dei parametri operativi dei componenti di calcolo (Nodi, CPU, GPU, TPU) .
+al fine di ridurre gli sprechi energetici e, allo stesso tempo, garantire una temperatura di funzionamento sicura. %Power Management può essere visto come un sistema composto sia da parti software che Hardware. %TODO: modificare
+L'insieme dei componenti software e hardware che svolgono il compito di Power Management vengono racchiusi all'interno di un Power Stack(PS) unificato. %  in grado di gestire la potenza assorbita di macchine HPC.
+
+
+Ad oggi, sono state proposte diverse soluzioni per il PM di apparati HPC. La maggior parte di esse è stata sviluppata per sopperire a problematiche specifiche legate ai singoli vendor, e singoli centri di calcolo.
+Manca quindi una visione globale e la possibilità di poter comporre diverse soluzioni in modo sinergico.
+Non sono infatti mai state definite o standardizzate interfacce di comunicazione comuni tra i vari software, lasciando agli amministratori dei sistemi di HPC l'onere di farlo: limitando de-facto l'uso e la pervasività di tali soluzioni.
 
 
 
-Mentre sono state proposte diverse soluzioni in tale argomento, %o mancanza?
-%gestione della potenza e dell'energia, 
-la maggior parte di esse si è rivelata essere una rimedio per soddisfare singoli obiettivi di ottimizzazione o per un singolo sistema di HPC. Infatti molti dei prodotti attualmente disponibili svolgono compiti senza una visione globale e spesso in conflitto gli uni con gli altri. Peraltro non sono neanche mai state definite o modellizzate interfacce di comunicazione tra i vari software, lasciando agli amministratori dei sistemi di HPC, l'onere di farlo.
-%TODOV: Trovare queste cit: M. Maiterth et al., Energy and power aware job scheduling and resource management: global survey initial analysis, in 2018 IEEE International Parallel and Distributed Processing Symposium Workshops (IPDPSW), Vancouver, BC, 2018, pp. 685–693, doi: 10.1109/IPDPSW.2018.00111.
-%Un recente studio [22] condotto dal gruppo di lavoro EEHPC [9] ha concluso che la maggior parte di tali tecniche manca di una consapevolezza globale necessaria per ottenere le migliori prestazioni di sistema e throughput. Inoltre, ciascuna tecnica tende a migliorare la gestione di potenza ed energia per un sottoinsieme diverso dell'hardware del sito o del sistema e a diverse granularità (spesso in conflitto). Sfortunatamente, le tecniche esistenti non sono state progettate per coesistere simultaneamente su un unico sito e cooperare nella gestione in modo efficiente. %Traduzione GPT di paper PS, da cambiare
-% Per affrontare queste lacune, la comunità HPC ha bisogno di uno stack completo per la gestione di energia e potenza. 
+\section{Organizzazione}
+La tesi è organizzata nel seguente modo: nel primo capitolo viene introdotto il concetto di Power Management, nel secondo rappresentato lo stato dell'arte. Dopo una introduzione di DDS nel terzo viene presentato il progetto REGALE nel capitolo 4. Nel quinto verranno riportati i test effettuati con i relativi risultati nel sesto. Dopo una breve introduzione dei prototipi creati sarà presente la conclusione.
 
 
-
-% NON SO SE SERVE QUI DDS =======================================================================
-% L'obiettivo finale sarebbe infatti quello di fornire un middleware documentato e facilmente integrabile, nei vari strumenti ad oggi presenti, per collegarli tra loro utilizzando un approccio distribuito e sfruttando il potenziale del Data Distribution Service (DDS) %[\ref{SEC:dds}] 
-% nonché quello di \gls{Real-Time} Publish-Subscribe (RTPS).
-
-% \section{Contributi}
-% I contributi di questa tesi sono stati lo studio e caratterizzazione di una specifica implementazione di DDS all'interno di sistemi HPC al fine di fornire una visione più completa della possibilità di integrare questo strumento come base delle comunicazioni di un middlware per i componenti del power management. Successivamente sono stati valutati dei modelli basati su questi risultati come modo d'uso. Infine sono stati creati per completare il quadro due di questi attori, mancanti nelle implementazioni attualmente prodotte, utilizzando la libreria REGALE.
+\section{Contributi}
+I contributi di questa tesi sono stati in primo luogo, lo studio e caratterizzazione di una specifica implementazione di DDS all'interno di sistemi HPC. Questo ha portato una visione più completa della possibilità di integrare questo strumento come middleware per le comunicazioni del Power Stack. Successivamente sono stati valutati dei modelli basati su questi risultati come \emph{use-case}. Infine, in collaborazione con Cineca\cite{Cineca}, BSC\cite{BSC} ed E4\cite{E4}, sono stati creati dei prototipi in grado di simulare vere comunicazioni di Power Management, utilizzando il middleware creato.

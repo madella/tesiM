@@ -6,9 +6,9 @@
 \date{Aprile 2021}
 
 \input{setup/setup.tex}
-\makenoidxglossaries
+% \makenoidxglossaries
 
-\input{glossario.tex}
+% \input{glossario.tex}
 
 \begin{document}  
 
@@ -16,10 +16,10 @@
 \thispagestyle{empty}%
 \input{setup/frontpage.tex}
 \afterpage{\blankpage}
+%\afterpage{\blankpage}
 
-\thispagestyle{empty}%
-\input{0_Abstract.tex}
-
+\include{0_Abstract.tex}
+\afterpage{\blankpage}
 \tableofcontents
 \afterpage{\blankpage}
 
@@ -35,8 +35,9 @@
 \input{7_Model&Dummy.tex}
 \input{8_Conclusione.tex}
 
-\printnoidxglossaries
-\printbibliography
+% \printnoidxglossaries%
+\printbibliography%
+\listoffigures
 % \bibliography{references}
 % \bibliographystyle{splncs04}
 \end{document}

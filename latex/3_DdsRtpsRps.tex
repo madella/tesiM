@@ -1,5 +1,5 @@
 \chapter{DDS \& RTPS}\label{Chapter:dds}
-Data Distribution Service (DDS)\cite{DDS} e Real-Time Publish-Subscribe (RTPS)\cite{RTPS} sono strumenti che rivestono un ruolo importante nelle comunicazioni in sistemi distribuiti e \gls{Real-Time}. Infatti, anche se a diversi livelli, si occupano della la trasmissione di dati tra applicazioni e dispositivi interconnessi, giocando un ruolo importante in scenari con diverse centinaia di attori come i sistemi ad alte prestazioni come HPC. 
+Data Distribution Service (DDS)\cite{DDS} e Real-Time Publish-Subscribe (RTPS)\cite{RTPS} sono strumenti che rivestono un ruolo importante nelle comunicazioni in sistemi distribuiti e real-time. Infatti, anche se a diversi livelli, si occupano della la trasmissione di dati tra applicazioni e dispositivi interconnessi, giocando un ruolo importante in scenari con diverse centinaia di attori come i sistemi ad alte prestazioni come HPC. 
 
 
 \section{Implementazione usasta}
@@ -44,6 +44,7 @@ In particolare la sequenza di scambio è:
     \item quando RTPSReader riceve il messaggio, aggiorna la sua cache con il nuovo \emph{change}.
 \end{enumerate}
 
+Di seguito direttamente dalla documentazione di eProsima FastDDS\cite{FastDDS} gli schemi di funzionamento dei due layer di comunicazione.
 \begin{figure}[H]
     \centering
     \begin{subfigure}{0.45\linewidth}
@@ -71,7 +72,7 @@ Questo approccio distribuito per lo scambio dei dati tra vari attori utilizzando
   \label{fig:rmw_dds_common}
 \end{wrapfigure}
 ha deciso di usare questi strumenti introducendo un ulteriore livello che permette di usare diverse implementazioni di DDS. Questa idea è stata e sarà di grande ispirazione per il completamento di questo progetto.
-Nello specifico, è stata creata una libreria chiama rmw\_dds\_common(ros middleware) come mostrato nella \ref{fig:rmw_dds_common}\footnote{L'implementazione di FastDDS vuole essere un esempio tra le diverse soluzioni disponibili per ROS2} sopra il quale la community ha creato le implementazioni di DDS desiderate, andando a creare così diverse possibilità di configurazione dello stesso servizio di distribuzione dati.
+Nello specifico, è stata creata una libreria chiama rmw\_dds\_common(ros middleware) come mostrato nella~\ref{fig:rmw_dds_common}\footnote{L'implementazione di FastDDS vuole essere un esempio tra le diverse soluzioni disponibili per ROS2} sopra il quale la community ha creato le implementazioni di DDS desiderate, andando a creare così diverse possibilità di configurazione dello stesso servizio di distribuzione dati.
 Inoltre per cambiare tra le diverse versioni di DDS si deve semplicemente impostare una variabile di ambiente, rendendo il procedimento facile per tutti i possibili fruitori di ROS2. 
 
 Tuttavia è stato scelto di utilizzare direttamente l'implementazione DDS invece che \emph{Ros middlware} per i seguenti motivi:

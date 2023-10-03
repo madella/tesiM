@@ -1,1 +1,1 @@
-rm -f *.log *.fls *.out *.bcf *.aux *.run.xml *.gz *.fdb_latexmk *.blg *.bbl *.toc *.acn *.glo *.ist *.glsdefs
+rm -f *.log *.fls *.out *.bcf *.aux *.run.xml *.gz *.fdb_latexmk *.blg *.bbl *.toc *.acn *.glo *.ist *.glsdefs *.lof

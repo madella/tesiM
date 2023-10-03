@@ -76,11 +76,10 @@
 %\titleformat{\chapter}[display]{\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
 \usepackage{afterpage}
 \newcommand\blankpage{%
-    \null
+    \null%
     \thispagestyle{empty}%
     %\addtocounter{page}{-1}%
     \newpage}
-
 \usepackage[sorting=none]{biblatex}
 \usepackage{csquotes}
 \addbibresource{setup/references.bib}

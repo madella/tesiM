@@ -3,54 +3,49 @@
 % etc etc
 
 Nella sezione corrente, si riportano tutti i risultati rilevanti ottenuti durante la fase di testing, stilando un possibile modello di use-case utile alle finalità di Power Management.
-\section{Discovery centralizzata contro distribuita}
+\section{Discovery: centralizzata vs distribuita}
 Come previsto, nella fase di discovery un numero elevato di entità genera una quantità di operazioni da svolgere che cresce in modo esponenziale. In questo caso sono stati usati tutti i core di due nodi, con un totale di 96 entità.
-Già nel primo grafico è possibile notare un distacco tra i due approcci, con sole 30 unità \ref{fig:test0pack}. Nelle figure dei cicli \ref{fig:test0cicl} e delle istruzioni \ref{fig:test0_instr} viene confermato l'andamento non lineare.
+Già nel primo grafico è possibile notare un distacco tra i due approcci, con sole 30 unità~\ref{fig:test0pack}. Nelle figure dei cicli~\ref{fig:test0cicl} e delle istruzioni~\ref{fig:test0_instr} viene confermato l'andamento non lineare.
 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/test0_packet.png} 
-    \caption{Numero di pacchetti scambiati durante la discovery all'aumentare di entità} %TODO: caption
-    \label{fig:test0pack}
+    \caption{Numero di pacchetti scambiati durante la discovery all'aumentare di entità}\label{fig:test0pack}
 \end{figure}
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/test0_cicli.png} 
-    \caption{Numero di cicli durante la discovery all'aumentare di entità nelle diverse opzioni} %TODO: caption
-    \label{fig:test0cicl}
+    \caption{Numero di cicli durante la discovery all'aumentare di entità nelle diverse opzioni}\label{fig:test0cicl}
 \end{figure}
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/test0_istruzioni.png} 
-    \caption{Numero di cicli durante la discovery all'aumentare di entità nelle diverse opzioni} %TODO: caption
-    \label{fig:test0_instr}
+    \caption{Numero di cicli durante la discovery all'aumentare di entità nelle diverse opzioni}\label{fig:test0_instr}
 \end{figure}
 In un caso reale serve valutare in primo luogo il numero di entità in un determinato dominio, e successivamente i costi-benefici di ogni implementazione considerando anche l'impatto che si può avere nel caso di fallimento del server (nonostante sia possibile avere un server di backup che viene automaticamente attivato, nel caso il primo fallisse)
 
-\section{Impatto del numero di sub iscritti ad un topic}
-Visto lo schema \ref{fig:uml} si può capire, che il numero di subscriber presenti in un dominio ed iscritti ad un topic, comporta un overhead di comunicazione che va ad influenzare sia i tempi, che cicli e istruzioni impiegate nella singola \emph{publish} come viene dimostrato nella figura \ref{fig:test3_overhead} e \ref{fig:test3_latenza}. L'effetto è particolarmente pronunciato anche in protocolli come \emph{UDP} che non dovrebbero possedere concetti di connessione. Questo potrebbe essere dovuto al costo di inizializzazione ed invio dei messaggi, ad indirizzi di rete diversi.
+\section{scalabilità del numero di subscriber iscritti ad un topic}
+Visto lo schema~\ref{fig:uml} si può capire, che il numero di subscriber presenti in un dominio ed iscritti ad un topic, comporta un overhead di comunicazione che va ad influenzare sia i tempi, che cicli e istruzioni impiegate nella singola \emph{publish} come viene dimostrato nella figura~\ref{fig:test3_overhead} e~\ref{fig:test3_latenza}. L'effetto è particolarmente pronunciato anche in protocolli come \emph{UDP} che non dovrebbero possedere concetti di connessione. Questo potrebbe essere dovuto al costo di inizializzazione ed invio dei messaggi, ad indirizzi di rete diversi.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{./results/test3_sending_multiplesub.png} %TODO, sqeunce is an error
-    \caption{overhead sulla publish all'aumentare dei subscriber}
-    \label{fig:test3_overhead}
+    \includegraphics[width=\textwidth]{./results/test3_sending_multiplesub.png} %TODO, manca il titolo
+    \caption{overhead sulla publish all'aumentare dei subscriber}\label{fig:test3_overhead}
 \end{figure}
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{./results/test3_sendingreceiving_multiplesub.png} 
-    \caption{latenza di ricezione all'aumentare dei subscriber}
-    \label{fig:test3_latenza}
+    \caption{latenza di ricezione all'aumentare dei subscriber}\label{fig:test3_latenza}
 \end{figure}
 
-Ovviamente l'impatto è poco significativo in quei protocolli che applicano strutture di \gls{multicasting} come udp-Multicast e Shared-Memory, che verranno 
+Ovviamente l'impatto è poco significativo in quei protocolli che applicano strutture di multicasting come udp-Multicast e Shared-Memory, che verranno 
 
 \begin{figure}[H]
         \includegraphics[width=\textwidth]{./results/test3_udpvsudpM.png} 
-        \caption{} %TODO: caption
-        \label{}
+        \caption{Tempo di invio di un messaggio a [\#] subscriber nei protocolli UDP e UDP Multicast}\label{fig:udpvsudpMfigure}
 \end{figure}
+\noindent Sull'asse y i tempi di invio di un messaggio; sull'asse X il numero di subscriber che cresce, nei due differenti protocolli.
 
 Da questo si può concludere che sia il publisher che subscriber risentono della presenza di molteplici \emph{dds-partecipant} in ascolto su un topic. Questo problema è migliorato nel caso vengano utilizzati protocolli che si basano su multicast. 
 
-\section{Primo messaggio}
-E' stato notato con tutti i protocolli utilizzati un ritardo, di un ordine di grandezza superiore, che riguarda esclusivamente il primo messaggio. Tuttavia, non è stato chiarito il motivo di questo \gls{overhead}, presente anche in comunicazioni locali\footnote{comunicazioni effettuati in localhost o in shared memory}. Anche se non dimostrato una delle possibili motivazioni potrebbe essere la necessità di allocare memoria durante la prima fase di comunicazione, da entrambi gli attori (potenzialmente amplificato nel caso \ref{fig:rtt_uml}). 
+\section{Analisi overhead primo messaggio}
+E' stato notato con tutti i protocolli utilizzati un ritardo, di un ordine di grandezza superiore, che riguarda esclusivamente il primo messaggio. Tuttavia, non è stato chiarito il motivo di questo overhead, presente anche in comunicazioni locali\footnote{comunicazioni effettuati in localhost o in shared memory}. Anche se non dimostrato una delle possibili motivazioni potrebbe essere la necessità di allocare memoria durante la prima fase di comunicazione, da entrambi gli attori (potenzialmente amplificato nel caso~\ref{fig:rtt_uml}). 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/errortest.png} 
     \caption{} %TODO: caption
@@ -59,25 +54,21 @@ E' stato notato con tutti i protocolli utilizzati un ritardo, di un ordine di gr
 Data la complessità necessaria per andare così a fondo nel problema, non è stato approfondito ulteriormente.
 
 \section{Protocolli di comunicazione}
-Visti gli schemi \ref{fig:schema_global} è prevedibile che in un vero Power Stack, siano predilette le comunicazioni non locali. In merito a ciò, nonostante ci siano di mezzo molti più livelli per comunicare con udp e tcp, i risultati trovati sono stati decisamente interessanti e non così lontani dal più veloce \emph{Shared Memory}.
+Visti gli schemi~\ref{fig:schema_global} è prevedibile che in un vero Power Stack, siano predilette le comunicazioni non locali. In merito a ciò, nonostante ci siano di mezzo molti più livelli per comunicare con udp e tcp, i risultati trovati sono stati decisamente interessanti e non così lontani dal più veloce \emph{Shared Memory}.
 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/test3_different_protocol_send_receive.png} 
-        \caption{differenza tra solo publish e publish-subscribe per ogni protocollo}%TODO Da sistemare immagine, sending receivin non va bene, label sbagliate etc
-        \label{fig:test3_different_protocols}
+        \caption{differenza tra solo publish e publish-subscribe per ogni protocollo}\label{fig:test3_different_protocols}%TODO Da sistemare immagine, sending Receiving non va bene, label sbagliate etc
 \end{figure}
-
 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/test1_box_sr_1p1s.png} 
-        \caption{diagramma a scatola nei vari protocolli di comunicazione con un publisher e un subscriber}
-        \label{fig:test1sdbox}
+        \caption{diagramma a scatola nei vari protocolli di comunicazione con un publisher e un subscriber}\label{fig:test1sdbox}
 \end{figure}
 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/test1_cyclinstr.png} 
-        \caption{Conteggio cicli e istruzioni per ogni protocollo}
-        \label{fig:test3_different_protocols}
+        \caption{Conteggio cicli e istruzioni per ogni protocollo}\label{fig:test3_cycle_different_protocols}
 \end{figure}
 E' quindi preferibile, ove possibile, usare \emph{Shared Memory} sia per prestazioni, che per evitare di saturare la rete. In secondo luogo, se in presenza di diversi subscriber, per non caricare il publisher usare \emph{UDP Multicast}. E infine utilizzare \emph{TCP} solo dove vi è necessità di connessione, visto le notevoli latenze si in scrittura che in lettura. In tutti gli altri casi, dove non si è in locale, e dove il numero di subscriber non supera qualche decina, risulta più che adeguato \emph{UDP}.
 
@@ -87,40 +78,38 @@ Nei test effettuati con topic e partizioni, non sono state notate differenze deg
 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/test2_cicli_partvstopicvsdomaain.png} 
-        \caption{Peso in termini di cicli nell'usare partizioni topic e domini}
-        \label{fig:test2parttopicdomain}
+        \caption{Peso in termini di cicli nell'usare partizioni topic e domini}\label{fig:test2parttopicdomain}
 \end{figure}
 
-Per quanto riguarda entità che necessitano di gerarchie, è conveniente usare le partizioni con le Wildcards visto che non hanno un peso significativo \ref{fig:test2wildcards}. Infine lasciando i topic come mezzo di partizionamento, per il tipo di dati, e il tipo di istruzioni da utilizzare.
+Per quanto riguarda entità che necessitano di gerarchie, è conveniente usare le partizioni con le Wildcards visto che non hanno un peso significativo~\ref{fig:test2wildcards}. Infine lasciando i topic come mezzo di partizionamento, per il tipo di dati, e il tipo di istruzioni da utilizzare.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{./results/test2_wildcards.png}
-    \caption{La differenza tra dummy, 1 partizione o 16 partizioni non ha particolari costi in termini di invio con utilizzo di wildcards}
-        \label{fig:test2wildcards}
+    \caption{La differenza tra dummy, 1 partizione o 16 partizioni non ha particolari costi in termini di invio con utilizzo di wildcards}\label{fig:test2wildcards}
 \end{figure}
 
 
 
-\section{Throughput}
-L'ultimo test è stato utile a comprendere tutte le potenzialità di questo strumento più che creare un modello di utilizzo. Infatti come si può vedere dai seguenti grafici, i numeri di KByte (\ref{fig:throughput_combined}) che è possibile inviare ogni secondo da un publisher ad un subscriber supera il MB/s, e permettendo comunicazione di diverse decine di Hz (\ref{fig:throughput_combined}). Inoltre questo valore raggiunge numeri ancora più elevati qualora si usassero comunicazioni multicast, come notabile in figura \ref{fig:throughput_increasing}.
+\section{Throughput} %TODO da sistemare test3 bandwidth, throughput e Freqeuncy
+L'ultimo test è rivolto alla caratterizzazione della capacità di comunicazione, misurata in KB/s, del middleware DDS. Questo ci permette di capire il massimo scambio di dati che può avvenire tra i vari attori del Power Management. Nella figura \ref{fig:throughput_combined} l'asse Y, a sinistra, mostra in verde i il valore di KMessaggi/s~\footnote{1000 Messaggi al secondo} raggiungibili dai vari protocolli di comunicazione (in asse X), mentre in grigio, a destra i KByte/s. Dalla figura si può vedere che è possibile inviare ogni secondo da un publisher ad un subscriber più di un MB/s di dati. Inoltre è possibile raggiungere frequenze di scambio di messaggi dell'ordine di decine di KHz (\ref{fig:throughput_combined}). Inoltre, nel caso di invii a più subscribe, come si può vedere in figura~\ref{fig:throughput_increasing}, mentre i protocolli udp shm tcp saturano all'aumentare del numero di subscriber, il protocollo UDP Multicast, permette una crescita lineare del throughput.
+
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/test3_throughput_combined.png} 
-        \caption{throughput di invio da parte di un singolo attore}
-        \label{fig:throughput_combined}
+        \caption{throughput con un publisher e un subscriber}\label{fig:throughput_combined}
 \end{figure}
-Sull'asse delle Y, a sinistra, vengono mostrati in verde i il valore di KMessaggi/s\footnote{1000 Messaggi al secondo} raggiungibili dai vari protocolli di comunicazione, mentre in grigio, a sinistra i KByte/s.
-
-% \begin{figure}[H]
-%     \includegraphics[width=\textwidth]{./results/test3_throughput_m.png} 
-%         \caption{throughput di invio da parte di un singolo attore in messaggi} %TODO: caption
-%         \label{fig:throughput_msg}
-% \end{figure}
-
 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/test3_graph_throughput.png} 
-    \caption{throughput a crescenti numeri di subscribers} 
-    \label{fig:throughput_increasing}
+    \caption{throughput a crescenti numeri di subscribers}\label{fig:throughput_increasing}
 \end{figure}
+
+Il risultato ottenuto nelle figure \ref{fig:throughput_combined} \ref{fig:throughput_increasing} per quanto riguarda il protocollo UDP Multicast, è influenzato dalla struttura del test \ref{fig:rtt_uml}, che non permette ad UDP Multicast di mostrare le sue potenzialita.
+
+% \begin{figure}[H]
+%     \includegraphics[width=\textwidth]{./results/test3_graph_bandwidth.png} 
+%         \caption{capacità di invio in KByte/s da un publisher a molteplici attori}\label{fig:bandwidth_combined}
+% \end{figure}
+
+% Nella figura \ref{fig:bandwidth_combined} viene mostrato come un publisher usando multicast, viene liberato del suo incarico di inviare il messaggio ad ogni indirizzo di ogni subscriber, inviandolo ad un semplice indirizzo dove tutti i publisher riescono a 
 
