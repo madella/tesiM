@@ -2,11 +2,11 @@
 % Visti i diversi risultati si può dire che è meglio usare i topic per* le partizioni per *
 % etc etc
 
-Nella sezione corrente, vengono riportati tutti i risultati rilevanti ottenuti durante la fase di testing, stilando un possibile modello di utilizzo utile alle finalità di Power Management.
+Nella sezione corrente, vengono riportati tutti i risultati rilevanti ottenuti durante la fase di testing stilando, dove possibile, un modello di utilizzo utile alle finalità di Power Management.
 \section{Discovery: centralizzata vs distribuita}
-Come previsto, nella fase di discovery un numero elevato di entità genera una quantità di operazioni da svolgere che cresce in modo esponenziale. In questo caso sono stati usati tutti i core di due nodi, con un totale di 96 entità.
-Già nel primo grafico~\ref{fig:test0pack}, con il numero di pacchetti sull'asse Y e il numero di entita sull'asse X, è possibile notare un distacco tra i due approcci, con sole 30 unità. Nelle figure dei cicli~\ref{fig:test0cicl} e delle istruzioni~\ref{fig:test0_instr} viene confermato l'andamento non lineare.
-
+Come previsto, nella fase di discovery un numero elevato di entità genera una quantità di di pacchetti scambiati che cresce in modo esponenziale. In questo caso sono stati usati tutti i core di due nodi, con un totale di 96 entità.
+Già nel primo grafico~\ref{fig:test0pack}, con il numero di pacchetti sull'asse Y e il numero di entita sull'asse X, è possibile notare un distacco tra i due approcci, con sole 30 unità. Nella figura~\ref{fig:test0cicl} con i cicli sulle Y, numero entità sulle X, e nella figura~\ref{fig:test0_instr} con istruzioni sulle Y, viene confermato l'andamento non lineare.
+%TODO change 90s graph
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/test0_packet.png} 
     \caption{Numero di pacchetti scambiati durante la discovery all'aumentare di entità}\label{fig:test0pack}
@@ -19,10 +19,10 @@ Già nel primo grafico~\ref{fig:test0pack}, con il numero di pacchetti sull'asse
     \includegraphics[width=\textwidth]{./results/test0_istruzioni.png} 
     \caption{Numero di cicli durante la discovery all'aumentare di entità nelle diverse opzioni}\label{fig:test0_instr}
 \end{figure}
-In un caso reale serve valutare in primo luogo il numero di entità in un determinato dominio, e successivamente i costi-benefici di ogni implementazione considerando anche l'impatto che si può avere nel caso di fallimento del server (nonostante sia possibile avere un server di backup che viene automaticamente attivato, nel caso il primo fallisse)
+In un caso reale serve valutare in primo luogo il numero di entità in un determinato dominio, e successivamente i costi-benefici di ogni implementazione considerando anche l'impatto che si può avere nel caso di fallimento del server (nonostante sia possibile avere un server di backup che viene automaticamente attivato, nel caso il primo fallisse).
 
 \section{Scalabilità del numero di subscriber iscritti ad un topic}
-Visto lo schema~\ref{fig:uml} si può capire, che il numero di subscriber presenti in un dominio ed iscritti ad un topic, comporta un overhead di comunicazione che va ad influenzare sia i tempi, che cicli e istruzioni impiegate nella singola \emph{publish} come viene dimostrato nella figura~\ref{fig:test3_overhead} e~\ref{fig:test3_latenza}. L'effetto è particolarmente pronunciato anche in protocolli come \emph{UDP} che non dovrebbero possedere concetti di connessione. Questo potrebbe essere dovuto al costo di inizializzazione ed invio dei messaggi, ad indirizzi di rete diversi.
+Visto lo schema~\ref{fig:uml} si può capire, che il numero di subscriber presenti in un dominio ed iscritti ad un topic, comporta un overhead di comunicazione che va ad influenzare sia i tempi, che cicli e istruzioni impiegate nella singola \emph{publish}. Questo viene dimostrato nella figura~\ref{fig:test3_overhead} (con i tempi medi di invio sulle Y) e~\ref{fig:test3_latenza} (con latenza media di ricezione in asse Y). In tutte le figure sull'asse X viene riportato il numero di subscriber che cresce fino a 40. L'effetto visto è particolarmente pronunciato anche in protocolli come \emph{UDP} che non possiedono concetti di connessione. Questo potrebbe essere dovuto al costo di inizializzazione ed invio dei messaggi, ad indirizzi di rete diversi.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{./results/test3_sending_multiplesub.png} %TODO, manca il titolo
@@ -40,60 +40,66 @@ Ovviamente l'impatto è poco significativo in quei protocolli che applicano stru
         \includegraphics[width=\textwidth]{./results/test3_udpvsudpM.png} 
         \caption{Tempo di invio di un messaggio a [\#] subscriber nei protocolli UDP e UDP Multicast}\label{fig:udpvsudpMfigure}
 \end{figure}
-\noindent Sull'asse y i tempi di invio di un messaggio; sull'asse X il numero di subscriber che cresce, nei due differenti protocolli.
 
 Da questo si può concludere che sia il publisher che subscriber risentono della presenza di molteplici \emph{dds-partecipant} in ascolto su un topic. Questo problema è migliorato nel caso vengano utilizzati protocolli che si basano su multicast. 
 
-\section{Analisi overhead primo messaggio}
-E' stato notato con tutti i protocolli utilizzati un ritardo, di un ordine di grandezza superiore, che riguarda esclusivamente il primo messaggio. Tuttavia, non è stato chiarito il motivo di questo overhead, presente anche in comunicazioni locali\footnote{comunicazioni effettuati in localhost o in shared memory}. Anche se non dimostrato una delle possibili motivazioni potrebbe essere la necessità di allocare memoria durante la prima fase di comunicazione, da entrambi gli attori (potenzialmente amplificato nel caso~\ref{fig:rtt_uml}). 
+\section{Overhead sul primo messaggio}
+E' stato notato con tutti i protocolli utilizzati un ritardo, di un ordine di grandezza superiore, che riguarda esclusivamente il primo messaggio. Tuttavia, non è stato chiarito il motivo di questo overhead, presente anche in comunicazioni locali\footnote{comunicazioni effettuati in localhost o in shared memory}. Anche se non dimostrato una delle possibili motivazioni potrebbe essere la necessità di allocare memoria durante la prima fase di comunicazione, da entrambi gli attori (potenzialmente amplificato nel caso~\ref{fig:rtt_uml}). In figura~\ref{fig:overhead_primo_messaggio} dove sugli assi Y viene mostrato il tempo di ricezione in microsecondi, e sull'asse X la sequenza dei messaggi, viene mostrato il problema citato.
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/errortest.png} 
-    \caption{} %TODO: caption
-    \label{}
+    \caption{Overhead del primo messaggio nei vari protocolli}
+    \label{fig:overhead_primo_messaggio}
 \end{figure}
-Data la complessità necessaria per andare così a fondo nel problema, non è stato approfondito ulteriormente.
+Infine, vista la mancanza di approfondimento verso tale problema, non si può concludere che l'invio di pochi messaggi sia sfavorito in questa implementazione.
 
 \section{Protocolli di comunicazione}
-Visti gli schemi~\ref{fig:schema_global} è prevedibile che in un vero Power Stack, siano predilette le comunicazioni non locali. In merito a ciò, nonostante ci siano di mezzo molti più livelli per comunicare con udp e tcp, i risultati trovati sono stati decisamente interessanti e non così lontani dal più veloce \emph{Shared Memory}.
-
+Visti gli schemi~\ref{fig:minpowerstackscheme} è risulta probabile che in un Power Stack, siano predilette le comunicazioni non locali. In merito a ciò, nonostante ci siano di mezzo molti più livelli per comunicare con udp e tcp, i risultati trovati sono stati decisamente interessanti e non così lontani dal più veloce \emph{Shared Memory}. 
+In figura~\ref{fig:test3_different_protocols} sugli assi X il numero di subscriber, e sulle Y le latenza di ricezione in microsecondi.
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/test3_different_protocol_send_receive.png} 
         \caption{differenza della latenza di ricezione dei vari protocolli con }\label{fig:test3_different_protocols}
 \end{figure}
-
+Invece, in figura~\ref{fig:test3_different_protocols2} e figura~\ref{fig:test1sdbox} sugli assi X i protocolli, mentre sulle Y per il primo solo le latenza di ricezione in microsecondi, e nel secondo sia latenza di ricezione che overhead di invio.
 \begin{figure}[H]
-    \includegraphics[width=\textwidth]{./results/test3_bar_sr_1p1s.png} 
-        \caption{latenza media di un singolo messaggio nei vari protocolli}\label{fig:test3_different_protocols}%TODO Da sistemare protocol non va bene, label sbagliate etc
+    \includegraphics[width=\textwidth]{./results/test1_bar_sr_1p1s.png} 
+        \caption{latenza media di ricezione di un singolo messaggio nei vari protocolli}\label{fig:test3_different_protocols2}%TODO Da sistemare protocol non va bene, label sbagliate etc
 \end{figure}
 
 \begin{figure}[H] %TODO: do this graph also for wildcards
     \includegraphics[width=\textwidth]{./results/test1_box_sr_1p1s.png} 
         \caption{diagramma a scatola nei vari protocolli di comunicazione con un publisher e un subscriber}\label{fig:test1sdbox}
 \end{figure}
-
+Infine, in figura~\ref{fig:test3_cycle_different_protocols} sugli assi X i protocolli, mentre sulle Y il conteggio di cicli e istruzioni ($10^6$).
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/test1_cyclinstr.png} 
-        \caption{Conteggio cicli e istruzioni per ogni protocollo}\label{fig:test3_cycle_different_protocols}
+        \caption{Conteggio cicli e istruzioni per ogni protocollo}\label{fig:test3_cycle_different_protocols}%TODO label overfull boxes
 \end{figure}
 E' quindi preferibile, ove possibile, usare \emph{Shared Memory} sia per prestazioni, che per evitare di saturare la rete. In secondo luogo, se in presenza di diversi subscriber, per non caricare il publisher usare \emph{UDP Multicast}. E infine utilizzare \emph{TCP} solo dove vi è necessità di connessione, visto le notevoli latenze si in scrittura che in lettura. In tutti gli altri casi, dove non si è in locale, e dove il numero di subscriber non supera qualche decina, risulta più che adeguato \emph{UDP}.
 
 \section{Domini, Partizioni e Wildcards}
 Nei test effettuati con topic e partizioni, non sono state notate differenze degne di nota in termini di performance nell'usare uno strumento piuttosto che un altro (\ref{fig:test2parttopicdomain}). Lo sono stati invece tra questi ultimi e i Domini. Tuttavia i domini non offrono alcun tipo di flessibilità e richiede il riavvio dei \emph{dds-partecipant} nel caso si necessiti di un qualsiasi cambiamento. Per questo è consigliato utilizzo di domini diversi, solo tra entità che non hanno necessità di comunicare, e che anzi, magari anche per motivi di sicurezza devono stare isolati. 
-
+In figura~\ref{fig:test2parttopicdomain} sugli assi X il numero crescente di subscriber, e sulle Y conteggio medio di cicli ($10^6$).
 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/test2_cicli_partvstopicvsdomaain.png} 
         \caption{Peso in termini di cicli nell'usare partizioni topic e domini}\label{fig:test2parttopicdomain}
 \end{figure}
 
-Per quanto riguarda entità che necessitano di gerarchie, è conveniente usare le partizioni con le Wildcards visto che non hanno un peso significativo~\ref{fig:test2wildcards}. Infine lasciando i topic come mezzo di partizionamento, per il tipo di dati, e il tipo di istruzioni da utilizzare.
+Per quanto riguarda entità che necessitano di gerarchie, è conveniente usare le partizioni con le Wildcards visto che non hanno un peso significativo come notabile in~\ref{fig:test2wildcards} dove sull'asse X vi è il numero di partizioni usate, mentre sulle Y il tempo di invio. Infine lasciando i topic come mezzo di partizionamento, per il tipo di dati, e il tipo di istruzioni da utilizzare.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{./results/test2_wildcards.png}
-    %TODO: sistema caption
-    \caption{La differenza tra dummy, 1 partizione o 16 partizioni non ha particolari costi in termini di invio con utilizzo di wildcards}\label{fig:test2wildcards}
+
+    \caption{Differenza in tempi di invio con utilizzo di wildcards in diverse partizioni}\label{fig:test2wildcards}
 \end{figure}
+Nella figura \ref{fig:test2cicl} sulle Y il conteggio di istruzioni e cicli ($10^6$) rispetto al numero di partizioni (sulle X).
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{./results/test2_cyclinstr.png}
+    \caption{Cicli e istruzioni necessari per invio con wildcards in diverse partizioni}\label{fig:test2cicl}
+\end{figure}
+
 
 
 
@@ -110,7 +116,7 @@ L'ultimo test, rivolto alla caratterizzazione della capacità di comunicazione, 
     \caption{throughput a crescenti numeri di subscribers}\label{fig:throughput_increasing}
 \end{figure}
 
-Il risultato ottenuto nelle figure \ref{fig:throughput_combined} \ref{fig:throughput_increasing} per quanto riguarda il protocollo UDP Multicast, è influenzato dalla struttura del test mostrato in figura \ref{fig:rtt_uml}, che non permette ad UDP Multicast di mostrare le sue potenzialita, come invece si può vedere dalla figura \ref{fig:bandwidth_graph}.
+Il risultato ottenuto nelle figure \ref{fig:throughput_combined} \ref{fig:throughput_increasing} (KBytes/s sulla Y e numero di subscriber sulla X), per quanto riguarda il protocollo UDP Multicast, è influenzato dalla struttura del test mostrato in figura \ref{fig:rtt_uml}, che non permette ad UDP Multicast di mostrare le sue potenzialita, come invece si può vedere dalla figura \ref{fig:bandwidth_graph}.
 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/test3_graph_bandwidth.png} 

@@ -1,11 +1,10 @@
 \chapter{Conclusioni}
 Per concludere, dopo aver presentato in modo esaustivo tutti gli strumenti utilizzati per eseguire i test, con obbiettivi e metodo di sperimentazione, sono stati mostrati i risultati degli esperimenti fatti. 
-In primo luogo si è visto l'andamento esponenziale nella fase di discovery, in presenta di molteplici partecipanti, risolvibile tramite la sua implementazione di server.
+In primo luogo si è visto l'andamento esponenziale nella fase di discovery, in presenza di molteplici partecipanti, risolvibile tramite la sua implementazione di server.
 In secondo luogo, sono stati analizzati e caratterizzati i protocolli, di cui il più performante si è rilevato essere quello di Shared Memory con una latenza media di ricezione messaggi di appena 6.72 microsecondi, utilizzabile però solo in presenza di memorie condivise.
 Al secondo posto troviamo UDP con 23.70 microsecondi e UDP Multicast con 24.37 microsecondi. Per ultimo TCP con 30.94 microsecondi di media, che però offre garanzia di ricezione. Escludendo la shared memory, per le comunicazioni tramite rete si sono raggiunti throughput di 7,63 MB/s con frequenze di invio a 476 KHz.
-Per quanto concerne al test sul tipo di partizionamento dello scambio di informazioni, si è visto come i domini, sono quelli con minore impatto sulle risorse, seguito dai topic ed infine partizioni. Inoltre non si sono notate particolari differenze nell'usare le wildcards, aprendo le strade alle comunicazioni di tipo gerarchico.
-Infine grazie ai risultati è stato fornito un modello di utilizzo su come è possibile utilizzare e impostare al meglio questo middleware.
+Per quanto concerne al test sul tipo di partizionamento dello scambio di informazioni, si è visto come i domini, sono quelli con minore impatto sulle performance, seguito dai topic ed infine partizioni. Inoltre, le minime differenze sia in termini di performance, che di tempi, nell'usare le wildcards, permette un ampio uso di comunicazioni di tipo gerarchico.
+Infine, insieme a questi risultati è stato fornito anche un modello di utilizzo di questo middleware caratterizzato per HPC.
 
-Come ultimo passo, sono stati mostrati tutti i prototipi di Power Stack, che comunicano tramite il middleware DDS chiamato REGALE Library prodotto in collaborazione i membri del progetto. Sono infine state mostrate le strutture di comunicazione utilizzate per questo scopo.
-
+Come ultimo passo, sono stati mostrati tutti i prototipi di Power Stack, insieme alle sue strutture, che comunicano tramite il middleware DDS chiamato REGALE Library prodotto in collaborazione i membri del progetto.
 %TODO: ringraziamenti? 
