@@ -2,10 +2,10 @@
 % Visti i diversi risultati si può dire che è meglio usare i topic per* le partizioni per *
 % etc etc
 
-Nella sezione corrente, si riportano tutti i risultati rilevanti ottenuti durante la fase di testing, stilando un possibile modello di use-case utile alle finalità di Power Management.
+Nella sezione corrente, vengono riportati tutti i risultati rilevanti ottenuti durante la fase di testing, stilando un possibile modello di utilizzo utile alle finalità di Power Management.
 \section{Discovery: centralizzata vs distribuita}
 Come previsto, nella fase di discovery un numero elevato di entità genera una quantità di operazioni da svolgere che cresce in modo esponenziale. In questo caso sono stati usati tutti i core di due nodi, con un totale di 96 entità.
-Già nel primo grafico è possibile notare un distacco tra i due approcci, con sole 30 unità~\ref{fig:test0pack}. Nelle figure dei cicli~\ref{fig:test0cicl} e delle istruzioni~\ref{fig:test0_instr} viene confermato l'andamento non lineare.
+Già nel primo grafico~\ref{fig:test0pack}, con il numero di pacchetti sull'asse Y e il numero di entita sull'asse X, è possibile notare un distacco tra i due approcci, con sole 30 unità. Nelle figure dei cicli~\ref{fig:test0cicl} e delle istruzioni~\ref{fig:test0_instr} viene confermato l'andamento non lineare.
 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/test0_packet.png} 
@@ -21,7 +21,7 @@ Già nel primo grafico è possibile notare un distacco tra i due approcci, con s
 \end{figure}
 In un caso reale serve valutare in primo luogo il numero di entità in un determinato dominio, e successivamente i costi-benefici di ogni implementazione considerando anche l'impatto che si può avere nel caso di fallimento del server (nonostante sia possibile avere un server di backup che viene automaticamente attivato, nel caso il primo fallisse)
 
-\section{scalabilità del numero di subscriber iscritti ad un topic}
+\section{Scalabilità del numero di subscriber iscritti ad un topic}
 Visto lo schema~\ref{fig:uml} si può capire, che il numero di subscriber presenti in un dominio ed iscritti ad un topic, comporta un overhead di comunicazione che va ad influenzare sia i tempi, che cicli e istruzioni impiegate nella singola \emph{publish} come viene dimostrato nella figura~\ref{fig:test3_overhead} e~\ref{fig:test3_latenza}. L'effetto è particolarmente pronunciato anche in protocolli come \emph{UDP} che non dovrebbero possedere concetti di connessione. Questo potrebbe essere dovuto al costo di inizializzazione ed invio dei messaggi, ad indirizzi di rete diversi.
 \begin{figure}[H]
     \centering
@@ -58,10 +58,15 @@ Visti gli schemi~\ref{fig:schema_global} è prevedibile che in un vero Power Sta
 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/test3_different_protocol_send_receive.png} 
-        \caption{differenza tra solo publish e publish-subscribe per ogni protocollo}\label{fig:test3_different_protocols}%TODO Da sistemare immagine, sending Receiving non va bene, label sbagliate etc
+        \caption{differenza della latenza di ricezione dei vari protocolli con }\label{fig:test3_different_protocols}
 \end{figure}
 
 \begin{figure}[H]
+    \includegraphics[width=\textwidth]{./results/test3_bar_sr_1p1s.png} 
+        \caption{latenza media di un singolo messaggio nei vari protocolli}\label{fig:test3_different_protocols}%TODO Da sistemare protocol non va bene, label sbagliate etc
+\end{figure}
+
+\begin{figure}[H] %TODO: do this graph also for wildcards
     \includegraphics[width=\textwidth]{./results/test1_box_sr_1p1s.png} 
         \caption{diagramma a scatola nei vari protocolli di comunicazione con un publisher e un subscriber}\label{fig:test1sdbox}
 \end{figure}
@@ -86,13 +91,14 @@ Per quanto riguarda entità che necessitano di gerarchie, è conveniente usare l
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{./results/test2_wildcards.png}
+    %TODO: sistema caption
     \caption{La differenza tra dummy, 1 partizione o 16 partizioni non ha particolari costi in termini di invio con utilizzo di wildcards}\label{fig:test2wildcards}
 \end{figure}
 
 
 
-\section{Throughput} %TODO da sistemare test3 bandwidth, throughput e Freqeuncy
-L'ultimo test è rivolto alla caratterizzazione della capacità di comunicazione, misurata in KB/s, del middleware DDS. Questo ci permette di capire il massimo scambio di dati che può avvenire tra i vari attori del Power Management. Nella figura \ref{fig:throughput_combined} l'asse Y, a sinistra, mostra in verde i il valore di KMessaggi/s~\footnote{1000 Messaggi al secondo} raggiungibili dai vari protocolli di comunicazione (in asse X), mentre in grigio, a destra i KByte/s. Dalla figura si può vedere che è possibile inviare ogni secondo da un publisher ad un subscriber più di un MB/s di dati. Inoltre è possibile raggiungere frequenze di scambio di messaggi dell'ordine di decine di KHz (\ref{fig:throughput_combined}). Inoltre, nel caso di invii a più subscribe, come si può vedere in figura~\ref{fig:throughput_increasing}, mentre i protocolli udp shm tcp saturano all'aumentare del numero di subscriber, il protocollo UDP Multicast, permette una crescita lineare del throughput.
+\section{Throughput} % da sistemare test3 bandwidth, throughput e Freqeuncy
+L'ultimo test, rivolto alla caratterizzazione della capacità di comunicazione, del middleware DDS, ci permette di capire il massimo scambio di dati che può avvenire tra i vari attori del Power Management. Nella figura \ref{fig:throughput_combined} l'asse Y, a sinistra, mostra in verde i il valore di KMessaggi/s~\footnote{1000 Messaggi al secondo} raggiungibili dai vari protocolli di comunicazione (in asse X), mentre in grigio, a destra i KByte/s. Dalla figura si può vedere che è possibile inviare ogni secondo da un publisher ad un subscriber più di un MB/s di dati. Inoltre è possibile raggiungere frequenze di scambio di messaggi dell'ordine di decine di KHz (\ref{fig:throughput_combined}). Inoltre, nel caso di invii a più subscriber, come si può vedere in figura~\ref{fig:bandwidth_graph}, mentre i protocolli udp shm tcp saturano all'aumentare del numero di subscriber, il protocollo UDP Multicast, permette una crescita lineare del throughput.
 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/test3_throughput_combined.png} 
@@ -104,12 +110,12 @@ L'ultimo test è rivolto alla caratterizzazione della capacità di comunicazione
     \caption{throughput a crescenti numeri di subscribers}\label{fig:throughput_increasing}
 \end{figure}
 
-Il risultato ottenuto nelle figure \ref{fig:throughput_combined} \ref{fig:throughput_increasing} per quanto riguarda il protocollo UDP Multicast, è influenzato dalla struttura del test \ref{fig:rtt_uml}, che non permette ad UDP Multicast di mostrare le sue potenzialita.
+Il risultato ottenuto nelle figure \ref{fig:throughput_combined} \ref{fig:throughput_increasing} per quanto riguarda il protocollo UDP Multicast, è influenzato dalla struttura del test mostrato in figura \ref{fig:rtt_uml}, che non permette ad UDP Multicast di mostrare le sue potenzialita, come invece si può vedere dalla figura \ref{fig:bandwidth_graph}.
 
-% \begin{figure}[H]
-%     \includegraphics[width=\textwidth]{./results/test3_graph_bandwidth.png} 
-%         \caption{capacità di invio in KByte/s da un publisher a molteplici attori}\label{fig:bandwidth_combined}
-% \end{figure}
+\begin{figure}[H]
+    \includegraphics[width=\textwidth]{./results/test3_graph_bandwidth.png} 
+        \caption{capacità di invio in KByte/s da un publisher a molteplici subscriber}\label{fig:bandwidth_graph}
+\end{figure}
 
 % Nella figura \ref{fig:bandwidth_combined} viene mostrato come un publisher usando multicast, viene liberato del suo incarico di inviare il messaggio ad ogni indirizzo di ogni subscriber, inviandolo ad un semplice indirizzo dove tutti i publisher riescono a 
 

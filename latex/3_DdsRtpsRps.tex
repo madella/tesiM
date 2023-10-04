@@ -1,9 +1,9 @@
 \chapter{DDS \& RTPS}\label{Chapter:dds}
-Data Distribution Service (DDS)\cite{DDS} e Real-Time Publish-Subscribe (RTPS)\cite{RTPS} sono strumenti che rivestono un ruolo importante nelle comunicazioni in sistemi distribuiti e real-time. Infatti, anche se a diversi livelli, si occupano della la trasmissione di dati tra applicazioni e dispositivi interconnessi, giocando un ruolo importante in scenari con diverse centinaia di attori come i sistemi ad alte prestazioni come HPC. 
+Data Distribution Service (DDS)\cite{DDS} e Real-Time Publish-Subscribe (RTPS)\cite{RTPS} sono strumenti che rivestono un ruolo importante nelle comunicazioni in sistemi distribuiti e real-time. Infatti, anche se a diversi livelli, si occupano della la trasmissione di dati tra applicazioni e dispositivi interconnessi, giocando un ruolo importante in scenari con diverse centinaia di attori come i sistemi ad alte prestazioni. 
 
 
 \section{Implementazione usasta}
-In particolare, DDS e RTPS sono due differenti protocolli di comunicazione che accoppiati forniscono i servizi sopracitati . Ci sono state diverse implementazioni di questi protocolli da diversi società e organizzazioni, come:
+In particolare, DDS e RTPS sono due differenti protocolli da cui sono state proposte diverse implementazioni da diversi società e organizzazioni, come:
 \begin{itemize}
   \item FastDDS (eprosima)
   \item CycloneDDS (Oracle)
@@ -11,7 +11,7 @@ In particolare, DDS e RTPS sono due differenti protocolli di comunicazione che a
   \item GurumDDS
 \end{itemize}
 
-In tutti i successivi capitoli verrà preso come riferimento FastDDS ed in particolare la sua versione 2.11.2 \cite{FastDDS}. E' stato scelto di utilizzare questa implementazione dato il supporto per le comunicazione Real-Time, e la vasta possibilità di impostazioni delle Qualità del servizio(QoS) che la rendevano adeguatamente configurabile per un utilizzo su sistemi di HPC. %TODO: Da migliorare
+In tutti i successivi capitoli verrà preso come riferimento FastDDS ed in particolare la sua versione 2.11.2 \cite{FastDDS}. E' stato scelto di utilizzare questa implementazione dato il supporto per le comunicazione in tempo reale, e la vasta possibilità di impostazioni delle Qualità del servizio(QoS) che la rendevano adeguatamente configurabile per un utilizzo su sistemi di HPC.
 
 \section{DDS}
 Data Distribution Service è un protocollo incentrato sullo scambio di dati per sistemi distribuiti. Questo si basa su modello chiamato Data-Centric Publish Subscribe (DCPS). I principali attori che vengono coinvolti sono:
@@ -22,7 +22,7 @@ Data Distribution Service è un protocollo incentrato sullo scambio di dati per 
 
     \item Topic: collega i DataWriter con i DataReader. È univoco all'interno di un dominio DDS;\@
     
-    \item Dominio: utilizzato per collegare tutti i publisher e subscriber appartenenti a una o più domini di appartenenza, che scambiano dati sotto diversi topic. Il DomainParticipant funge da contenitore per altre entità DCPS, e svolge anche la funzione di costruttore di entità Publisher, Subscriber e Topic fornendo anche servizi di QoS;\@
+    \item Dominio: utilizzato per collegare tutti i publisher e subscriber appartenenti a una o più domini di appartenenza, che scambiano dati sotto diversi topic. Il DomainParticipant funge da contenitore per altre entità DCPS, e svolge anche la funzione di costruttore di entità Publisher, Subscriber e Topic;\@
 
     \item Partizione: costituisce un isolamento logico di entità all'interno dell'isolamento fisico offerto dal dominio;
 
@@ -44,7 +44,7 @@ In particolare la sequenza di scambio è:
     \item quando RTPSReader riceve il messaggio, aggiorna la sua cache con il nuovo \emph{change}.
 \end{enumerate}
 
-Di seguito direttamente dalla documentazione di eProsima FastDDS\cite{FastDDS} gli schemi di funzionamento dei due layer di comunicazione.
+Di seguito, dalla documentazione di eProsima FastDDS\cite{FastDDS} gli schemi di funzionamento dei due layer di comunicazione.
 \begin{figure}[H]
     \centering
     \begin{subfigure}{0.45\linewidth}
@@ -59,8 +59,6 @@ Di seguito direttamente dalla documentazione di eProsima FastDDS\cite{FastDDS} g
     \end{subfigure}
     \caption{Confronto tra architettura DDS e RTPS}\label{fig:confrontodds_rtps}
   \end{figure}
-
-%TODO: ROS
 
 \section{ROS}\label{SSEC:rosiface}
 
@@ -80,7 +78,7 @@ Tuttavia è stato scelto di utilizzare direttamente l'implementazione DDS invece
     \item Potenzialità: ROS mette a disposizione solo alcuni degli strumenti resi disponibili dallo strato DDS, andando a limitare la possibilità di sfruttamento di tutte le impostazioni e QoS di FastDDS;
     \item Granularità: oltre alla mancanza di alcune funzionalità, in ros sono predisposti dei pacchetti preconfigurati di entità. Per andare a studiare più approfonditamente gli strumenti su architetture diverse, è più pratico avere la possibilità di cambiare ogni piccola configurazione.
     \item Flessibilità: Per andare a definire delle strutture dati di ROS, al fine di scambiare messaggi DDS usando il middleware offerto, era necessario creare diverse strutture dati che combaciassero con le interfacce ROS;
-    \item Diversa natura: In ROS, la maggior parte delle comunicazioni fatte sono intra-processo e raramente viene utilizzata una infrastruttura di rete, per andare a collegare tutti i nodi. Per questo sono maggiormente ottimizzate quel tipo di comunicazioni, piuttosto che quelle su rete, come in questo caso.
+    % \item Diversa natura: In ROS, la maggior parte delle comunicazioni fatte sono intra-processo e raramente viene utilizzata una infrastruttura di rete, per andare a collegare tutti i nodi. Per questo sono maggiormente ottimizzate quel tipo di comunicazioni, piuttosto che quelle su rete, come in questo caso.
     \item Facilità di implementazione: Implementare completamente \emph{rmw\_dds\_common} richiedeva un impegno e uno studio non indifferente della architettura sottostante a ROS, che seppur ben documentata, sarebbe costata diverso tempo. 
 \end{itemize}
 

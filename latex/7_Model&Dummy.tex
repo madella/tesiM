@@ -1,5 +1,5 @@
 \chapter{Realizzazione dei prototipi di Power Stack}
-Nel corso di questa tesi con la collaborazione dei membri del progetto REGALE, come Cineca\cite{Cineca}, E4\cite{E4} e BSC\cite{BSC} sono stati sviluppati dei prototipi di componenti del modello di Power Stack per HPC.
+Nel corso di questa tesi con la collaborazione dei membri del progetto REGALE, come Cineca\cite{Cineca}, E4\cite{E4} e BSC\cite{BSC} sono stati sviluppati i middleware ed i prototipi di componenti del modello di Power Stack per HPC.
 Questi ultimi oltre a fornire una prova delle potenzialità del middleware di DDS, sono utili anche come esempio per una sua effettiva implementazione all'interno dei software mostrati nel capitolo~\ref{chap:4_REGALE} che vogliono essere introdotti nell'infrastruttura.
 In merito a questo, nello schema~\ref{fig:schema_global_dummy_implementati} viene mostrato lo stato di avanzamento del Power Stack, illustrando quali di questi sono implementati e operativi, e quali in via di sviluppo.
 
@@ -9,12 +9,12 @@ In merito a questo, nello schema~\ref{fig:schema_global_dummy_implementati} vien
     \caption{Schema componenti sviluppati: in verde completato, in grigio non previsto, in rosso ancora da sviluppare}
     \label{fig:schema_global_dummy_implementati}
 \end{figure}
-L'infrastruttura DDS utilizzata, chiamata \emph{REGALE Library} al momento permette di utilizzare i vari tipi di comunicazione, configurazioni di qos, e anche vari tipi di dati scambiati, tutti passabili tramite file \textbf{XML}.
+L'infrastruttura DDS creata, chiamata \emph{REGALE Library}\cite{TODO} al momento permette di utilizzare i vari tipi di comunicazione, configurazioni di qos, e anche vari tipi di dati scambiati, tutti passabili tramite file \textbf{XML}.
 
-I componenti creati sono dei programmi in c++ che vanno a simulare uno scambio di informazioni realistico. Al momento per motivi di semplicità utilizzano dati di tipo \emph{uint32\_t} ed il loro comportamento si può riassumere nel seguente modo.
+I prototipi, sono dei programmi in c++ che vanno a simulare uno scambio di informazioni realistico. Al momento per motivi di semplicità utilizzano dati di tipo \emph{uint32\_t} ed il loro comportamento si può riassumere nel seguente modo.
 
 \subsection*{Implementazione Job Scheduler}
-Il JS interroga ogni 10 secondi  il SPM per le informazioni sui servizi e la potenza totale del cluster riportandolo a schermo. Successivamente  imposta il limite di potenza del cluster con un valore casuale tra 1000 e 1500.
+Il JS interroga ogni 10 secondi il SPM per le informazioni sui servizi e la potenza totale del cluster riportandolo a schermo. Successivamente  imposta il limite di potenza del cluster con un valore casuale tra 1000 e 1500.
 
 \subsection*{Implementazione Job Manager}
 Il JM interroga il NM ogni 10 secondi e richiede il \emph{powercap} impostato e le informazioni sulle frequenze (massima, minima e corrente) riportando a schermo tutti i valori ottenuti.
@@ -26,7 +26,7 @@ Il SPM nella sua implementazione server aspetta per le richieste in entrata. Al 
     \item GET\_POWER
     \item SET\_POWER
 \end{itemize}
-Inoltre quando riceve una GET\_POWER il SPM inoltra la richiesta al NM per ottenere la sua potenza prima di rispondere alla richiesta. 
+%  ? Inoltre quando riceve una GET\_POWER il SPM inoltra la richiesta al NM per ottenere la sua potenza prima di rispondere alla richiesta. 
 
 \subsection*{Implementazione Node manager}
 Il NM mentre ogni 30 secondi manda i dati al Monitor, aspetta per le richieste in entrata. Le richieste che accetta sono:
@@ -44,16 +44,16 @@ Il NM mentre ogni 30 secondi manda i dati al Monitor, aspetta per le richieste i
 Il Monitor semplicemente aspetta che i componenti gli inviino i dati, e quando li riceve li riporta a schermo.
 
 \subsection*{MQTT Bridge}
-Questo componente, a differenza di tutti gli altri, non ha alcun ruolo nel Power Management ma serve solo a supporto di alcuni software che fanno ampio uso di comunicazioni \textbf{MQTT}\cite{mqtt}. Infatti il suo scopo è quello di intercettare e convertire tutte le comunicazioni provenienti da MQTT e DDS per infine inoltrare quelle desiderate nel protocollo opposto.% Come dice il nome fa da \emph{ponte} tra le due infrastrutture, semplificando l'introduzione di alcuni software come Countdown\cite{cesarini2019countdown}.
+Questo componente, a differenza di tutti gli altri, non ha alcun ruolo nel Power Management ma serve solo a supporto di alcuni software che fanno ampio uso di comunicazioni \textbf{MQTT}\cite{mqtt}. Infatti il suo scopo è quello di intercettare e convertire tutte le comunicazioni provenienti da MQTT e DDS per infine inoltrare quelle desiderate nel protocollo opposto (DDS in MQTT e viceversa).% Come dice il nome fa da \emph{ponte} tra le due infrastrutture, semplificando l'introduzione di alcuni software come Countdown\cite{cesarini2019countdown}.
 
 \section{Struttura}
-I componenti mostrati fanno uso delle strutture di domini, partizioni e topic mostrati in tabella~\ref{fig:dummy_topic}.
+I componenti mostrati, al momento fanno uso delle strutture di domini, partizioni e topic mostrati in tabella~\ref{fig:dummy_topic}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\textwidth]{./img/server\_skeleton.png}
-    \includegraphics[width=0.6\textwidth]{./img/dummies\_skeleton.png}
+    \includegraphics[width=0.75\textwidth]{./img/server\_skeleton.png}
+    \includegraphics[width=0.75\textwidth]{./img/dummies\_skeleton.png}
     \caption{ Strutture di comunicazioni dei componenti implementati nel power stack.}
     \label{fig:dummy_topic}
 \end{figure}
-In viola tutti i publisher, ed in giallo i subscriber. Successivamente nel rispettivo ordine vengono mostrati, domini, partizioni e topic utilizzati.
+% In viola tutti i publisher, ed in giallo i subscriber. Successivamente nel rispettivo ordine vengono mostrati, domini, partizioni e topic utilizzati.

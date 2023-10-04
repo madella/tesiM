@@ -1,30 +1,27 @@
 \chapter{Caratterizzazione DDS}
-Il tema principale di questa tesi, è stata quelli di generare un modello, analizzare e alla fine implementare quello che potrebbe essere l'infrastruttura sulla quale tutti gli attori di un Power Stack 
-possano comunicare in modo completamente distribuito tramite DDS. Per poter creare l'infrastruttura necessaria, sono stati utilizzati sistemi di High-Performance Computing sui quali andare a provare empiricamente i vari esperimenti. Per supportare questo lavoro, sono stati resi disponibili due supercomputer uno da Cineca\cite{Cineca} e uno da E4\cite{E4} nel tentativo di ottenere risultati affidabili. Di seguito le specifiche dei sistemi utilizzati:
+Uno dei temi di questa tesi, è stato quello di generare e  analizzare un modello utile per l'implementazione dell'infrastruttura sulla quale tutti gli attori di un Power Stack possano comunicare in modo distribuito. Per poter caratterizzare  l'infrastruttura necessaria, sono stati utilizzati sistemi di High-Performance Computing sui quali andare a testare i vari esperimenti. Per supportare questo lavoro, sono stati resi disponibili due supercomputer uno da Cineca\cite{Cineca} e uno da E4\cite{E4} nel tentativo di ottenere risultati affidabili. Di seguito le specifiche dei sistemi utilizzati:
 %In questo capitolo verranno riportati i casi studio e i test effettuati sul framework. %Tutti questi sono stati eseguiti su un sistema HPC Galileo-100 Cineca con le specifiche riportate nella tabella seguente
 
 \begin{table}[H]
 \begin{center}
-    %TODO: Da riscrivere in italiano
+    %TODO: Da riscrivere in italiano e completare E4
 \begin{tabular}{l|l|l}
     \hline
     \textbf{Parameter} & \textbf{Cineca} & \textbf{E4} \\
     \hline
-    Number of nodes used & 3 \\
+    Processore & Intel CascadeLake 8260 S & Intel Xeon Silver 4216 \\
     \hline
-    Processor & Intel CascadeLake 8260 S \\
+    [\#] sockets per nodo & 2 & 2 \\
     \hline
-    Number of sockets per node & 2 \\
+    [\#]  cores per socket & 24 & 16 \\
     \hline
-    Number of cores per socket & 24 \\
+    Memoria per nodo & 384 GB & 100 GB\\
     \hline
-    Memory size per node & 384 GB \\
+    Connessione & Mellanox Infiniband 100GbE & Eth 100Gb\\
     \hline
-    Interconnect & Mellanox Infiniband 100GbE \\
+    OS & CentOS Linux &  Red Hat Enterprise 8.7\\ 
     \hline
-    OS & CentOS Linux \\ 
-    \hline
-    MPI & Open MPI  4.1.1 \\
+    MPI & Open MPI 4.1.1 & Open MPI 4.1.4 \\
     \hline
 \end{tabular}
 \end{center}
@@ -43,10 +40,9 @@ I test effettuati in questa sezione sono stati generati da diversi tipi di compo
 \end{figure}
 
 \subsection{Bash}\label{sec:Shell}
-Vista la necessità di lanciare diversi publisher e diversi subscriber ogni volta con dei parametri variabili è stato conveniente usare programmi di scripting come bash. Infatti questi gestivano i diversi parametri da passare agli attori, inizializzavano le variabili d'ambiente, decidevano quali core dovevano essere utilizzati da ogni partecipante (task-setaffinity) e mantenevano sincronizzati i test per evitare che alcuni attori fossero inizializzati troppo presto. Infine ripulivano e ordinavano i dati una volta terminato i test ed andavano ad eseguire gli script python che processavano i dati, nelle cartelle corrette.
+Vista la necessità di lanciare diversi publisher e diversi subscriber ogni volta con dei parametri variabili è stato conveniente usare programmi di scripting come bash. Infatti questi gestivano i diversi parametri da passare agli attori, inizializzavano le variabili d'ambiente, decidevano quali core dovevano essere utilizzati da ogni partecipante (task-setaffinity) e mantenevano sincronizzati i test per evitare che alcuni attori venissero inizializzati troppo presto. Infine ripulivano e ordinavano i dati una volta terminato i test andando ad eseguire gli script python che processavano i dati, nelle cartelle corrette.
 \subsection{C++}
-
-E' stato scelto di realizzare una unica implementazione publisher e subscriber dove i valore delle funzionalità che si volevano testare dovevano essere passati come parametro lato bash (\ref{sec:Shell}) in modo da poter avviare tutti i test con gli stessi codici, rendendo più semplice la gestione dei diversi test, e più robusto ad errori dovuti a diverse configurazioni.
+E' stato scelto di realizzare una unica versione di publisher e subscriber in cui cambiavano i parametri con cui venivano lanciati. In questo modo era più semplice la gestione dei diversi test, e più robusto ad errori dovuti a diverse configurazioni.
 \subsubsection*{Struttura}
 
 Per scambiarsi dei messaggi all'interno di infrastruttura basata su DDS, sono necessari: (i) un topic, (ii) un publisher ed (iii) un subscriber. Inoltre nel topic è necessario definire il tipo dato o struttura di dati che si va a scambiare. La struttura che si è scelta di utilizzare per i test è stata la seguente:
@@ -59,7 +55,7 @@ Per scambiarsi dei messaggi all'interno di infrastruttura basata su DDS, sono ne
 \end{verbatim}
 Dove index era necessario per definire una corrispondenza stretta tra i messaggi inviati e quelli ricevuti, mentre la stringa era comoda per definire un oggetto di dimensione molto variabile (anche dinamicamente durante i test).
 
-Una volta studiata la documentazione ufficiale di eProsima FastDDS, è stato sviluppato un codice in grado di integrare tutte le funzionalità di DDS ed alcuni strumenti per l'ottenimento di metriche precedentemente concordate con Cineca\cite{Cineca}. Nello specifico sono state scelte:
+Una volta studiata la documentazione ufficiale, è stato sviluppato un codice in grado di integrare tutte le funzionalità di DDS ed alcuni strumenti per l'ottenimento di metriche precedentemente concordate con i collaboratori. Nello specifico sono state scelte:
 \begin{itemize}
     \item Tempo di invio
     \item Istruzioni Perf-Event per invio
@@ -67,7 +63,7 @@ Una volta studiata la documentazione ufficiale di eProsima FastDDS, è stato svi
     \item Tempo di invio e ricezione
 \end{itemize}
 \subsection{Lettura TSC}
-Il Time Stamp Counter, è un registro a 64 bit, presente nella maggior parte dei processori moderni. Il registro fornisce informazioni sul tempo, in termini di cicli di clock del processore, e viene spesso utilizzato per effettuare misure di queste metriche. Per leggere questo valore, che viene fatto prima e dopo l'istruzione da misurare, è necessario eseguire la seguente istruzione:
+Il Time Stamp Counter, è un registro a 64 bit, presente nella maggior parte dei processori moderni. Il registro fornisce informazioni sul tempo, in termini di cicli di clock del processore, e viene spesso utilizzato per effettuare misure di questo tipo. Il valore, viene letto prima e dopo l'istruzione studiata, tramite l'esecuzione della seguente istruzione:
 \begin{verbatim}
     unsigned int lo, hi;
     __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
@@ -76,61 +72,41 @@ Il Time Stamp Counter, è un registro a 64 bit, presente nella maggior parte dei
 \emph{rdtsc} è l'istruzione assembly per leggere il registro Timestamp Counter, =a (lo) e =d (hi) sono i vincoli di output che specificano come i risultati dell'istruzione rdtsc devono essere restituiti al programma. In lo ("=a") viene riportato il valore a 32 bit meno significativo ed in hi, il valore a 32 bit più significativo.
 
 \subsection{Conteggio istruzioni}
-Per le istruzioni invece è stato usato lo strumento \textbf{Perf}, un software offerto da Linux ed incluso anche nel suo kernel, per la profilazione delle performance tramite i \emph{performance\_counter}. Questa suite è estremamente avanzata e permette di ottenere delle metriche specifiche senza troppa difficolta. In questo caso è stata usata una chiamata alla libreria \textbf{perf\_event} nel codice per il valore \emph{PERF\_COUNT\_HW\_INSTRUCTIONS}.
+Per le istruzioni invece è stato usato lo strumento \textbf{Perf}, un software offerto da Linux ed incluso anche nel suo kernel, per la profilazione delle performance tramite i \emph{performance\_counter}. Questa suite è estremamente avanzata e permette di ottenere delle metriche specifiche senza troppa difficolta. In questo caso è stata usata una chiamata alla libreria \textbf{perf\_event} utile all'ottenimento del \emph{PERF\_COUNT\_HW\_INSTRUCTIONS}.
 
 \subsection{Ottenimento dei tempi}
-In sistemi molto complessi come può essere considerato un supercalcolatore, la gestione degli orologi è tutt'altro che banale. Infatti dopo aver deciso una tra le tante politiche di sincronizzazione disponibile come centralizzata, distribuita, GPS e tante altre, è necessario applicarle e continuare a tenere questi orologi sullo stesso tempo assoluto. Nei sistemi utilizzati in questo progetto, ed in particolare nei sistemi~\ref{table:hpc-cineca}, lo strumento adottato è Network Time Protocol (fornito da ntpd). Quest'ultimo ogni intervallo di tempo impostato, va a rendere disponibile ai vari nodi ed ai rispettivi orologi locali un tempo di riferimento che ha la funzione di punto fisso. Questo intervallo è normalmente fissato ogni 1024s, ma non disponendo dei diritti necessari ad utilizzarlo, non mi è stato possibile recuperare l'informazione.
+In sistemi molto complessi come può essere considerato un supercalcolatore, la gestione degli orologi è tutt'altro che banale. Infatti dopo aver deciso una tra le tante politiche di sincronizzazione disponibile come centralizzata, distribuita e GPS, è necessario continuare a tenere questi orologi aggiornati. Nei sistemi utilizzati in questo progetto, ed in particolare nei supercalcolatori~\ref{table:hpc-cineca}, lo strumento adottato è Network Time Protocol (fornito da ntpd). Quest'ultimo ogni intervallo di tempo impostato, va a rendere disponibile ai vari nodi ed ai rispettivi orologi locali un tempo di riferimento che ha la funzione di punto fisso. Questo intervallo è normalmente fissato ogni 1024s, ma non disponendo dei diritti necessari, non mi è stato possibile recuperare l'informazione.
 
-Detto questo, per ottenere le differenze di tempi su sistemi Linux, è ricorrente utilizzare una funzione chiamata \textbf{clock\_gettime()} che restituisce il tempo istantaneo alla chiamata. Se si esegue la differenza tra due diverse clock\_gettime(), si ottiene il tempo trascorso tra queste due.
+Per ottenere le differenze di tempi su sistemi Linux, è quindi ricorrente utilizzare una funzione chiamata \textbf{clock\_gettime()} che restituisce il tempo istantaneo alla chiamata. Perciò calcolando la differenza tra due diverse clock\_gettime(), si ottiene il tempo trascorso.
 Per questa funzione è possibile ottenere diverse metriche tra cui:
 \begin{itemize}
-    \item CLOCK\_REALTIME: ottiene il tempo assoluto, sincronizzato dei vari sistemi da ntpd
-    \item CLOCK\_MONOTONIC: ottiene un tempo relativo, da un punto non preciso dall'avvio del sistema
-    \item CLOCK\_MONOTONIC\_RAW: come sopra, ma non influenzato da ntpd
-    \item CLOCK\_PROCESS\_CPUTIME\_ID: timer dei processori ad alta risoluzione
-    \item CLOCK\_THREAD\_CPUTIME\_ID: tempo dei thread dei processori
+    \item CLOCK\_REALTIME: ottiene il tempo assoluto, sincronizzato dei vari sistemi da ntpd;
+    \item CLOCK\_MONOTONIC: ottiene un tempo relativo, da un punto non preciso dall'avvio del sistema;
+    \item CLOCK\_MONOTONIC\_RAW: come sopra, ma non influenzato da ntpd;
+    \item CLOCK\_PROCESS\_CPUTIME\_ID: timer dei processori ad alta risoluzione;
+    \item CLOCK\_THREAD\_CPUTIME\_ID: tempo dei thread dei processori;
 \end{itemize}
-Tra queste è stato utilizzato il MONOTONIC, visto che il REALTIME con aggiornamenti di ntpd di 1024s subisce variazioni di alcuni millisecondi\cite{ntpd}, di gran lunga superiore all'ordine di grandezza da misurare (microsecondi, a volte anche nanosecondi). Inoltre dato che per eseguire i test è stato usato un solo sistema per volta (o Cineca, o E4) MONOTONIC\_RAW non era necessario (anche in caso di aggiornamento ntp, viene diffuso in egual modo su tutti i nodi).
-Il problema di usare la MONOTONIC, è che su sistemi con orologi diversi, questi sono sfasati di diverse migliaia di secondi. E' stato necessario aggirare questo problema, e per farlo sono stati usati 2 approcci completamente diversi:
+Tra tutte queste è stato deciso di utilizzare il MONOTONIC, visto che REALTIME con aggiornamenti di ntpd di 1024s subisce variazioni di alcuni millisecondi\cite{ntpd}, di gran lunga superiore all'ordine di grandezza da misurare (microsecondi, a volte anche nanosecondi). Inoltre dato che per eseguire i test è stato usato un solo sistema per volta, MONOTONIC\_RAW non era necessario (anche in caso di aggiornamento ntp, viene diffuso in egual modo su tutti i nodi).
+Il problema di usare la MONOTONIC, è che su sistemi con orologi diversi, questi possono essere sfasati anche di diverse migliaia di secondi. Per aggirare questo problema, sono stati usati 2 approcci completamente diversi:
 \begin{itemize}
     \item Sincronizzazione dei nodi
     \item RTT
 \end{itemize} 
 
-\noindent Entrambi i tentativi verranno approfonditi nelle successive sezioni~\ref{sec:timesync}
-
-
-\subsection{UML}
-Lo schema UML di funzionamento degli attori DDS è riassunto e schematizzato dalla figura~\ref{fig:uml}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{./img/umel-send-receive.png}
-    \caption{Schema UML}\label{fig:uml}
-\end{figure}
-
-In particolare nel Publisher~\ref{actor:publisher} prima e dopo la chiamata a funzione di write() %FTODO: inserire nella tesi?
-si sono presi i valori tempo-invio, istruzioni, e TSC, mentre al lato ricevente, di Subscriber~\ref{actor:subscriber} è stato preso il tempo al momento dell'arrivo del messaggio. Segue uno schema uml della base di ognuno dei test.
-
-%TODO: se serve approfondire TSC, e metriche eseguite prima e dopo
-
-\section{DataMiners}
-Considerando che ogni publisher genera 10 mila messaggi da inviare a tutti e 48 i subscriber, per ogni protocollo di trasporto, e in alcuni casi in partizioni differenti si è arrivato ad avere per ogni test fino a $1'960'000$ messaggi scambiati e le relative metriche per ogni messaggio da processare. 
-Gli script python sono stati utili a organizzare e processare tutti i dati prodotti dai vari test. Inoltre sono stati fondamentali per poter generare tutti i grafici che sono stati in questa tesi.
-
 \section{Sincronizzazione}\label{sec:timesync}
 Una delle prime soluzioni che è stata provata, è stata quella di sincronizzare gli orologi locali dei diversi nodi tramite l'utilizzo di librerie sviluppate per la programmazione parallela come Message Passing Interface (MPI). Quest'ultimo è un protocollo di comunicazione molto utilizzato nei sistemi HPC per la programmazione parallela.
 Nello specifico è stata utilizzata una funzionalità chiamata MPI\_barrier, che permette di bloccare i processi, fino all'arrivo di un punto in comune, dopo il quale tutti procedono insieme. Questo serve per sincronizzare i processi tra di loro, ma non è ideata nello specifico per sincronizzare gli orologi. Gli strumenti strumenti utili alla mera sincronizzazione dei tempi dei nodi sono altri, come il già citato Network Time Protocol,
-ma essendo ntpd un servizio di amministrazioni non è stato possibile interagirci e quindi usarli. Nelle figure~\ref{fig:sync_time_shift1}~\ref{fig:sync_time_shift2} sono stati riportati come esempio, i dati ottenuti grazie a questo meccanismo.
+ma essendo ntpd un servizio di amministrazioni non è stato possibile interagirci e quindi usarli. Nella figura~\ref{fig:sync_time_shift1}~\ref{fig:sync_time_shift2} sono stati riportati i dati ottenuti grazie a questo meccanismo.
 
-\begin{figure}[H]
+\begin{figure}[H]%TODO da rifare!
     \centering
     \includegraphics[width=\textwidth]{./results/time_sync_node.png}
     \caption{Scostamento del tempo su nodi diversi}\label{fig:sync_time_shift1}
 \end{figure}
-\begin{figure}[H]
-    \includegraphics[width=0.99\textwidth]{./results/time_shift_clean.png}
-    \caption{Scostamento senza outliers}\label{fig:sync_time_shift2}
-\end{figure}
+% \begin{figure}[H]
+%     \includegraphics[width=0.99\textwidth]{./results/time_shift_clean.png}
+%     \caption{Scostamento senza outliers}\label{fig:sync_time_shift2}
+% \end{figure}
 % \begin{figure}[H]
 %     \includegraphics[width=\textwidth]{./results/time_sync_distribution.png}
 %     \caption{Distribuzione delle differenze}
@@ -138,10 +114,19 @@ ma essendo ntpd un servizio di amministrazioni non è stato possibile interagirc
 % \end{figure}
 
 Come possibile notare nella figura~\ref{fig:sync_time_shift1} nonostante le mpi\_barrier, gli scostamenti di tempo tra 2 nodi durante i diversi tentativi effettuati (100), cambia notevolmente, arrivando a differenze fino ad un massimo di 103.812 microsecondi. Questo rende il metodo appena mostrato utilizzabile solo nel caso in cui non sia necessario sapere il tempo assoluto di qualche azione, ma le varianze, che rimarrebbero costanti se si utilizzano sempre gli stessi nodi.
+\subsection*{UML}
+Lo schema UML di funzionamento degli attori DDS, con questo approccio, è riassunto e schematizzato dalla figura~\ref{fig:uml}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{./img/umel-send-receive.png}
+    \caption{Schema UML}\label{fig:uml}
+\end{figure}
+Come si può vedere, il Publisher~\ref{actor:publisher} prima e dopo la write() salva i valori di tempo di invio, istruzioni, e TSC, mentre al lato ricevente, il Subscriber~\ref{actor:subscriber} salva il tempo di ricezione del messaggio.
 
 
 \section{RTT}\label{sec:timeRTT}
-Nonostante la sincronizzazione fosse idealmente il metodo più preciso per ottenere i tempi di invio-ricezione, essendo l'errore possibile dello stesso ordine di grandezza dei tempi di ricezione, per alcuni test si è utilizzato un approccio che non richiedesse sincronizzazione. Il metodo più intuitivo è utilizzare il Round Trip Time (RTT).
+
+Nonostante la sincronizzazione fosse idealmente il metodo più preciso per ottenere i tempi di invio-ricezione, essendo l'errore riscontrato, dello stesso ordine di grandezza dei tempi di ricezione, per alcuni test si è utilizzato un approccio che non richiedesse sincronizzazione. Si è scelto quindi di utilizzare il Round Trip Time (RTT).
 Il RTT è un metrica che viene solitamente utilizzata per misurare la latenza di una rete, e si basa sull'idea di calcolare il tempo che intercorre tra l'invio di un segnale e la ricezione della conferma di arrivo dello stesso. Ovviamente il valore ottenuto risulta nel caso ideale più che raddoppiato vista la necessità di un messaggio di risposta. Nel diagramma~\ref{fig:uml} non sarebbe stato possibile condurre questa misura, perchè un subscriber non può inviare un messaggio di risposta.
 Per farlo è stato necessario rivedere gli attori coinvolti, ed introdurre in quello che prima venivano chiamati publisher e subscriber, un publisher e un subscriber a testa.
 Per semplificarne la comprensione viene riportato lo schema modificato:
@@ -153,8 +138,12 @@ Per semplificarne la comprensione viene riportato lo schema modificato:
 
 Ovviamente questo metodo può comportare qualche ritardo intrinseco di dover gestire due entità per ogni attore, ma sono tempi infinitesimali in confronto al tempo necessario per inviare il messaggio su rete (dove è stato usato questo approccio).
 
+\section{DataMiners}
+Considerando che ogni publisher ha generato in alcuni casi 10 mila messaggi, da inviare a tutti e 48 i subscriber, e per ogni protocollo di trasporto, si è arrivato ad avere per ogni test fino a $1'960'000$ messaggi con le relative metriche da processare. 
+Gli script python sono stati utili a organizzare e processare tutti questi dati oltre a generare tutti i grafici prodotti in questa tesi.
+
 \section{Schema test}
-Sono stati svolti diversi test al fine di trovare un modello ottimale di utilizzo e per la caratterizzazione di DDS, all'interno di sistemi HPC, nel contesto del Power Management. Nello specifico i test sono stati utili a capire il peso che avesse una singola configurazione o modello di utilizzo al fine di trovare quello più adeguato per una futura implementazione. I test effettuati sono:
+I test svolti per il modello di utilizzo e per la caratterizzazione di DDS in sistemi HPC sono stati diversi. Nello specifico sono state pensate 4 categorie di test che comprendessero diverse famiglie di problemi:
 
 \begin{itemize}
     \item test-0: discovery
@@ -163,72 +152,69 @@ Sono stati svolti diversi test al fine di trovare un modello ottimale di utilizz
     \item test-3: throughput
 \end{itemize}
 
-
-Al fine di condurli nel modo più trasparente e corretto possibile sono stati resi pubblici~\cite{mygit} tutti i codici utilizzati durante lo svolgimento di questi test. %TODO5: riordinare & documentare git
+Al fine di condurli nel modo più trasparente possibile sono stati resi disponibili~\cite{mygit} tutti i codici utilizzati durante lo svolgimento di questi test. %TODO5: riordinare & documentare git
 
 
 \subsection{Discovery}
-La prima fase di DDS consiste nel riconoscere altri \emph{dds-partecipant} appartenenti allo stesso dominio. Questa viene chiamata \textbf{fase di Discovery}. Essa ha un ruolo estremamente importante siccome senza non sarebbe possibile far comunicare nessun attore all'interno della stessa rete e nemmeno nello stesso nodo. Una delle peculiarità di DDS è che permette di eseguire tutto in modo completamente distribuito, e anche questa fase non viene fatta diversamente (se non esplicitamente configurato). Il problema è che durante la discovery, quando si hanno diverse migliaia di componenti, si genera un overhead di pacchetti scambiati e di conseguenza anche le computazioni necessarie che crescono esponenzialmente. %Ovviamente la natura effimera di alcuni di questi componenti potrebbe aggravare il problema. 
-Sono disponibili in DDS, anche per questo motivo, meccanismi di discovery centralizzati al fine di evitare questo problema. In questo esperimento si andranno a comparare le due diverse implementazioni e per farlo si useranno gli strumenti \textbf{perf} e \textbf{TCPdump}.
+La prima fase di DDS consiste nel riconoscere altri \emph{dds-partecipant} appartenenti allo stesso dominio. Questa viene chiamata \textbf{fase di Discovery}. Essa ha un ruolo estremamente importante siccome senza non sarebbe possibile far comunicare nessun attore all'interno della stessa rete e nemmeno nello stesso nodo. Una delle peculiarità di DDS è che permette di eseguire tutto in modo completamente distribuito (se non esplicitamente configurato). Il problema sorge, quando si hanno numeri elevati di attori, che per eseguire la discovery (comunicazione due a due), generano migliaia di pacchetti con la conseguente crescita di  computazioni necessarie. %Ovviamente la natura effimera di alcuni di questi componenti potrebbe aggravare il problema. 
+Per questo motivo, in DDS sono stati creati dei meccanismi di discovery centralizzati. In questo esperimento si andranno a comparare le due diverse implementazioni e per farlo si useranno gli strumenti \textbf{perf} e \textbf{TCPdump}.
 %CONTROLLA CHE SI POSSA FARE TCPDUMP SU CINECA
 
 \subsection{Protocolli di comunicazione}
-In DDS ed in particolare nel layer sottostante di RTPS, per scambiare messaggi anche tramite rete, e non solo nello stesso nodo, è possibile scegliere come mezzo diversi tipi di protocolli:
-
+In DDS ed in particolare nel layer sottostante di RTPS, al fine di scambiare messaggi tramite rete, e non solo nello stesso nodo, è possibile scegliere come mezzo di comunicazione diversi tipi di protocolli:
 \begin{itemize}
-    \item udp: fornisce due versioni v4 e v6 e importa l'omonimo protocollo di trasporto
-    \item tcp: fornisce due versioni v4 e v6 e importa l'omonimo protocollo di trasporto
-    \item udp-multicast: una versione modificata del semplice udp, dove tutti i subscriber collegati allo stesso topic, hanno un indirizzo comune di ricezione dei dati, permettendo così al publisher di inviare un singolo messaggio che viene condiviso tra tutti i subscriber  % TODO: uml
-    \item shared-memory: analogo al metodo precedentemente, ma invece di utilizzare un indirizzo IP, viene utilizzato un indirizzo di memoria. E' possibile solo quando i due processi che comunicano sono sullo stesso nodo, con memoria condivisa.
+    \item udp: fornisce la versione v4 e v6 dell'omonimo protocollo di trasporto;
+    \item tcp: fornisce la versione v4 e v6 dell'omonimo protocollo di trasporto;
+    \item udp-multicast: una versione modificata del semplice udp, dove i subscriber collegati allo stesso topic, hanno un indirizzo comune di ricezione dei dati, permettendo così al publisher di inviare un singolo messaggio che viene condiviso tra tutti;
+    \item shared-memory: analogo al metodo precedentemente, ma invece di utilizzare un indirizzo IP, viene utilizzato un indirizzo di memoria. E' possibile solo quando i due processi che comunicano sono sullo stesso nodo, con memoria condivisa;
 \end{itemize}
 
-Nel primo test si è valutata la differenza di queste implementazioni utilizzando la rete infiniband~\ref{table:hpc-cineca} su diversi nodi di un supercalcolatore. 
+Nel primo test si è valutata la differenza di queste implementazioni utilizzando la rete infiniband~\ref{table:hpc-cineca} sui diversi nodi del supercalcolatore. 
 
 \subsection{Wildcards e metodi di instradamento}
-Un concetto fondamentale nelle comunicazioni tra attori con gerarchie diverse, in sistemi con diverse centinaia di migliaia di entita, come cluster, nodi, processori, workflow, job (etc.), sono le possibilità di instradare, segmentare e rendere gerarchiche le comunicazioni. Come spiegatolo nel capitolo~\ref{Chapter:dds} in DDS ci sono diversi strumenti disponibili per farlo. Tra di loro differiscono per alcuni aspetti, come flessibilità, costo (in performance) e livello di segmentazione.
+Un concetto fondamentale nelle comunicazioni tra attori con gerarchie diverse, in sistemi con diverse centinaia di migliaia di entita, come cluster, nodi, processori, job (etc.), sono le possibilità di instradare, segmentare e rendere gerarchiche le comunicazioni. Come spiegatolo nel capitolo~\ref{Chapter:dds} in DDS ci sono diversi strumenti disponibili per farlo. Tra di loro differiscono per alcuni aspetti, come flessibilità, costo (in performance) e livello di segmentazione.
 
 \subsubsection{Dominio} 
 Il dominio è la segmentazione di più ``forte`` e di più alto livello. Va a partizionare gli attori presenti in un dominio in modo del tutto fisico (cambiando per ogni dominio porte e indirizzi di comunicazione) e per nulla flessibile. Per cambiare il dominio è necessario distruggere e creare di nuovo il partecipante. Inoltre il dominio non permette nessun tipo di gerarchia.
     
 \subsubsection{Topic}
-All'interno di un dominio i topic definiscono il metodo principale di instradamento dei messaggi, essendo però limitato dal tipo di messaggio che si vuole inviare. Infatti topic diversi supportano tipi di dato diversi, e non sono modificabili durante il loro utilizzo.
-Inoltre il topic non permette gerarchie ed è difficilmente modificabile a run-time %TODO: glossario
+All'interno di un dominio, i topic costituiscono la scelta predefinita di instradamento dei messaggi, essendo però limitato dal tipo di messaggio che si vuole inviare. Infatti topic diversi supportano tipi di dato diversi, e non sono modificabili durante il loro utilizzo.
+Inoltre il topic non permette gerarchie ed è difficilmente modificabile a run-time.
 
 \subsubsection{Partizione}
-Questo strumento risulta molto interessante, in quanto all'interno di un topic permette di definire gerarchie (è possibile sottoscriversi a più partizioni contemporaneamente), definisce wildcards e crea una segmentazione virtuale. Inoltre è facilmente modificabile a run-time.
+Questo strumento risulta molto interessante, in quanto permette di definire gerarchie e wildcards all'interno di un dominio creando una segmentazione virtuale. Inoltre è facilmente modificabile a run-time.
 
 \subsubsection{Wildcards}
-Le wildcards sono un costrutto appartenente alle partizioni, che permette di definire dei pattern testuali sulla base del quale vengono instradati i messaggi. Un esempio può essere \textit{Node*} che va a corrisponde a tutti i messaggi sotto il topic precedentemente definito, a tutte le partizioni che iniziano con Node.
+Le wildcards sono un costrutto appartenente alle partizioni, che definisce dei pattern testuali sulla base del quale vengono instradati i messaggi. Un esempio può essere \textit{Node*} che va a corrisponde a tutti i messaggi sotto il topic precedentemente definito, a tutte le partizioni che iniziano con Node.
 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./img/wildcards.png}
     \caption{Schema test wildcards}\label{fig:test_UML_wildcards}
 \end{figure} 
 
-
-%In questo test si è valutata la differenza in termini di performance dei diversi strumenti, con un particolare focus sulle partizioni e le wildcards rese disponibili in esso.
-Definiti questi concetti è stato pensato un test rappresentato dalla figura~\ref{fig:test_UML_wildcards} per valutare se utilizzare la partizioni, e quindi sfruttare le gerarchie negli instradamenti avesse un prezzo in termini di performance da pagare.  
-
+In questo test si è valutata la differenza in termini di performance dei diversi strumenti, con un particolare focus sulle partizioni e le wildcards, con schema in figura~\ref{fig:test_UML_wildcards}.
 
 \subsection{Throughput}
-Nel l'ultimo test ci si è focalizzati sui risultati numerici dell'utilizzo di questo middleware. In particolare è stato misurato il throughput e la frequenza di scambio dei messaggi, valori particolarmente importante quando si parla di sistemi con volumi di scambio estremamente elevati. Sono stati eseguiti i test su tutti e 4 i protocolli messi a disposizione, al fine di fornire una panoramica completa. Inoltre per calcolarlo sono usate le configurazioni in tabella~\ref{table:test3} per simulare un carico di comunicazioni elevato tra attori di HPC.\@Nella vengono riportati i parametri scelti.
+Nell'ultimo esperimento ci si è focalizzati sulla caratterizzazione di questo middleware ed in particolare è stato misurato il throughput e la frequenza di scambio dei messaggi nei sistemi target. 
+%, valori particolarmente importanti quando si parla di sistemi con volumi di scambio estremamente elevati. 
+Per farlo, sono stati eseguiti i test su tutti e 4 i protocolli messi a disposizione e con volumi di scambio più elevati, al fine di fornire una panoramica completa. %Inoltre per calcolarlo sono usate le configurazioni in tabella~\ref{table:test3} per simulare un carico di comunicazioni elevato tra attori di HPC.\@Nella vengono riportati i parametri scelti.
 
-\begin{table}[H]
-    \begin{center}%TODO tabella 
-    \begin{tabular}{l|l}
-        \hline
-        \textbf{Parametri} & \textbf{throughput} \\
-        \hline
-        [\#] publisher & 1  \\
-        \hline
-        [\#] subscriber & 40 \\
-        \hline
-        [\#] messaggi scambiati (per attore) & 10 000 \\
-        \hline
-        Dimensione del messaggio & 16 Byte \\
-        \hline
-    \end{tabular}
-    \end{center}
-    \caption{Valori usati per il test 3}\label{table:test3}
-    \end{table}
+% \begin{table}[H]
+%     \begin{center}%TODO tabella 
+%     \begin{tabular}{l|l}
+%         \hline
+%         \textbf{Parametri} & \textbf{throughput} \\
+%         \hline
+%         [\#] publisher & 1  \\
+%         \hline
+%         [\#] subscriber & 40 \\
+%         \hline
+%         [\#] messaggi scambiati (per attore) & 10 000 \\
+%         \hline
+%         Dimensione del messaggio & 16 Byte \\
+%         \hline
+%     \end{tabular}
+%     \end{center}
+%     \caption{Valori usati per il test 3}\label{table:test3}
+%     \end{table}
     

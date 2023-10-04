@@ -1,0 +1,40 @@
+\babel@toc {italian}{}\relax 
+\babel@toc {italian}{}\relax 
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Differenza tra le interfacce in-band e out-of-band}}{9}{figure.caption.2}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Struttura interfacce in-band: divise su più livelli tra cui Sistema Operativo (SO) e Hardware (HW)}}{10}{figure.caption.3}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Struttura interfacce out-of-band}}{11}{figure.caption.4}%
+\contentsline {figure}{\numberline {2.4}{\ignorespaces Modello di power stack}}{15}{figure.caption.5}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Confronto tra architettura DDS e RTPS}}{18}{figure.caption.6}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Ros Middleware per DDS}}{18}{figure.caption.7}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Implementazione dei componenti secondo il modello del Power stack}}{22}{figure.caption.9}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Struttura test}}{24}{figure.caption.11}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Scostamento del tempo su nodi diversi}}{27}{figure.caption.12}%
+\contentsline {figure}{\numberline {5.3}{\ignorespaces Schema UML}}{28}{figure.caption.13}%
+\contentsline {figure}{\numberline {5.4}{\ignorespaces Schema UML RTT}}{29}{figure.caption.14}%
+\contentsline {figure}{\numberline {5.5}{\ignorespaces Schema test wildcards}}{32}{figure.caption.15}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {6.1}{\ignorespaces Numero di pacchetti scambiati durante la discovery all'aumentare di entità}}{33}{figure.caption.16}%
+\contentsline {figure}{\numberline {6.2}{\ignorespaces Numero di cicli durante la discovery all'aumentare di entità nelle diverse opzioni}}{34}{figure.caption.17}%
+\contentsline {figure}{\numberline {6.3}{\ignorespaces Numero di cicli durante la discovery all'aumentare di entità nelle diverse opzioni}}{34}{figure.caption.18}%
+\contentsline {figure}{\numberline {6.4}{\ignorespaces overhead sulla publish all'aumentare dei subscriber}}{35}{figure.caption.19}%
+\contentsline {figure}{\numberline {6.5}{\ignorespaces latenza di ricezione all'aumentare dei subscriber}}{36}{figure.caption.20}%
+\contentsline {figure}{\numberline {6.6}{\ignorespaces Tempo di invio di un messaggio a [\#] subscriber nei protocolli UDP e UDP Multicast}}{36}{figure.caption.21}%
+\contentsline {figure}{\numberline {6.7}{\ignorespaces \relax }}{37}{figure.caption.22}%
+\contentsline {figure}{\numberline {6.8}{\ignorespaces differenza della latenza di ricezione dei vari protocolli con }}{38}{figure.caption.23}%
+\contentsline {figure}{\numberline {6.9}{\ignorespaces latenza media di un singolo messaggio nei vari protocolli}}{38}{figure.caption.24}%
+\contentsline {figure}{\numberline {6.10}{\ignorespaces diagramma a scatola nei vari protocolli di comunicazione con un publisher e un subscriber}}{39}{figure.caption.25}%
+\contentsline {figure}{\numberline {6.11}{\ignorespaces Conteggio cicli e istruzioni per ogni protocollo}}{39}{figure.caption.26}%
+\contentsline {figure}{\numberline {6.12}{\ignorespaces Peso in termini di cicli nell'usare partizioni topic e domini}}{40}{figure.caption.27}%
+\contentsline {figure}{\numberline {6.13}{\ignorespaces La differenza tra dummy, 1 partizione o 16 partizioni non ha particolari costi in termini di invio con utilizzo di wildcards}}{41}{figure.caption.28}%
+\contentsline {figure}{\numberline {6.14}{\ignorespaces throughput con un publisher e un subscriber}}{42}{figure.caption.29}%
+\contentsline {figure}{\numberline {6.15}{\ignorespaces throughput a crescenti numeri di subscribers}}{42}{figure.caption.30}%
+\contentsline {figure}{\numberline {6.16}{\ignorespaces capacità di invio in KByte/s da un publisher a molteplici subscriber}}{43}{figure.caption.31}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {7.1}{\ignorespaces Schema componenti sviluppati: in verde completato, in grigio non previsto, in rosso ancora da sviluppare}}{44}{figure.caption.32}%
+\contentsline {figure}{\numberline {7.2}{\ignorespaces Strutture di comunicazioni dei componenti implementati nel power stack.}}{47}{figure.caption.33}%
+\addvspace {10\p@ }
