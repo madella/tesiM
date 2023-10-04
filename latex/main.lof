@@ -21,19 +21,19 @@
 \contentsline {figure}{\numberline {6.1}{\ignorespaces Numero di pacchetti scambiati durante la discovery all'aumentare di entità}}{33}{figure.caption.16}%
 \contentsline {figure}{\numberline {6.2}{\ignorespaces Numero di cicli durante la discovery all'aumentare di entità nelle diverse opzioni}}{34}{figure.caption.17}%
 \contentsline {figure}{\numberline {6.3}{\ignorespaces Numero di cicli durante la discovery all'aumentare di entità nelle diverse opzioni}}{34}{figure.caption.18}%
-\contentsline {figure}{\numberline {6.4}{\ignorespaces overhead sulla publish all'aumentare dei subscriber}}{35}{figure.caption.19}%
-\contentsline {figure}{\numberline {6.5}{\ignorespaces latenza di ricezione all'aumentare dei subscriber}}{36}{figure.caption.20}%
+\contentsline {figure}{\numberline {6.4}{\ignorespaces Overhead sulla publish all'aumentare dei subscriber}}{35}{figure.caption.19}%
+\contentsline {figure}{\numberline {6.5}{\ignorespaces Latenza di ricezione all'aumentare dei subscriber}}{36}{figure.caption.20}%
 \contentsline {figure}{\numberline {6.6}{\ignorespaces Tempo di invio di un messaggio a [\#] subscriber nei protocolli UDP e UDP Multicast}}{36}{figure.caption.21}%
 \contentsline {figure}{\numberline {6.7}{\ignorespaces Overhead del primo messaggio nei vari protocolli}}{37}{figure.caption.22}%
-\contentsline {figure}{\numberline {6.8}{\ignorespaces differenza della latenza di ricezione dei vari protocolli con }}{38}{figure.caption.23}%
-\contentsline {figure}{\numberline {6.9}{\ignorespaces latenza media di ricezione di un singolo messaggio nei vari protocolli}}{38}{figure.caption.24}%
-\contentsline {figure}{\numberline {6.10}{\ignorespaces diagramma a scatola nei vari protocolli di comunicazione con un publisher e un subscriber}}{39}{figure.caption.25}%
+\contentsline {figure}{\numberline {6.8}{\ignorespaces Differenza della latenza di ricezione dei vari protocolli con }}{38}{figure.caption.23}%
+\contentsline {figure}{\numberline {6.9}{\ignorespaces Latenza media di ricezione di un singolo messaggio nei vari protocolli}}{38}{figure.caption.24}%
+\contentsline {figure}{\numberline {6.10}{\ignorespaces Diagramma a scatola nei vari protocolli di comunicazione con un publisher e un subscriber}}{39}{figure.caption.25}%
 \contentsline {figure}{\numberline {6.11}{\ignorespaces Conteggio cicli e istruzioni per ogni protocollo}}{39}{figure.caption.26}%
 \contentsline {figure}{\numberline {6.12}{\ignorespaces Peso in termini di cicli nell'usare partizioni topic e domini}}{40}{figure.caption.27}%
 \contentsline {figure}{\numberline {6.13}{\ignorespaces Differenza in tempi di invio con utilizzo di wildcards in diverse partizioni}}{41}{figure.caption.28}%
 \contentsline {figure}{\numberline {6.14}{\ignorespaces Cicli e istruzioni necessari per invio con wildcards in diverse partizioni}}{41}{figure.caption.29}%
-\contentsline {figure}{\numberline {6.15}{\ignorespaces throughput con un publisher e un subscriber}}{42}{figure.caption.30}%
-\contentsline {figure}{\numberline {6.16}{\ignorespaces throughput a crescenti numeri di subscribers}}{43}{figure.caption.31}%
+\contentsline {figure}{\numberline {6.15}{\ignorespaces Throughput con un publisher e un subscriber}}{42}{figure.caption.30}%
+\contentsline {figure}{\numberline {6.16}{\ignorespaces Throughput a crescenti numeri di subscribers}}{43}{figure.caption.31}%
 \contentsline {figure}{\numberline {6.17}{\ignorespaces capacità di invio in KByte/s da un publisher a molteplici subscriber}}{43}{figure.caption.32}%
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {7.1}{\ignorespaces Schema componenti sviluppati: in verde completato, in rosso ancora da sviluppare, in grigio non previsto}}{44}{figure.caption.33}%

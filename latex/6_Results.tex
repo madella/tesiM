@@ -25,13 +25,13 @@ In un caso reale serve valutare in primo luogo il numero di entità in un determ
 Visto lo schema~\ref{fig:uml} si può capire, che il numero di subscriber presenti in un dominio ed iscritti ad un topic, comporta un overhead di comunicazione che va ad influenzare sia i tempi, che cicli e istruzioni impiegate nella singola \emph{publish}. Questo viene dimostrato nella figura~\ref{fig:test3_overhead} (con i tempi medi di invio sulle Y) e~\ref{fig:test3_latenza} (con latenza media di ricezione in asse Y). In tutte le figure sull'asse X viene riportato il numero di subscriber che cresce fino a 40. L'effetto visto è particolarmente pronunciato anche in protocolli come \emph{UDP} che non possiedono concetti di connessione. Questo potrebbe essere dovuto al costo di inizializzazione ed invio dei messaggi, ad indirizzi di rete diversi.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{./results/test3_sending_multiplesub.png} %TODO, manca il titolo
-    \caption{overhead sulla publish all'aumentare dei subscriber}\label{fig:test3_overhead}
+    \includegraphics[width=\textwidth]{./results/test3_sending_multiplesub.png}
+    \caption{Overhead sulla publish all'aumentare dei subscriber}\label{fig:test3_overhead}
 \end{figure}
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{./results/test3_sendingreceiving_multiplesub.png} 
-    \caption{latenza di ricezione all'aumentare dei subscriber}\label{fig:test3_latenza}
+    \caption{Latenza di ricezione all'aumentare dei subscriber}\label{fig:test3_latenza}
 \end{figure}
 
 Ovviamente l'impatto è poco significativo in quei protocolli che applicano strutture di multicasting come udp-Multicast e Shared-Memory, che verranno 
@@ -57,22 +57,22 @@ Visti gli schemi~\ref{fig:minpowerstackscheme} è risulta probabile che in un Po
 In figura~\ref{fig:test3_different_protocols} sugli assi X il numero di subscriber, e sulle Y le latenza di ricezione in microsecondi.
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/test3_different_protocol_send_receive.png} 
-        \caption{differenza della latenza di ricezione dei vari protocolli con }\label{fig:test3_different_protocols}
+        \caption{Differenza della latenza di ricezione dei vari protocolli con }\label{fig:test3_different_protocols}
 \end{figure}
 Invece, in figura~\ref{fig:test3_different_protocols2} e figura~\ref{fig:test1sdbox} sugli assi X i protocolli, mentre sulle Y per il primo solo le latenza di ricezione in microsecondi, e nel secondo sia latenza di ricezione che overhead di invio.
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/test1_bar_sr_1p1s.png} 
-        \caption{latenza media di ricezione di un singolo messaggio nei vari protocolli}\label{fig:test3_different_protocols2}%TODO Da sistemare protocol non va bene, label sbagliate etc
+        \caption{Latenza media di ricezione di un singolo messaggio nei vari protocolli}\label{fig:test3_different_protocols2}
 \end{figure}
 
-\begin{figure}[H] %TODO: do this graph also for wildcards
+\begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/test1_box_sr_1p1s.png} 
-        \caption{diagramma a scatola nei vari protocolli di comunicazione con un publisher e un subscriber}\label{fig:test1sdbox}
+        \caption{Diagramma a scatola nei vari protocolli di comunicazione con un publisher e un subscriber}\label{fig:test1sdbox}
 \end{figure}
 Infine, in figura~\ref{fig:test3_cycle_different_protocols} sugli assi X i protocolli, mentre sulle Y il conteggio di cicli e istruzioni ($10^6$).
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/test1_cyclinstr.png} 
-        \caption{Conteggio cicli e istruzioni per ogni protocollo}\label{fig:test3_cycle_different_protocols}%TODO label overfull boxes
+        \caption{Conteggio cicli e istruzioni per ogni protocollo}\label{fig:test3_cycle_different_protocols}
 \end{figure}
 E' quindi preferibile, ove possibile, usare \emph{Shared Memory} sia per prestazioni, che per evitare di saturare la rete. In secondo luogo, se in presenza di diversi subscriber, per non caricare il publisher usare \emph{UDP Multicast}. E infine utilizzare \emph{TCP} solo dove vi è necessità di connessione, visto le notevoli latenze si in scrittura che in lettura. In tutti gli altri casi, dove non si è in locale, e dove il numero di subscriber non supera qualche decina, risulta più che adeguato \emph{UDP}.
 
@@ -108,12 +108,12 @@ L'ultimo test, rivolto alla caratterizzazione della capacità di comunicazione, 
 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/test3_throughput_combined.png} 
-        \caption{throughput con un publisher e un subscriber}\label{fig:throughput_combined}
+        \caption{Throughput con un publisher e un subscriber}\label{fig:throughput_combined}
 \end{figure}
 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{./results/test3_graph_throughput.png} 
-    \caption{throughput a crescenti numeri di subscribers}\label{fig:throughput_increasing}
+    \caption{Throughput a crescenti numeri di subscribers}\label{fig:throughput_increasing}
 \end{figure}
 
 Il risultato ottenuto nelle figure \ref{fig:throughput_combined} \ref{fig:throughput_increasing} (KBytes/s sulla Y e numero di subscriber sulla X), per quanto riguarda il protocollo UDP Multicast, è influenzato dalla struttura del test mostrato in figura \ref{fig:rtt_uml}, che non permette ad UDP Multicast di mostrare le sue potenzialita, come invece si può vedere dalla figura \ref{fig:bandwidth_graph}.

@@ -4,7 +4,6 @@ Uno dei temi di questa tesi, è stato quello di generare e  analizzare un modell
 
 \begin{table}[H]
 \begin{center}
-    %TODO: Da riscrivere in italiano e completare E4
 \begin{tabular}{l|l|l}
     \hline
     \textbf{Parameter} & \textbf{Cineca} & \textbf{E4} \\
@@ -98,7 +97,7 @@ Una delle prime soluzioni che è stata provata, è stata quella di sincronizzare
 Nello specifico è stata utilizzata una funzionalità chiamata MPI\_barrier, che permette di bloccare i processi, fino all'arrivo di un punto in comune, dopo il quale tutti procedono insieme. Questo serve per sincronizzare i processi tra di loro, ma non è ideata nello specifico per sincronizzare gli orologi. Gli strumenti strumenti utili alla mera sincronizzazione dei tempi dei nodi sono altri, come il già citato Network Time Protocol,
 ma essendo ntpd un servizio di amministrazioni non è stato possibile interagirci e quindi usarli. Nella figura~\ref{fig:sync_time_shift1}~\ref{fig:sync_time_shift2} sono stati riportati i dati ottenuti grazie a questo meccanismo.
 
-\begin{figure}[H]%TODO da rifare!
+\begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{./results/time_sync_node.png}
     \caption{Scostamento del tempo su nodi diversi}\label{fig:sync_time_shift1}
@@ -156,7 +155,7 @@ Al fine di condurli nel modo più trasparente possibile sono stati resi disponib
 
 
 \subsection{Discovery}
-La prima fase di DDS consiste nel riconoscere altri \emph{dds-partecipant} appartenenti allo stesso dominio. Questa viene chiamata \textbf{fase di Discovery}. Essa ha un ruolo estremamente importante siccome senza non sarebbe possibile far comunicare nessun attore all'interno della stessa rete e nemmeno nello stesso nodo. Una delle peculiarità di DDS è che permette di eseguire tutto in modo completamente distribuito (se non esplicitamente configurato). Il problema sorge, quando si hanno numeri elevati di attori, che per eseguire la discovery (comunicazione due a due), generano migliaia di pacchetti con la conseguente crescita di  computazioni necessarie. %Ovviamente la natura effimera di alcuni di questi componenti potrebbe aggravare il problema. 
+La prima fase di DDS consiste nel riconoscere altri \emph{dds-partecipant} appartenenti allo stesso dominio. Questa viene chiamata fase di \emph{ Discovery}. Essa ha un ruolo estremamente importante siccome senza non sarebbe possibile far comunicare nessun attore all'interno della stessa rete e nemmeno nello stesso nodo. Una delle peculiarità di DDS è che permette di eseguire tutto in modo completamente distribuito (se non esplicitamente configurato). Il problema sorge, quando si hanno numeri elevati di attori, che per eseguire la discovery (comunicazione due a due), generano migliaia di pacchetti con la conseguente crescita di  computazioni necessarie. %Ovviamente la natura effimera di alcuni di questi componenti potrebbe aggravare il problema. 
 Per questo motivo, in DDS sono stati creati dei meccanismi di discovery centralizzati. In questo esperimento si andranno a comparare le due diverse implementazioni e per farlo si useranno gli strumenti \textbf{perf} e \textbf{TCPdump}.
 %CONTROLLA CHE SI POSSA FARE TCPDUMP SU CINECA
 
@@ -200,7 +199,7 @@ Nell'ultimo esperimento ci si è focalizzati sulla caratterizzazione di questo m
 Per farlo, sono stati eseguiti i test su tutti e 4 i protocolli messi a disposizione e con volumi di scambio più elevati, al fine di fornire una panoramica completa. %Inoltre per calcolarlo sono usate le configurazioni in tabella~\ref{table:test3} per simulare un carico di comunicazioni elevato tra attori di HPC.\@Nella vengono riportati i parametri scelti.
 
 % \begin{table}[H]
-%     \begin{center}%TODO tabella 
+%     \begin{center}
 %     \begin{tabular}{l|l}
 %         \hline
 %         \textbf{Parametri} & \textbf{throughput} \\

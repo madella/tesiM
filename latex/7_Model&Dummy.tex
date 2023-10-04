@@ -5,11 +5,11 @@ In merito a questo, nello schema~\ref{fig:schema_global_dummy_implementati} vien
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{./img/SchemaPowerStack_perdummy.drawio.png} %TODO: Change
+    \includegraphics[width=0.5\textwidth]{./img/SchemaPowerStack_perdummy.drawio.png}
     \caption{Schema componenti sviluppati: in verde completato, in rosso ancora da sviluppare, in grigio non previsto}
     \label{fig:schema_global_dummy_implementati}
 \end{figure}
-L'infrastruttura DDS creata, chiamata \emph{REGALE Library}\cite{TODO} al momento permette di utilizzare i vari tipi di comunicazione, configurazioni di qos, e anche vari tipi di dati scambiati, tutti impostabile tramite file \textbf{XML}.
+L'infrastruttura DDS creata, chiamata \emph{REGALE Library}\cite{RegaleLibrary} al momento permette di utilizzare i vari tipi di comunicazione, configurazioni di qos, e anche vari tipi di dati scambiati, tutti impostabile tramite file \textbf{XML}.
 I prototipi invece, sono dei programmi (c++) che vanno a simulare uno scambio di informazioni realistico. Al momento per motivi di semplicità utilizzano dati di tipo \emph{uint32\_t} ed il loro comportamento si può riassumere nel seguente modo.
 
 \subsection*{Implementazione Job Scheduler}
@@ -48,9 +48,9 @@ I componenti mostrati, al momento fanno uso delle strutture di domini, partizion
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.65\textwidth]{./img/server\_skeleton.png}
-    \includegraphics[width=0.75\textwidth]{./img/dummies\_skeleton.png}
-    \caption{ Strutture di comunicazioni dei componenti implementati nel power stack.}
+    \includegraphics[width=0.70\textwidth]{./img/server\_skeleton.png}
+    \includegraphics[width=0.70\textwidth]{./img/dummies\_skeleton.png}
+    \caption{Strutture di comunicazioni dei componenti implementati nel power stack.}
     \label{fig:dummy_topic}
 \end{figure}
 % In viola tutti i publisher, ed in giallo i subscriber. Successivamente nel rispettivo ordine vengono mostrati, domini, partizioni e topic utilizzati.
