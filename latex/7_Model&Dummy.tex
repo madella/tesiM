@@ -1,12 +1,12 @@
 \chapter{Realizzazione dei prototipi di Power Stack}
 Nel corso di questa tesi con la collaborazione dei membri del progetto REGALE, come Cineca\cite{Cineca}, E4\cite{E4} e BSC\cite{BSC} sono stati sviluppati i middleware ed i prototipi di Power Stack per HPC. 
 Questi ultimi oltre a fornire una prova della fattibilità nell'utilizzare una infrastruttura DDS come mezzo di comunicazione, sono utili anche come esempio per tutti quei software che devono essere introdotti nel progetto, mostrati nel capitolo~\ref{chap:4_REGALE}.
-In merito a questo, nello schema~\ref{fig:schema_global_dummy_implementati} viene mostrato lo stato di avanzamento del Power Stack, illustrando quali di questi sono implementati e operativi, e quali in via di sviluppo.
+In merito a questo, nello schema~\ref{fig:schema_global_dummy_implementati} viene mostrato lo stato di avanzamento dei prototipi del Power Stack, illustrando quali di questi sono implementati e operativi, e quali in via di sviluppo.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.50\textwidth]{./img/SchemaPowerStack_perdummy.drawio.png}
-    \caption{Schema componenti sviluppati: in verde completato, in rosso ancora da sviluppare, in grigio non previsto}
+    \caption{Schema componenti sviluppati: in verde completato ed in rosso ancora da sviluppare}
     \label{fig:schema_global_dummy_implementati}
 \end{figure}
 L'infrastruttura DDS creata, chiamata \emph{REGALE Library}\cite{RegaleLibrary} al momento permette di utilizzare i vari tipi di comunicazione, configurazioni delle QoS, e anche vari tipi di dati scambiati, tutto impostabile tramite file \textbf{XML}.
@@ -41,7 +41,7 @@ Il NM mentre ogni 30 secondi manda i dati al Monitor, aspetta per le richieste i
 Il Monitor semplicemente aspetta che i componenti gli inviino i dati, e quando li riceve li riporta a schermo.
 
 \subsection*{MQTT Bridge}
-Questo componente, a differenza di tutti gli altri, non ha alcun ruolo nel Power Management ma serve solo a supporto di alcuni software che fanno ampio uso di comunicazioni MQTT\cite{mqtt}. Infatti il suo scopo è quello di intercettare e convertire tutte le comunicazioni provenienti da MQTT e DDS per infine inoltrare quelle desiderate nel protocollo opposto.% Come dice il nome fa da \emph{ponte} tra le due infrastrutture, semplificando l'introduzione di alcuni software come Countdown\cite{cesarini2019countdown}.
+Questo componente, a differenza di tutti gli altri, non ha alcun ruolo nel Power Management ma serve solo a supporto di alcuni software che fanno ampio uso di comunicazioni MQTT\cite{mqtt}. Infatti, il suo scopo è quello di intercettare e convertire tutte le comunicazioni provenienti da MQTT e DDS per poi instradarle nel protocollo complementare.% Come dice il nome fa da \emph{ponte} tra le due infrastrutture, semplificando l'introduzione di alcuni software come Countdown\cite{cesarini2019countdown}.
 
 \section{Struttura}
 I componenti mostrati, al momento fanno uso delle strutture di domini, partizioni e topic mostrati in tabella~\ref{fig:dummy_topic}.

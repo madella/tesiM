@@ -1,5 +1,5 @@
 \chapter{Caratterizzazione DDS}
-Uno dei temi di questa tesi, è stato quello di generare e  analizzare un modello utile per l'implementazione dell'infrastruttura sulla quale tutti gli attori di un Power Stack possano comunicare in modo distribuito. Per poter caratterizzare  l'infrastruttura necessaria, sono stati utilizzati sistemi di High-Performance Computing sui quali andare a testare i vari esperimenti. A supporto di questo lavoro, sono stati resi disponibili due supercalcolatori uno da Cineca\cite{Cineca} e uno da E4\cite{E4} con le specifiche in tabella \ref{table:hpc-cineca}.
+Uno dei temi di questa tesi, è stato quello di generare e  analizzare un modello per l'infrastruttura sulla quale tutti gli attori di un Power Stack possano comunicare in modo distribuito. Per poter caratterizzare  l'infrastruttura necessaria, sono stati utilizzati sistemi di High-Performance Computing sui quali andare a testare i vari esperimenti. A supporto di questo lavoro, sono stati resi disponibili due supercalcolatori uno da Cineca\cite{Cineca} e uno da E4\cite{E4} con le specifiche in tabella \ref{table:hpc-cineca}.
 %In questo capitolo verranno riportati i casi studio e i test effettuati sul framework. %Tutti questi sono stati eseguiti su un sistema HPC Galileo-100 Cineca con le specifiche riportate nella tabella seguente
 
 \begin{table}[H]
@@ -31,7 +31,7 @@ Uno dei temi di questa tesi, è stato quello di generare e  analizzare un modell
 % In tutti i test successivi, ove non specificato diversamente sono stati usati 1 publisher e 48 subscriber su diversi nodi. Questo è stato fatto per provare la scalabilità, visto che nel testbed che è stato utilizzato, erano presenti 48 core (1 core per ogni subscriber).
 
 \section{Strumenti utilizzati}%Struttura dei test
-I test effettuati in questa sezione sono stati generati da diversi tipi di componenti ognuno di essi con uno o più compiti specifici, in modo da avere un discreto controllo sull'avanzamento e la gestione dei dati. Nella figura~\ref{fig:schema_global} viene riportato uno schema riassuntivo di tutte le tecnologie utilizzate.
+Per effettuare i test sulla caratterizzazione di DDS per HPC, sono stati utilizzati diversi tipi di strumenti a livelli diversi al fine di garantire la più alta qualità possibile dei dati prodotti. Nella figura~\ref{fig:schema_global} viene riportato uno schema riassuntivo di tutte le tecnologie utilizzate.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{./img/schema_test_globale.drawio.png}
@@ -39,12 +39,12 @@ I test effettuati in questa sezione sono stati generati da diversi tipi di compo
 \end{figure}
 
 \subsection{Bash}\label{sec:Shell}
-Vista la necessità di lanciare diversi publisher e diversi subscriber ogni volta con dei parametri variabili è stato conveniente usare programmi di scripting come bash. Infatti questi avevano il compito di (i) gestire i diversi parametri da passare agli attori, (ii) inizializzare le variabili d'ambiente, (iii) prendere decisioni di quali core dovevano essere utilizzati da ogni partecipante (task-setaffinity) e (iiii) mantenere sincronizzati i test per evitare che alcuni attori venissero inizializzati troppo presto. Infine ripulivano e ordinavano i dati una volta terminato i test andando ad eseguire gli script python che processavano i dati, nelle cartelle corrette.
+Vista la necessità di avviare diverse entità ogni volta con dei parametri variabili è stato conveniente usare programmi di scripting come bash. Infatti questi avevano il compito di (i) gestire i diversi parametri da passare agli attori, (ii) inizializzare le variabili d'ambiente, (iii) prendere decisioni di quali core dovevano essere utilizzati da ogni partecipante (task-setaffinity) e (iiii) mantenere sincronizzati i test per evitare che alcuni attori venissero inizializzati nel momento sbagliato. Infine ripulivano e ordinavano i dati una volta terminati i test andando ad eseguire gli script python nelle cartelle corrette.
 \subsection{C++}
-E' stato scelto di realizzare una unica versione di publisher e subscriber in cui cambiavano i parametri con cui venivano lanciati. In questo modo è stato più semplice la gestione dei diversi test, e più robusto ad errori dovuti a diverse configurazioni.
+E' stato scelto di realizzare una unica implementazione di publisher e subscriber in cui le varie funzionalità venivano testate attraverso i parametri con cui venivano lanciati. In questo modo la gestione dei test si è rilevata essere più semplice e robusta ad eventuali errori di configurazioni.
 \subsubsection*{Struttura}
 
-Per scambiarsi dei messaggi all'interno di infrastruttura basata su DDS, sono necessari: un topic,un publisher ed un subscriber. Inoltre nel topic è necessario definire il tipo dato o struttura di dati che si va a scambiare. La struttura che si è scelta di utilizzare per i test è stata la seguente:
+Per scambiarsi dei messaggi all'interno di infrastrutture basate su DDS, sono necessari: un topic, un publisher ed un subscriber. Inoltre nel topic è necessario definire il tipo dato o struttura di dati che si va a scambiare. La struttura che si è scelta di utilizzare per i test è stata la seguente:
 \begin{verbatim}
     struct DDSTest
     {
@@ -52,8 +52,8 @@ Per scambiarsi dei messaggi all'interno di infrastruttura basata su DDS, sono ne
         std::string message;
     };
 \end{verbatim}
-Dove index era necessario per definire una corrispondenza stretta tra i messaggi inviati e quelli ricevuti, mentre la stringa era comoda per definire un oggetto di dimensione molto variabile (anche dinamicamente durante i test).
-Per quanto concerne al publisher ed al subscriber, sono state utilizzate delle versioni modificate da quelle proposte nella documentazione ufficiale \cite{FastDDS} che andassero sia ad integrare tutte le principali configurazioni possibili, sia integrare alcuni strumenti per l'ottenimento di metriche precedentemente concordate con i collaboratori. Nello specifico sono state scelte per il \textbf{Publisher}:
+Dove index è necessario per definire una corrispondenza stretta tra i messaggi inviati e quelli ricevuti, mentre la stringa è utile a definire un oggetto di dimensione variabile (anche dinamicamente durante i test).
+Per quanto concerne al publisher ed al subscriber, sono state utilizzate delle versioni modificate di quelle proposte nella documentazione ufficiale \cite{FastDDS} che andassero sia ad integrare le principali funzionalità, sia ad inserire alcuni strumenti per l'ottenimento di metriche precedentemente concordate con i collaboratori. Nello specifico sono state scelte per il \textbf{Publisher}:
 \begin{itemize}
     \item Tempo di invio;
     \item Istruzioni Perf-Event;
@@ -61,7 +61,7 @@ Per quanto concerne al publisher ed al subscriber, sono state utilizzate delle v
 \end{itemize}
 mentre per il \textbf{Subscriber}, solo il tempo di ricezione con un meccanismo di controllo degli indici del messaggio ricevuto.
 \subsection{Lettura TSC}
-Il Time Stamp Counter, è un registro a 64 bit, presente nella maggior parte dei processori moderni. Il registro fornisce informazioni sul tempo, in termini di cicli di clock del processore, e viene spesso utilizzato per effettuare misure di questo tipo. Il valore, viene letto prima e dopo l'istruzione studiata, tramite l'esecuzione della seguente istruzione:
+Il Time Stamp Counter, è un registro a 64 bit, presente nella maggior parte dei processori moderni. Il registro fornisce informazioni sui cicli di clock del processore, e viene spesso utilizzato per effettuare misure di questo tipo. Il valore, viene letto prima e dopo l'istruzione studiata, tramite l'esecuzione della seguente istruzione:
 \begin{verbatim}
     unsigned int lo, hi;
     __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
@@ -70,7 +70,7 @@ Il Time Stamp Counter, è un registro a 64 bit, presente nella maggior parte dei
 \emph{rdtsc} è l'istruzione assembly per leggere il registro Timestamp Counter, =a (lo) e =d (hi) sono i vincoli di output che specificano come i risultati dell'istruzione rdtsc devono essere restituiti al programma. In lo ("=a") viene riportato il valore a 32 bit meno significativo ed in hi, il valore a 32 bit più significativo.
 
 \subsection{Conteggio istruzioni}
-Per le istruzioni invece è stato usato lo strumento \textbf{Perf}, un software offerto da Linux ed incluso anche nel suo kernel, per la profilazione delle performance tramite i \emph{performance\_counter}. Questa suite è estremamente avanzata e permette di ottenere delle metriche a bassa granularità. In questo caso è stata usata una chiamata alla libreria \textbf{perf\_event} utile all'ottenimento del \emph{PERF\_COUNT\_HW\_INSTRUCTIONS}.
+Per le istruzioni invece è stato usato lo strumento \textbf{Perf}, un software offerto da Linux ed incluso anche nel suo kernel, per la profilazione delle performance tramite i \emph{performance\_counter}. Questa suite è estremamente avanzata e permette di ottenere delle metriche a bassa granularità. In questo caso è stata usata una libreria chiamata \textbf{perf\_event} utile all'ottenimento del \emph{PERF\_COUNT\_HW\_INSTRUCTIONS}.
 \subsection{UML}
 Lo schema UML di funzionamento degli attori DDS, con questo approccio, è riassunto e schematizzato dalla figura~\ref{fig:uml}
 \begin{figure}[H]
@@ -91,18 +91,18 @@ Per ottenere invece le differenze di tempi su sistemi Linux, è ricorrente utili
     \item CLOCK\_PROCESS\_CPUTIME\_ID: timer dei processori ad alta risoluzione;
     \item CLOCK\_THREAD\_CPUTIME\_ID: tempo dei thread dei processori;
 \end{itemize}
-Tra tutte queste è stato deciso di utilizzare MONOTONIC, visto che REALTIME con frequenze di aggiornamento di ntpd ogni 1024s fa in tempo ad accumulare sfasamenti di alcuni millisecondi\cite{ntpd}, di gran lunga superiore all'ordine di grandezza da misurare (microsecondi, a volte anche nanosecondi). Inoltre dato che per eseguire i test è stato usato un solo sistema (con più nodi) per volta, la precisione di MONOTONIC\_RAW non è risultata necessaria.
+Tra tutte queste è stato deciso di utilizzare MONOTONIC, visto che REALTIME con frequenze di aggiornamento di ntpd ogni 1024s fa in tempo ad accumulare sfasamenti di alcuni millisecondi\cite{ntpd}, di gran lunga superiore all'ordine di grandezza da misurare (microsecondi, a volte anche nanosecondi). Inoltre dato che per eseguire i test è stato usato un solo sistema (con più nodi) per volta, non è risultato necessario usare MONOTONIC\_RAW .
 
-Il problema riscontrato nell'utilizzare  MONOTONIC, è che su sistemi con orologi diversi, questi possono essere sfasati anche di diverse migliaia di secondi. Per aggirare questo problema, sono stati usati 2 approcci completamente diversi:
+Nonostante questo, nell'utilizzare MONOTONIC, è stato riscontrato uno sfasamento che ha raggiunto, nel suo apice, l'ordine di migliaia di secondi.
+Per aggirare questo problema, sono stati usati 2 approcci completamente diversi:
 \begin{itemize}
     \item Sincronizzazione dei nodi
     \item RTT
 \end{itemize} 
-
 \subsection{Sincronizzazione}\label{sec:timesync}
 Una delle prime soluzioni che è stata provata, è stata quella di sincronizzare gli orologi locali dei diversi nodi tramite l'utilizzo di librerie sviluppate per la programmazione parallela come Message Passing Interface (MPI). Quest'ultimo è un protocollo di comunicazione molto utilizzato nei sistemi HPC per sincronizzare i diversi processi tra di loro.
-Nello specifico è stata utilizzata una funzionalità chiamata MPI\_barrier, che permette di bloccare i processi che ne fanno uso,
-fino a quando sono tutti sincronizzati, procedendo di conseguenza tutti insieme. Nonostante questo meccanismo fosse particolarmente utile alla sincronizzazione degli orologi non è nato per questo motivo, e racchiudeva per questo alcuni ritardi. Nella figura~\ref{fig:sync_time_shift1} sono stati riportati sull'asse delle Y gli sfasamenti dei tempi di due nodi diversi e sull'asse X il numero dei test effettuati.
+Nello specifico è stata utilizzata una funzionalità chiamata MPI\_barrier, che permette di bloccare i processi che ne fanno uso, fino a quando sono tutti sincronizzati, procedendo di conseguenza tutti insieme. 
+Nonostante questo meccanismo si fosse rilevato particolarmente utile per la sincronizzazione dei nodi, non essendo nato con questo scopo, nascondeva in realtà dei ritardi, nell'ordine dei microsecondi. Nella figura~\ref{fig:sync_time_shift1} sono stati riportati sull'asse delle Y gli sfasamenti dei tempi di due nodi diversi e sull'asse X il numero dei test effettuati.
 
 \begin{figure}[H]
     \centering
@@ -119,9 +119,8 @@ fino a quando sono tutti sincronizzati, procedendo di conseguenza tutti insieme.
 %     \label{fig:sync_diff_distr3}
 % \end{figure}
 
-Come possibile notare, nonostante le mpi\_barrier, gli scostamenti di tempo tra 2 nodi durante i diversi tentativi effettuati (100), cambia notevolmente, arrivando a differenze fino ad un massimo di 296.659 microsecondi. 
-Questo rende il metodo appena mostrato altamente inaffidabile nel 
-misurare variazioni di tempi dell'ordine di decine di microsecondi. 
+Come possibile notare, nonostante le mpi\_barrier, gli scostamenti di tempo tra 2 nodi durante i diversi tentativi effettuati (100), cambia notevolmente, arrivando a differenze fino ad un massimo di 296.66 microsecondi. 
+Questo rende il metodo appena mostrato altamente inaffidabile nel misurare variazioni di tempi dell'ordine di decine di microsecondi. 
 
 
 \subsection{RTT}\label{sec:timeRTT}
@@ -139,7 +138,7 @@ Per semplificarne la comprensione viene riportato lo schema modificato:
 Ovviamente questo metodo può comportare qualche ritardo intrinseco di dover gestire due entità per ogni attore, ma sono tempi infinitesimali in confronto al tempo necessario per inviare il messaggio su rete (dove è stato usato questo approccio).
 
 \section{Python}
-Gli script python sono stati utili a organizzare e processare tutti i dati oltre a generare tutti i grafici prodotti in questa tesi, considerando che ogni publisher ha generato in ogni test circa 10 mila messaggi, da inviare a tutti e 48 i subscriber, e per ogni protocollo di trasporto, arrivando ad avere per ogni test fino a $1'960'000$ messaggi. 
+Gli script python sono stati usati per organizzare e processare la grande mole di dati che ogni test ha prodotto (circa $1'960'000$ messaggi/test). 
 
 
 \section{Schema test}
@@ -175,7 +174,7 @@ Nel primo test si è valutata la differenza di queste implementazioni utilizzand
 Un concetto fondamentale nelle comunicazioni tra attori con gerarchie diverse, in sistemi con diverse centinaia di migliaia di entita, come cluster, nodi, processori, job (etc.), sono le possibilità di instradare, segmentare e rendere gerarchiche le comunicazioni. Come spiegatolo nel capitolo~\ref{Chapter:dds} in DDS ci sono diversi strumenti disponibili per farlo. Tra di loro differiscono per alcuni aspetti, come flessibilità, costo (in performance) e livello di segmentazione.
 
 \subsubsection{Dominio} 
-Il dominio è la segmentazione di più ``forte`` e di più alto livello. Va a partizionare gli attori presenti in un dominio in modo del tutto fisico (cambiando per ogni dominio porte e indirizzi di comunicazione) e per nulla flessibile. Per cambiare il dominio è necessario distruggere e creare di nuovo il partecipante. Inoltre il dominio non permette nessun tipo di gerarchia.
+Il dominio è la segmentazione di più ``forte`` e di più alto livello. Va a partizionare fisicamente e senza alcuna flessibilità, gli attori presenti in un dominio (cambiando per ogni dominio porte e indirizzi di comunicazione). Per cambiare il dominio è necessario distruggere e creare di nuovo il partecipante. Inoltre il dominio non permette nessun tipo di gerarchia.
     
 \subsubsection{Topic}
 All'interno di un dominio, i topic costituiscono la scelta predefinita di instradamento dei messaggi, essendo però limitato dal tipo di messaggio che si vuole inviare. Infatti topic diversi supportano tipi di dato diversi, e non sono modificabili durante il loro utilizzo.

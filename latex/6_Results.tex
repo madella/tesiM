@@ -21,7 +21,7 @@ Già nel primo grafico~\ref{fig:test0pack}, con il numero di pacchetti sull'asse
 \end{figure}
 In un caso reale serve valutare in primo luogo il numero di entità in un determinato dominio, e successivamente i costi-benefici di ogni implementazione considerando anche l'impatto che si può avere nel caso di fallimento del server (nonostante sia possibile avere un server di backup che viene automaticamente attivato, nel caso il primo fallisse).
 
-\section{Scalabilità del numero di subscriber iscritti ad un topic}
+\section{Scalabilità del numero di entità iscritte ad un topic}
 Visto lo schema~\ref{fig:uml} si può capire, che il numero di subscriber presenti in un dominio ed iscritti ad un topic, comporta un overhead di comunicazione che va ad influenzare sia i tempi, che cicli e istruzioni impiegate nella singola \emph{publish}. Questo viene dimostrato nella figura~\ref{fig:test3_overhead} (con i tempi medi di invio sulle Y) e~\ref{fig:test3_latenza} (con latenza media di ricezione in asse Y). In tutte le figure sull'asse X viene riportato il numero di subscriber che cresce fino a 40 entità. L'effetto visto è particolarmente pronunciato anche in protocolli come \emph{UDP} che non possiedono concetti di connessione. Questo potrebbe essere dovuto al costo di inizializzazione ed invio dei messaggi, ad indirizzi di rete diversi.
 \begin{figure}[H]
     \centering
