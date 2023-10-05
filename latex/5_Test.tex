@@ -1,5 +1,5 @@
 \chapter{Caratterizzazione DDS}
-Uno dei temi di questa tesi, è stato quello di generare e  analizzare un modello utile per l'implementazione dell'infrastruttura sulla quale tutti gli attori di un Power Stack possano comunicare in modo distribuito. Per poter caratterizzare  l'infrastruttura necessaria, sono stati utilizzati sistemi di High-Performance Computing sui quali andare a testare i vari esperimenti. Per supportare questo lavoro, sono stati resi disponibili due supercomputer uno da Cineca\cite{Cineca} e uno da E4\cite{E4} nel tentativo di ottenere risultati affidabili. Di seguito le specifiche dei sistemi utilizzati:
+Uno dei temi di questa tesi, è stato quello di generare e  analizzare un modello utile per l'implementazione dell'infrastruttura sulla quale tutti gli attori di un Power Stack possano comunicare in modo distribuito. Per poter caratterizzare  l'infrastruttura necessaria, sono stati utilizzati sistemi di High-Performance Computing sui quali andare a testare i vari esperimenti. A supporto di questo lavoro, sono stati resi disponibili due supercalcolatori uno da Cineca\cite{Cineca} e uno da E4\cite{E4} con le specifiche in tabella \ref{table:hpc-cineca}.
 %In questo capitolo verranno riportati i casi studio e i test effettuati sul framework. %Tutti questi sono stati eseguiti su un sistema HPC Galileo-100 Cineca con le specifiche riportate nella tabella seguente
 
 \begin{table}[H]
@@ -12,7 +12,7 @@ Uno dei temi di questa tesi, è stato quello di generare e  analizzare un modell
     \hline
     [\#] sockets per nodo & 2 & 2 \\
     \hline
-    [\#]  cores per socket & 24 & 16 \\
+    [\#]  core per socket & 24 & 16 \\
     \hline
     Memoria per nodo & 384 GB & 100 GB\\
     \hline
@@ -39,12 +39,12 @@ I test effettuati in questa sezione sono stati generati da diversi tipi di compo
 \end{figure}
 
 \subsection{Bash}\label{sec:Shell}
-Vista la necessità di lanciare diversi publisher e diversi subscriber ogni volta con dei parametri variabili è stato conveniente usare programmi di scripting come bash. Infatti questi gestivano i diversi parametri da passare agli attori, inizializzavano le variabili d'ambiente, decidevano quali core dovevano essere utilizzati da ogni partecipante (task-setaffinity) e mantenevano sincronizzati i test per evitare che alcuni attori venissero inizializzati troppo presto. Infine ripulivano e ordinavano i dati una volta terminato i test andando ad eseguire gli script python che processavano i dati, nelle cartelle corrette.
+Vista la necessità di lanciare diversi publisher e diversi subscriber ogni volta con dei parametri variabili è stato conveniente usare programmi di scripting come bash. Infatti questi avevano il compito di (i) gestire i diversi parametri da passare agli attori, (ii) inizializzare le variabili d'ambiente, (iii) prendere decisioni di quali core dovevano essere utilizzati da ogni partecipante (task-setaffinity) e (iiii) mantenere sincronizzati i test per evitare che alcuni attori venissero inizializzati troppo presto. Infine ripulivano e ordinavano i dati una volta terminato i test andando ad eseguire gli script python che processavano i dati, nelle cartelle corrette.
 \subsection{C++}
-E' stato scelto di realizzare una unica versione di publisher e subscriber in cui cambiavano i parametri con cui venivano lanciati. In questo modo era più semplice la gestione dei diversi test, e più robusto ad errori dovuti a diverse configurazioni.
+E' stato scelto di realizzare una unica versione di publisher e subscriber in cui cambiavano i parametri con cui venivano lanciati. In questo modo è stato più semplice la gestione dei diversi test, e più robusto ad errori dovuti a diverse configurazioni.
 \subsubsection*{Struttura}
 
-Per scambiarsi dei messaggi all'interno di infrastruttura basata su DDS, sono necessari: (i) un topic, (ii) un publisher ed (iii) un subscriber. Inoltre nel topic è necessario definire il tipo dato o struttura di dati che si va a scambiare. La struttura che si è scelta di utilizzare per i test è stata la seguente:
+Per scambiarsi dei messaggi all'interno di infrastruttura basata su DDS, sono necessari: un topic,un publisher ed un subscriber. Inoltre nel topic è necessario definire il tipo dato o struttura di dati che si va a scambiare. La struttura che si è scelta di utilizzare per i test è stata la seguente:
 \begin{verbatim}
     struct DDSTest
     {
@@ -53,14 +53,13 @@ Per scambiarsi dei messaggi all'interno di infrastruttura basata su DDS, sono ne
     };
 \end{verbatim}
 Dove index era necessario per definire una corrispondenza stretta tra i messaggi inviati e quelli ricevuti, mentre la stringa era comoda per definire un oggetto di dimensione molto variabile (anche dinamicamente durante i test).
-
-Una volta studiata la documentazione ufficiale, è stato sviluppato un codice in grado di integrare tutte le funzionalità di DDS ed alcuni strumenti per l'ottenimento di metriche precedentemente concordate con i collaboratori. Nello specifico sono state scelte:
+Per quanto concerne al publisher ed al subscriber, sono state utilizzate delle versioni modificate da quelle proposte nella documentazione ufficiale \cite{FastDDS} che andassero sia ad integrare tutte le principali configurazioni possibili, sia integrare alcuni strumenti per l'ottenimento di metriche precedentemente concordate con i collaboratori. Nello specifico sono state scelte per il \textbf{Publisher}:
 \begin{itemize}
-    \item Tempo di invio
-    \item Istruzioni Perf-Event per invio
-    \item Cicli TSC (read\_tsc) per invio
-    \item Tempo di invio e ricezione
+    \item Tempo di invio;
+    \item Istruzioni Perf-Event;
+    \item Cicli TSC (read\_tsc);
 \end{itemize}
+mentre per il \textbf{Subscriber}, solo il tempo di ricezione con un meccanismo di controllo degli indici del messaggio ricevuto.
 \subsection{Lettura TSC}
 Il Time Stamp Counter, è un registro a 64 bit, presente nella maggior parte dei processori moderni. Il registro fornisce informazioni sul tempo, in termini di cicli di clock del processore, e viene spesso utilizzato per effettuare misure di questo tipo. Il valore, viene letto prima e dopo l'istruzione studiata, tramite l'esecuzione della seguente istruzione:
 \begin{verbatim}
@@ -71,31 +70,39 @@ Il Time Stamp Counter, è un registro a 64 bit, presente nella maggior parte dei
 \emph{rdtsc} è l'istruzione assembly per leggere il registro Timestamp Counter, =a (lo) e =d (hi) sono i vincoli di output che specificano come i risultati dell'istruzione rdtsc devono essere restituiti al programma. In lo ("=a") viene riportato il valore a 32 bit meno significativo ed in hi, il valore a 32 bit più significativo.
 
 \subsection{Conteggio istruzioni}
-Per le istruzioni invece è stato usato lo strumento \textbf{Perf}, un software offerto da Linux ed incluso anche nel suo kernel, per la profilazione delle performance tramite i \emph{performance\_counter}. Questa suite è estremamente avanzata e permette di ottenere delle metriche specifiche senza troppa difficolta. In questo caso è stata usata una chiamata alla libreria \textbf{perf\_event} utile all'ottenimento del \emph{PERF\_COUNT\_HW\_INSTRUCTIONS}.
-
+Per le istruzioni invece è stato usato lo strumento \textbf{Perf}, un software offerto da Linux ed incluso anche nel suo kernel, per la profilazione delle performance tramite i \emph{performance\_counter}. Questa suite è estremamente avanzata e permette di ottenere delle metriche a bassa granularità. In questo caso è stata usata una chiamata alla libreria \textbf{perf\_event} utile all'ottenimento del \emph{PERF\_COUNT\_HW\_INSTRUCTIONS}.
+\subsection{UML}
+Lo schema UML di funzionamento degli attori DDS, con questo approccio, è riassunto e schematizzato dalla figura~\ref{fig:uml}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{./img/umel-send-receive.png}
+    \caption{Schema UML}\label{fig:uml}
+\end{figure}
+Come si può vedere, il Publisher~\ref{actor:publisher} prima e dopo la write() salva i valori di tempo di invio, istruzioni, e TSC, mentre al lato ricevente, il Subscriber~\ref{actor:subscriber} salva il tempo di ricezione del messaggio.
 \subsection{Ottenimento dei tempi}
-In sistemi molto complessi come può essere considerato un supercalcolatore, la gestione degli orologi è tutt'altro che banale. Infatti dopo aver deciso una tra le tante politiche di sincronizzazione disponibile come centralizzata, distribuita e GPS, è necessario continuare a tenere questi orologi aggiornati. Nei sistemi utilizzati in questo progetto, ed in particolare nei supercalcolatori~\ref{table:hpc-cineca}, lo strumento adottato è Network Time Protocol (fornito da ntpd). Quest'ultimo ogni intervallo di tempo impostato, va a rendere disponibile ai vari nodi ed ai rispettivi orologi locali un tempo di riferimento che ha la funzione di punto fisso. Questo intervallo è normalmente fissato ogni 1024s, ma non disponendo dei diritti necessari, non mi è stato possibile recuperare l'informazione.
+In sistemi molto complessi come può essere considerato un supercalcolatore, la gestione degli orologi è tutt'altro che banale. Infatti dopo aver deciso una tra le tante politiche di sincronizzazione disponibile come centralizzata, distribuita e GPS, è necessario continuare a tenere questi orologi aggiornati. Nei sistemi utilizzati in questo progetto, ed in particolare nei supercalcolatori mostrati in tabella~\ref{table:hpc-cineca}, lo strumento adottato è Network Time Protocol (fornito da ntpd). 
+Quest'ultimo va a fornire periodicamente agli orologi dei nodi, un tempo di riferimento. Questo intervallo è fissato di default ogni 1024s, ma non disponendo dei diritti necessari, non è stato possibile recuperare questa informazione.
 
-Per ottenere le differenze di tempi su sistemi Linux, è quindi ricorrente utilizzare una funzione chiamata \textbf{clock\_gettime()} che restituisce il tempo istantaneo alla chiamata. Perciò calcolando la differenza tra due diverse clock\_gettime(), si ottiene il tempo trascorso.
-Per questa funzione è possibile ottenere diverse metriche tra cui:
+Per ottenere invece le differenze di tempi su sistemi Linux, è ricorrente utilizzare una funzione chiamata \textbf{clock\_gettime()} che restituisce il tempo all'istante della chiamata. Perciò calcolando la differenza tra due diverse clock\_gettime(), si ottiene il tempo trascorso. Il tempo ottenuto, deve avere però un riferimento, non essendo assoluto. Infatti questa funzione mette a disposizione diverse metriche tra cui:
 \begin{itemize}
-    \item CLOCK\_REALTIME: ottiene il tempo assoluto, sincronizzato dei vari sistemi da ntpd;
+    \item CLOCK\_REALTIME: ottiene il tempo ''reale'' (ore, minuti e secondi del giorno corrente), sincronizzato nei vari sistemi da ntpd;
     \item CLOCK\_MONOTONIC: ottiene un tempo relativo, da un punto non preciso dall'avvio del sistema;
-    \item CLOCK\_MONOTONIC\_RAW: come sopra, ma non influenzato da ntpd;
+    \item CLOCK\_MONOTONIC\_RAW: ottiene un tempo relativo, da un punto non preciso dall'avvio del sistema, ma non influenzato da ntpd;
     \item CLOCK\_PROCESS\_CPUTIME\_ID: timer dei processori ad alta risoluzione;
     \item CLOCK\_THREAD\_CPUTIME\_ID: tempo dei thread dei processori;
 \end{itemize}
-Tra tutte queste è stato deciso di utilizzare il MONOTONIC, visto che REALTIME con aggiornamenti di ntpd di 1024s subisce variazioni di alcuni millisecondi\cite{ntpd}, di gran lunga superiore all'ordine di grandezza da misurare (microsecondi, a volte anche nanosecondi). Inoltre dato che per eseguire i test è stato usato un solo sistema per volta, MONOTONIC\_RAW non era necessario (anche in caso di aggiornamento ntp, viene diffuso in egual modo su tutti i nodi).
-Il problema di usare la MONOTONIC, è che su sistemi con orologi diversi, questi possono essere sfasati anche di diverse migliaia di secondi. Per aggirare questo problema, sono stati usati 2 approcci completamente diversi:
+Tra tutte queste è stato deciso di utilizzare MONOTONIC, visto che REALTIME con frequenze di aggiornamento di ntpd ogni 1024s fa in tempo ad accumulare sfasamenti di alcuni millisecondi\cite{ntpd}, di gran lunga superiore all'ordine di grandezza da misurare (microsecondi, a volte anche nanosecondi). Inoltre dato che per eseguire i test è stato usato un solo sistema (con più nodi) per volta, la precisione di MONOTONIC\_RAW non è risultata necessaria.
+
+Il problema riscontrato nell'utilizzare  MONOTONIC, è che su sistemi con orologi diversi, questi possono essere sfasati anche di diverse migliaia di secondi. Per aggirare questo problema, sono stati usati 2 approcci completamente diversi:
 \begin{itemize}
     \item Sincronizzazione dei nodi
     \item RTT
 \end{itemize} 
 
-\section{Sincronizzazione}\label{sec:timesync}
-Una delle prime soluzioni che è stata provata, è stata quella di sincronizzare gli orologi locali dei diversi nodi tramite l'utilizzo di librerie sviluppate per la programmazione parallela come Message Passing Interface (MPI). Quest'ultimo è un protocollo di comunicazione molto utilizzato nei sistemi HPC per la programmazione parallela.
-Nello specifico è stata utilizzata una funzionalità chiamata MPI\_barrier, che permette di bloccare i processi, fino all'arrivo di un punto in comune, dopo il quale tutti procedono insieme. Questo serve per sincronizzare i processi tra di loro, ma non è ideata nello specifico per sincronizzare gli orologi. Gli strumenti strumenti utili alla mera sincronizzazione dei tempi dei nodi sono altri, come il già citato Network Time Protocol,
-ma essendo ntpd un servizio di amministrazioni non è stato possibile interagirci e quindi usarli. Nella figura~\ref{fig:sync_time_shift1}~\ref{fig:sync_time_shift2} sono stati riportati i dati ottenuti grazie a questo meccanismo.
+\subsection{Sincronizzazione}\label{sec:timesync}
+Una delle prime soluzioni che è stata provata, è stata quella di sincronizzare gli orologi locali dei diversi nodi tramite l'utilizzo di librerie sviluppate per la programmazione parallela come Message Passing Interface (MPI). Quest'ultimo è un protocollo di comunicazione molto utilizzato nei sistemi HPC per sincronizzare i diversi processi tra di loro.
+Nello specifico è stata utilizzata una funzionalità chiamata MPI\_barrier, che permette di bloccare i processi che ne fanno uso,
+fino a quando sono tutti sincronizzati, procedendo di conseguenza tutti insieme. Nonostante questo meccanismo fosse particolarmente utile alla sincronizzazione degli orologi non è nato per questo motivo, e racchiudeva per questo alcuni ritardi. Nella figura~\ref{fig:sync_time_shift1} sono stati riportati sull'asse delle Y gli sfasamenti dei tempi di due nodi diversi e sull'asse X il numero dei test effettuati.
 
 \begin{figure}[H]
     \centering
@@ -112,22 +119,16 @@ ma essendo ntpd un servizio di amministrazioni non è stato possibile interagirc
 %     \label{fig:sync_diff_distr3}
 % \end{figure}
 
-Come possibile notare nella figura~\ref{fig:sync_time_shift1} nonostante le mpi\_barrier, gli scostamenti di tempo tra 2 nodi durante i diversi tentativi effettuati (100), cambia notevolmente, arrivando a differenze fino ad un massimo di 103.812 microsecondi. Questo rende il metodo appena mostrato utilizzabile solo nel caso in cui non sia necessario sapere il tempo assoluto di qualche azione, ma le varianze, che rimarrebbero costanti se si utilizzano sempre gli stessi nodi.
-\subsection*{UML}
-Lo schema UML di funzionamento degli attori DDS, con questo approccio, è riassunto e schematizzato dalla figura~\ref{fig:uml}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{./img/umel-send-receive.png}
-    \caption{Schema UML}\label{fig:uml}
-\end{figure}
-Come si può vedere, il Publisher~\ref{actor:publisher} prima e dopo la write() salva i valori di tempo di invio, istruzioni, e TSC, mentre al lato ricevente, il Subscriber~\ref{actor:subscriber} salva il tempo di ricezione del messaggio.
+Come possibile notare, nonostante le mpi\_barrier, gli scostamenti di tempo tra 2 nodi durante i diversi tentativi effettuati (100), cambia notevolmente, arrivando a differenze fino ad un massimo di 296.659 microsecondi. 
+Questo rende il metodo appena mostrato altamente inaffidabile nel 
+misurare variazioni di tempi dell'ordine di decine di microsecondi. 
 
 
-\section{RTT}\label{sec:timeRTT}
+\subsection{RTT}\label{sec:timeRTT}
 
 Nonostante la sincronizzazione fosse idealmente il metodo più preciso per ottenere i tempi di invio-ricezione, essendo l'errore riscontrato, dello stesso ordine di grandezza dei tempi di ricezione, per alcuni test si è utilizzato un approccio che non richiedesse sincronizzazione. Si è scelto quindi di utilizzare il Round Trip Time (RTT).
-Il RTT è un metrica che viene solitamente utilizzata per misurare la latenza di una rete, e si basa sull'idea di calcolare il tempo che intercorre tra l'invio di un segnale e la ricezione della conferma di arrivo dello stesso. Ovviamente il valore ottenuto risulta nel caso ideale più che raddoppiato vista la necessità di un messaggio di risposta. Nel diagramma~\ref{fig:uml} non sarebbe stato possibile condurre questa misura, perchè un subscriber non può inviare un messaggio di risposta.
-Per farlo è stato necessario rivedere gli attori coinvolti, ed introdurre in quello che prima venivano chiamati publisher e subscriber, un publisher e un subscriber a testa.
+Questa è un metrica che viene solitamente utilizzata per misurare la latenza di una rete, e si basa sull'idea di calcolare il tempo che intercorre tra l'invio di un segnale e la ricezione della conferma di arrivo dello stesso. Ovviamente il valore ottenuto risulta nel caso ideale più che raddoppiato vista la necessità di un messaggio di risposta. Nel diagramma~\ref{fig:uml} non sarebbe stato possibile condurre questa misura, perchè un subscriber non può inviare un messaggio di risposta.
+Per farlo è stato necessario rivedere gli attori coinvolti, ed introdurre in quello che prima venivano chiamati publisher e subscriber, dei meccanismi di ascolto e risposta.
 Per semplificarne la comprensione viene riportato lo schema modificato:
 
 \begin{figure}[H]
@@ -137,9 +138,9 @@ Per semplificarne la comprensione viene riportato lo schema modificato:
 
 Ovviamente questo metodo può comportare qualche ritardo intrinseco di dover gestire due entità per ogni attore, ma sono tempi infinitesimali in confronto al tempo necessario per inviare il messaggio su rete (dove è stato usato questo approccio).
 
-\section{DataMiners}
-Considerando che ogni publisher ha generato in alcuni casi 10 mila messaggi, da inviare a tutti e 48 i subscriber, e per ogni protocollo di trasporto, si è arrivato ad avere per ogni test fino a $1'960'000$ messaggi con le relative metriche da processare. 
-Gli script python sono stati utili a organizzare e processare tutti questi dati oltre a generare tutti i grafici prodotti in questa tesi.
+\section{Python}
+Gli script python sono stati utili a organizzare e processare tutti i dati oltre a generare tutti i grafici prodotti in questa tesi, considerando che ogni publisher ha generato in ogni test circa 10 mila messaggi, da inviare a tutti e 48 i subscriber, e per ogni protocollo di trasporto, arrivando ad avere per ogni test fino a $1'960'000$ messaggi. 
+
 
 \section{Schema test}
 I test svolti per il modello di utilizzo e per la caratterizzazione di DDS in sistemi HPC sono stati diversi. Nello specifico sono state pensate 4 categorie di test che comprendessero diverse famiglie di problemi:

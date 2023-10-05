@@ -3,7 +3,7 @@ Data Distribution Service (DDS)\cite{DDS} e Real-Time Publish-Subscribe (RTPS)\c
 
 
 \section{Implementazione usasta}
-In particolare, DDS e RTPS sono due differenti protocolli da cui sono state proposte diverse implementazioni da diversi società e organizzazioni, come:
+In particolare, DDS e RTPS sono due differenti protocolli da cui sono state proposte diverse implementazioni da diversi vendor e produttori, come:
 \begin{itemize}
   \item FastDDS (eprosima)
   \item CycloneDDS (Oracle)
@@ -22,7 +22,7 @@ Data Distribution Service è un protocollo incentrato sullo scambio di dati per 
 
     \item Topic: collega i DataWriter con i DataReader. È univoco all'interno di un dominio DDS;\@
     
-    \item Dominio: utilizzato per collegare tutti i publisher e subscriber appartenenti a una o più domini di appartenenza, che scambiano dati sotto diversi topic. Il DomainParticipant funge da contenitore per altre entità DCPS, e svolge anche la funzione di costruttore di entità Publisher, Subscriber e Topic;\@
+    \item Dominio: utilizzato per collegare tutti i publisher e subscriber appartenenti a uno o più domini di appartenenza. Il DomainParticipant funge da contenitore per altre entità DCPS, e svolge anche la funzione di costruttore di entità Publisher, Subscriber e Topic;\@
 
     \item Partizione: costituisce un isolamento logico di entità all'interno dell'isolamento fisico offerto dal dominio;
 
@@ -70,13 +70,13 @@ Questo approccio distribuito per lo scambio dei dati tra vari attori utilizzando
   \label{fig:rmw_dds_common}
 \end{wrapfigure}
 ha deciso di usare questi strumenti introducendo un ulteriore livello che permette di usare diverse implementazioni di DDS. Questa idea è stata e sarà di grande ispirazione per il completamento di questo progetto.
-Nello specifico, è stata creata una libreria chiama rmw\_dds\_common(ros middleware) come mostrato nella~\ref{fig:rmw_dds_common}\footnote{L'implementazione di FastDDS vuole essere un esempio tra le diverse soluzioni disponibili per ROS2} sopra il quale la community ha creato le implementazioni di DDS desiderate, andando a creare così diverse possibilità di configurazione dello stesso servizio di distribuzione dati.
+Nello specifico, è stata creata una libreria chiama rmw\_dds\_common(ros middleware) come mostrato nella~\ref{fig:rmw_dds_common}\footnote{L'implementazione di FastDDS vuole essere un esempio tra le diverse soluzioni disponibili per ROS2} sopra il quale la community ha creato le implementazioni di DDS desiderate, permettendo così diverse possibilità di configurazione dello stesso servizio di distribuzione dati.
 Inoltre per cambiare tra le diverse versioni di DDS si deve semplicemente impostare una variabile di ambiente, rendendo il procedimento facile per tutti i possibili fruitori di ROS2. 
 
 Tuttavia è stato scelto di utilizzare direttamente l'implementazione DDS invece che \emph{Ros middlware} per i seguenti motivi:
 \begin{itemize}
     \item Potenzialità: ROS mette a disposizione solo alcuni degli strumenti resi disponibili dallo strato DDS, andando a limitare la possibilità di sfruttamento di tutte le impostazioni e QoS di FastDDS;
-    \item Granularità: oltre alla mancanza di alcune funzionalità, in ros sono predisposti dei pacchetti preconfigurati di entità. Per andare a studiare più approfonditamente gli strumenti su architetture diverse, è più pratico avere la possibilità di cambiare ogni piccola configurazione.
+    \item Granularità: in ROS sono predisposti dei pacchetti preconfigurati di entità, che risulta sconveniente per andare a caratterizzare questo strumento su architetture diverse, limitando la possibilità di configurazione.
     \item Flessibilità: Per andare a definire delle strutture dati di ROS, al fine di scambiare messaggi DDS usando il middleware offerto, era necessario creare diverse strutture dati che combaciassero con le interfacce ROS;
     % \item Diversa natura: In ROS, la maggior parte delle comunicazioni fatte sono intra-processo e raramente viene utilizzata una infrastruttura di rete, per andare a collegare tutti i nodi. Per questo sono maggiormente ottimizzate quel tipo di comunicazioni, piuttosto che quelle su rete, come in questo caso.
     \item Facilità di implementazione: Implementare completamente \emph{rmw\_dds\_common} richiedeva un impegno e uno studio non indifferente della architettura sottostante a ROS, che seppur ben documentata, sarebbe costata diverso tempo. 

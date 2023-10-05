@@ -1,13 +1,13 @@
 
 \chapter{Stato dell'arte}
-Al fine di poter operare correttamente, il Power Stack deve gestire e monitorare la potenza assorbita, le frequenze e le temperature di processori all'interno dei sistemi ad alte prestazioni. Questo deve poter essere fatto anche a diversi livelli come intero sistema, singoli nodi e singoli elementi all'interno dei nodi. E' quindi necessario poter 
+Al fine di poter operare correttamente, il Power Stack deve gestire e monitorare la potenza assorbita, le frequenze e le temperature di processori all'interno dei sistemi ad alte prestazioni. Questo deve poter essere fatto anche a diversi livelli come intero sistema, singoli nodi e singoli elementi all'interno dei nodi. Partendo dal livello più basso, è necessario poter accedere agli attuatori e sensori presenti nei core sia in modo diretto che 
 \setlength{\intextsep}{1pt} 
 \begin{wrapfigure}{r}{0.5\textwidth}
     \includegraphics[width=0.5\textwidth]{img/SoA.png}
     \centering
     \caption{Differenza tra le interfacce in-band e out-of-band}\label{fig:SoAinoutband}
 \end{wrapfigure}
-accedere agli attuatori e sensori presenti nei core sia in modo diretto che da ''remoto''. Normalmente per farlo ci sono due vie disponibili basate su interfacce differenti:
+da ''remoto''. Normalmente per farlo ci sono due vie disponibili basate su interfacce differenti:
 \begin{itemize}
     \item in-band
     \item out-of-band
@@ -75,7 +75,7 @@ Con Power Stack si intende un insieme di software che cooperando riescono a forn
 Il workflow o \emph{flusso di lavoro} è un insieme task che devono essere svolti per risolvere un determinato problema. Il workflow engine si occupa di analizzare le dipendenze e le richieste di risorse di ogni workflow e decide dinamicamente come dividerlo nei jobs che verranno successivamente assegnati al Job Scheduler. %Si occupa quindi di analizzare ed assegnare i diversi task a chi poi va ad eseguirli.
 
 \subsection{System Power Manager}
-Il System Power Manager si occupa di comunicare con tutti i Node Manager all'interno del sistema, per impostare eventuali limiti di potenza. Questi ultimi vengono solitamente impostati manualmente dagli amministratori di sistema, oppure in modo automatico comunicando con altri attori, come monitor e Node Manager. Una volta fissati i limiti, vengono monitorati i dati relativi a potenza ed energia, e controlla di conseguenza i budget, e la \emph{user-fairness}.
+Il System Power Manager si occupa di comunicare con tutti i Node Manager all'interno del sistema, per impostare eventuali limiti di potenza. Questi ultimi vengono solitamente impostati manualmente dagli amministratori di sistema, oppure in modo automatico comunicando con altri attori, come Monitor e Node Manager. Una volta fissati i limiti, vengono monitorati i dati relativi a potenza ed energia, e controlla di conseguenza i budget, e la \emph{user-fairness}.
 \subsection{Job scheduler}
 %Il System Manager
 Il job scheduler dopo aver ricevuto come input un insieme di jobs li schedula all'interno del sistema, e in modo indicativo decide quando schedulare ogni job, su quale nodo, e con quale power budget. In particolare la serie di compiti che si trova a svolgere è il seguente:
