@@ -1,11 +1,12 @@
 \chapter{Conclusioni}
-Per concludere, dopo aver presentato in modo esaustivo tutti gli strumenti utilizzati per eseguire i test, con obbiettivi e metodo di sperimentazione, sono stati mostrati i risultati degli esperimenti fatti. 
+Per concludere, dopo aver presentato in modo esaustivo tutti gli strumenti utilizzati per eseguire i test, con obbiettivi e metodi di sperimentazione, sono stati mostrati i risultati degli esperimenti fatti. 
 In primo luogo si è visto l'andamento esponenziale nella fase di discovery, in presenza di molteplici partecipanti, risolvibile tramite la sua implementazione di server.
-In secondo luogo, sono stati analizzati e caratterizzati i protocolli, di cui il più performante si è rilevato essere quello di Shared Memory con una latenza media di ricezione messaggi di appena \SI{6.72}{\micro\second}, utilizzabile però solo in presenza di memorie condivise.
-Al secondo posto troviamo UDP con \SI{23.70}{\micro\second} e UDP Multicast con \SI{24.37}{\micro\second}. Per ultimo TCP con \SI{30.94}{\micro\second} di media, che però offre garanzia di ricezione. Escludendo la shared memory, per le comunicazioni tramite rete si sono raggiunti throughput di 7.63 MB/s con frequenze di invio a 476 KHz.
+In secondo luogo, sono stati analizzati e caratterizzati i protocolli, tra cui il più performante si è rilevato essere quello di Shared Memory con una latenza media di ricezione messaggi di appena \SI{6.72}{\micro\second}, utilizzabile però solo in presenza di memorie condivise.
+Al secondo posto troviamo UDP con \SI{23.7}{\micro\second} ed a seguire UDP Multicast con \SI{24.37}{\micro\second}, svantaggiato però dalla modalità utilizzata. Per ultimo TCP con \SI{30.94}{\micro\second} di media, che però offre garanzia di ricezione. Escludendo la shared memory, per le comunicazioni tramite rete si sono raggiunti throughput di 7.63 MB/s con frequenze di invio a 476 KHz.
 
-Per quanto concerne al test sul partizionamento dello scambio di informazioni, si è visto come i domini, sono quelli con minore impatto sulle performance, seguito dai topic ed infine partizioni. Inoltre, le minime differenze sia in termini di performance, che di tempi, nell'usare le wildcards, permette un ampio uso di comunicazioni di tipo gerarchico.
-Infine, insieme a questi risultati è stato fornito anche un modello di utilizzo di questo middleware caratterizzato per HPC.
+Per quanto concerne al test sul partizionamento e sulle wildcards, si è visto come i domini sono quelli con minore impatto sulle performance, seguito dai topic ed infine partizioni. Inoltre, le minime differenze sia in termini di cicli, che di tempi, nell'usare le wildcards, permette un ampio uso di comunicazioni di tipo gerarchico.
+Infine, insieme a questi risultati è stato fornito anche un modello di utilizzo di questo middleware in ambienti HPC.
 
-Come ultimo passo, sono stati mostrati tutti i prototipi di Power Stack, insieme alle sue strutture, che comunicano tramite il middleware DDS chiamato REGALE Library prodotto in collaborazione i membri del progetto.
+Come ultimo passo, sono stati mostrati i middleware per la comunicazione basato su DDS, ed i prototipi di Power stack, entrambi prodotti in collaborazione con i membri del progetto EuroHPC JU REGALE.
+
 %TODO: ringraziamenti? 

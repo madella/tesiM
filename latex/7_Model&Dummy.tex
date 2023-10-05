@@ -1,16 +1,16 @@
 \chapter{Realizzazione dei prototipi di Power Stack}
-Nel corso di questa tesi con la collaborazione dei membri del progetto REGALE, come Cineca\cite{Cineca}, E4\cite{E4} e BSC\cite{BSC} sono stati sviluppati i middleware ed i prototipi di componenti del modello di Power Stack per HPC.
-Questi ultimi oltre a fornire una prova delle potenzialità del middleware di DDS, sono utili anche come esempio per una sua effettiva implementazione all'interno dei software mostrati nel capitolo~\ref{chap:4_REGALE} che vogliono essere introdotti nell'infrastruttura.
+Nel corso di questa tesi con la collaborazione dei membri del progetto REGALE, come Cineca\cite{Cineca}, E4\cite{E4} e BSC\cite{BSC} sono stati sviluppati i middleware ed i prototipi di Power Stack per HPC. 
+Questi ultimi oltre a fornire una prova della fattibilità nell'utilizzare una infrastruttura DDS come mezzo di comunicazione, sono utili anche come esempio per tutti quei software che devono essere introdotti nel progetto, mostrati nel capitolo~\ref{chap:4_REGALE}.
 In merito a questo, nello schema~\ref{fig:schema_global_dummy_implementati} viene mostrato lo stato di avanzamento del Power Stack, illustrando quali di questi sono implementati e operativi, e quali in via di sviluppo.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{./img/SchemaPowerStack_perdummy.drawio.png}
+    \includegraphics[width=0.50\textwidth]{./img/SchemaPowerStack_perdummy.drawio.png}
     \caption{Schema componenti sviluppati: in verde completato, in rosso ancora da sviluppare, in grigio non previsto}
     \label{fig:schema_global_dummy_implementati}
 \end{figure}
-L'infrastruttura DDS creata, chiamata \emph{REGALE Library}\cite{RegaleLibrary} al momento permette di utilizzare i vari tipi di comunicazione, configurazioni di qos, e anche vari tipi di dati scambiati, tutti impostabile tramite file \textbf{XML}.
-I prototipi invece, sono dei programmi (c++) che vanno a simulare uno scambio di informazioni realistico. Al momento per motivi di semplicità utilizzano dati di tipo \emph{uint32\_t} ed il loro comportamento si può riassumere nel seguente modo.
+L'infrastruttura DDS creata, chiamata \emph{REGALE Library}\cite{RegaleLibrary} al momento permette di utilizzare i vari tipi di comunicazione, configurazioni delle QoS, e anche vari tipi di dati scambiati, tutto impostabile tramite file \textbf{XML}.
+I prototipi invece, sono dei programmi (c++) che vanno a simulare uno scambio di informazioni realistico. Al momento per motivi di semplicità utilizzano il protocollo \emph{UDP} e dati di tipo \emph{uint32\_t}. Il loro comportamento è riassumibile nel seguente modo.
 
 \subsection*{Implementazione Job Scheduler}
 Il JS interroga ogni 10 secondi il SPM per le informazioni sui servizi e la potenza totale del cluster riportandolo a schermo. Successivamente  imposta il limite di potenza del cluster con un valore casuale tra 1000 e 1500.
@@ -28,7 +28,7 @@ Il SPM nella sua implementazione server aspetta per le richieste in entrata. Al 
 %  ? Inoltre quando riceve una GET\_POWER il SPM inoltra la richiesta al NM per ottenere la sua potenza prima di rispondere alla richiesta. 
 
 \subsection*{Implementazione Node manager}
-Il NM mentre ogni 30 secondi manda i dati al Monitor, aspetta per le richieste in entrata. Le richieste che accetta sono:
+Il NM mentre ogni 30 secondi manda i dati al Monitor, aspetta per le richieste in entrata. Le richieste accettate sono:
 \begin{itemize}
     \item GET\_INFO\_NODE
     \item GET\_POWER\_NODE

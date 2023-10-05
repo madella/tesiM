@@ -30,7 +30,7 @@ Data Distribution Service è un protocollo incentrato sullo scambio di dati per 
 Inoltre DDS definisce le cosiddette Qualità di Servizio (QoS policy) che servono configurare il comportamento di ognuno di questi attori.
 
 
-\section{RTPS}
+\section{RTPS}\label{sec:rtps}
 Real-Time Publisher Subscribe è un middleware\footnote{Formalmente è un protocollo a se stante, utilizzato da DDS come middleware} utilizzato da DDS per gestire la comunicazione su diversi protocolli di rete come UDP/TCP e Shared Memory. Il suo principale scopo è quello di inviare messaggi real-time, con un approccio best-effort e cercando di massimizzare l'efficienza. E' inoltre progettato per fornire strumenti per la comunicazione unicast e multicast. Le principali entità descritte da RTPS sono:
 \begin{itemize}
     \item RTPSWriter: endpoint capace di inviare dati;
